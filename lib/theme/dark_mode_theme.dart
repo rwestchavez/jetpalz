@@ -9,9 +9,10 @@ class darkModeTheme {
   static const Color primaryText = Color(0xFFFFFFFF);
   static const Color secondaryText = Color(0xFFA1A0A3);
   static const Color error = Color(0xFFE65454);
+  static const Color onSurface = Color(0xFFFFFFFF);
+
   static const Color onPrimary = Color(0xFFFFFFFF);
   static const Color onSecondary = Color(0xFFFFFFFF);
-  static const Color onSurface = Color(0xFFFFFFFF);
   static const Color onError = Color(0xFFFFFFFF);
 
   // ThemeData for dark mode

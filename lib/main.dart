@@ -45,10 +45,24 @@ class MainState extends State<Main> {
     return Scaffold(
       body: IndexedStack(index: _index, children: screens),
       bottomNavigationBar: NavigationBar(
+        backgroundColor: Theme.of(context).colorScheme.surface,
+        labelBehavior: NavigationDestinationLabelBehavior.onlyShowSelected,
         destinations: const [
-          NavigationDestination(icon: Icon(Icons.chat_bubble), label: "Chat"),
-          NavigationDestination(icon: Icon(Icons.home), label: "Feed"),
-          NavigationDestination(icon: Icon(Icons.person), label: "Profile")
+          NavigationDestination(
+            icon: Icon(Icons.chat_bubble_outline),
+            label: "Chat",
+            selectedIcon: Icon(Icons.chat_bubble),
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.home_outlined),
+            label: "Feed",
+            selectedIcon: Icon(Icons.home),
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.person_outline),
+            label: "Profile",
+            selectedIcon: Icon(Icons.person),
+          )
         ],
         onDestinationSelected: (value) {
           setState(
