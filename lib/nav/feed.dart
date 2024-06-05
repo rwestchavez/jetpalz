@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../components/my_appbar.dart';
+import '../components/my_appBar.dart';
 
 class Feed extends StatelessWidget {
   const Feed({super.key});
@@ -12,22 +12,25 @@ class Feed extends StatelessWidget {
         title: "Feed",
         leading: IconButton(
           icon: const Icon(Icons.notifications),
+          iconSize: 48,
+          color: Colors.grey,
           onPressed: () {},
         ),
         actions: [
           Padding(
               padding: const EdgeInsets.only(right: 24),
               child: IconButton(
-                  onPressed: () {
-                    showModalBottomSheet(
-                        context: context,
-                        builder: (BuildContext context) {
-                          return const BottomSheeter();
-                        });
-                  },
-                  icon: const Icon(Icons.settings),
-                  iconSize: 48,
-                  color: const Color.fromRGBO(32, 23, 43, 0.5)))
+                onPressed: () {
+                  showModalBottomSheet(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return const BottomSheeter();
+                      });
+                },
+                icon: const Icon(Icons.settings),
+                iconSize: 48,
+                color: Colors.grey,
+              ))
         ],
       ),
     );

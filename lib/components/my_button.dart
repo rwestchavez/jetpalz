@@ -1,0 +1,25 @@
+import 'package:flutter/material.dart';
+
+class MyButton extends StatelessWidget {
+  final Function() onPressed;
+  final String text;
+
+  const MyButton({super.key, required this.onPressed, required this.text});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      child: FilledButton(
+        onPressed: onPressed,
+        style: FilledButton.styleFrom(
+            foregroundColor: Theme.of(context).colorScheme.onPrimary,
+            backgroundColor: Theme.of(context).colorScheme.primary,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12.0),
+            )),
+        child: Text(text),
+      ),
+    );
+  }
+}

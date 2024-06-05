@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import '../components/my_appbar.dart';
+import '../components/my_appBar.dart';
+import '../components/my_button.dart';
 
 class Chat extends StatelessWidget {
   const Chat({super.key});
@@ -7,7 +8,11 @@ class Chat extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(),
+      body: Container(
+          child: MyButton(
+        onPressed: () {},
+        text: "Hello",
+      )),
       appBar: MyAppBar(
         title: "Chat",
       ),

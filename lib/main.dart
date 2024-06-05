@@ -1,11 +1,15 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:jet_palz/components/my_appbar.dart';
+import 'package:jet_palz/firebase_options.dart';
 import 'nav/chat.dart';
 import 'nav/feed.dart';
 import 'nav/profile.dart';
-import 'components/my_appbar.dart';
+import 'theme/dark_mode_theme.dart';
+import 'theme/light_mode_theme.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   runApp(const MyApp());
 }
 
@@ -17,11 +21,10 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flutter Demo',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
-      ),
       home: const Main(),
+      theme: lightModeTheme.themeData,
+      darkTheme: darkModeTheme.themeData,
+      debugShowCheckedModeBanner: false,
     );
   }
 }
@@ -44,7 +47,7 @@ class MainState extends State<Main> {
       bottomNavigationBar: NavigationBar(
         destinations: const [
           NavigationDestination(icon: Icon(Icons.chat_bubble), label: "Chat"),
-          NavigationDestination(icon: Icon(Icons.home), label: "Home"),
+          NavigationDestination(icon: Icon(Icons.home), label: "Feed"),
           NavigationDestination(icon: Icon(Icons.person), label: "Profile")
         ],
         onDestinationSelected: (value) {
