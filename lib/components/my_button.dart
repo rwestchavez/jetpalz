@@ -13,8 +13,8 @@ class MyButton extends StatelessWidget {
       child: FilledButton(
         onPressed: onPressed,
         style: FilledButton.styleFrom(
-            foregroundColor: Theme.of(context).colorScheme.onPrimary,
-            backgroundColor: Theme.of(context).colorScheme.primary,
+            foregroundColor: Theme.of(context).colorScheme.onSecondary,
+            backgroundColor: Theme.of(context).colorScheme.secondary,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12.0),
             )),
