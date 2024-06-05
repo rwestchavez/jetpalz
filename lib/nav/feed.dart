@@ -1,5 +1,11 @@
+import 'package:animated_custom_dropdown/custom_dropdown.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import '../components/my_appBar.dart';
+import '../constants.dart';
+import '../models/venture_model.dart';
+import '../models/user_model.dart';
 
 class Feed extends StatelessWidget {
   const Feed({super.key});
@@ -10,9 +16,13 @@ class Feed extends StatelessWidget {
       body: Container(),
       floatingActionButton: FloatingActionButton(
           onPressed: () => showModalBottomSheet(
+                isScrollControlled: true,
                 context: context,
                 builder: (BuildContext context) {
-                  return const CreateVenture();
+                  return FractionallySizedBox(
+                      heightFactor:
+                          0.75, // Adjust this factor to control the height
+                      child: CreateVenture());
                 },
               ),
           backgroundColor: Theme.of(context).colorScheme.secondary,
@@ -28,6 +38,7 @@ class Feed extends StatelessWidget {
           IconButton(
               onPressed: () {
                 showModalBottomSheet(
+                    // Set to true to allow the modal sheet to take up more height
                     context: context,
                     builder: (BuildContext context) {
                       return const Filter();
@@ -55,17 +66,211 @@ class Filter extends StatelessWidget {
   }
 }
 
-class CreateVenture extends StatelessWidget {
+class CreateVenture extends StatefulWidget {
   const CreateVenture({Key? key}) : super(key: key);
 
   @override
+  State<CreateVenture> createState() => _CreateVentureWidgetState();
+}
+
+class _CreateVentureWidgetState extends State<CreateVenture> {
+  final TextEditingController textController = TextEditingController();
+  String? description = "";
+  String? country = "";
+  String? industry = "";
+  int? people = 0;
+  String? month = "";
+  int? weeks = 0;
+
+  @override
   Widget build(BuildContext context) {
-    return Container(
-        decoration: const BoxDecoration(
-            borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(25.0), // Adjust radius as needed
-          topRight: Radius.circular(25.0),
-        )),
-        child: const Center(child: Text("Nope")));
+    return GestureDetector(
+      onTap: () => FocusScope.of(context).unfocus(),
+      child: Container(
+        width: double.infinity,
+        height: double.infinity,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(24.0),
+        ),
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: EdgeInsets.all(16.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.max,
+              children: [
+                Row(
+                  children: [
+                    IconButton(
+                      icon: Icon(
+                        Icons.close,
+                      ),
+                      onPressed: () => Navigator.pop(context)
+                      // Add logic to close the widget
+                      ,
+                    ),
+                    Text(
+                      'Create Venture',
+                      style: TextStyle(
+                        fontSize: 20.0,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    Expanded(
+                      child: Align(
+                        alignment: Alignment.centerRight,
+                        child: TextButton(
+                          onPressed: () async {
+                            final CollectionReference ref = FirebaseFirestore
+                                .instance
+                                .collection('ventures');
+                            await ref.add({
+                              'destination': country,
+                              'creator':
+                                  "Bob", // add creator iin here. Need authentication
+                              'industry': industry,
+                              'description': description,
+                              'members':
+                                  [], // you would include the person who made it there, so it would be members: [user], and then when s someone joins, then it will simply just add to the array
+                              'starting_month': month,
+                              'estimated_length': weeks,
+                              'created_time': DateTime.now(),
+                              'num_people': people,
+                            });
+                            Navigator.pop(context);
+                          },
+                          child: Text(
+                            'Post',
+                            style: TextStyle(
+                              fontSize: 18.0,
+                              color: Colors.blue,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(
+                  height: 12,
+                ),
+
+                TextField(
+                  onChanged: (value) => description = value,
+                  controller: textController,
+                  minLines: 1,
+                  maxLines: null,
+                  decoration: InputDecoration(
+                    enabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide(
+                          color: Colors.grey
+                              .withOpacity(0.3)), // Light border color
+                      borderRadius: BorderRadius.circular(8.0),
+                    ),
+                    hintText: "Enter Description",
+                    hintStyle: TextStyle(
+                        color: Colors.grey), // Set the color of the hint text
+
+                    contentPadding:
+                        EdgeInsets.symmetric(vertical: 12.0, horizontal: 16.0),
+                    border: OutlineInputBorder(
+                      borderSide: BorderSide(
+                          color: Colors.grey
+                              .withOpacity(0.0)), // Light border color
+                      borderRadius: BorderRadius.circular(8.0),
+                    ),
+                  ),
+                ),
+                SizedBox(
+                  height: 12,
+                ),
+                // add items here, onto the row
+                CustomDropdown<String>(
+                  decoration: CustomDropdownDecoration(
+                    closedBorder: Border.all(
+                      color: Colors.grey.withOpacity(0.3), // Light border color
+                    ),
+                  ),
+                  hintText: 'Select Country',
+                  items: countries,
+                  onChanged: (value) {
+                    country = value;
+                    print('changing value to: $value');
+                  },
+                ),
+                SizedBox(
+                  height: 12,
+                ),
+
+                CustomDropdown<String>(
+                  decoration: CustomDropdownDecoration(
+                    closedBorder: Border.all(
+                      color: Colors.grey.withOpacity(0.3), // Light border color
+                    ),
+                  ),
+                  hintText: 'Select Industry',
+                  items: industries,
+                  onChanged: (value) {
+                    industry = value;
+                    print('changing value to: $value');
+                  },
+                ),
+                SizedBox(
+                  height: 12,
+                ),
+
+                CustomDropdown<String>(
+                  decoration: CustomDropdownDecoration(
+                    closedBorder: Border.all(
+                      color: Colors.grey.withOpacity(0.3), // Light border color
+                    ),
+                  ),
+                  hintText: 'Number of people',
+                  items: numbers,
+                  onChanged: (value) {
+                    people = int.parse(value!);
+                    print('changing value to: $value');
+                  },
+                ),
+                SizedBox(
+                  height: 12,
+                ),
+
+                CustomDropdown<String>(
+                  decoration: CustomDropdownDecoration(
+                    closedBorder: Border.all(
+                      color: Colors.grey.withOpacity(0.3), // Light border color
+                    ),
+                  ),
+                  hintText: 'Starting month',
+                  items: months,
+                  onChanged: (value) {
+                    month = value;
+                    print('changing value to: $value');
+                  },
+                ),
+                SizedBox(
+                  height: 12,
+                ),
+
+                CustomDropdown<String>(
+                  decoration: CustomDropdownDecoration(
+                    closedBorder: Border.all(
+                      color: Colors.grey.withOpacity(0.3), // Light border color
+                    ),
+                  ),
+                  hintText: 'Estimated weeks',
+                  items: numbers,
+                  onChanged: (value) {
+                    weeks = int.parse(value!);
+                    print('changing value to: $value');
+                  },
+                ),
+                // add more text here for description. So text controller with textbox
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }
