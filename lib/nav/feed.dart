@@ -1,5 +1,6 @@
 import 'package:animated_custom_dropdown/custom_dropdown.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import '../components/my_appBar.dart';
@@ -120,17 +121,21 @@ class _CreateVentureWidgetState extends State<CreateVenture> {
                         alignment: Alignment.centerRight,
                         child: TextButton(
                           onPressed: () async {
+                            final currentUser =
+                                FirebaseAuth.instance.currentUser;
+                            final userDoc = FirebaseFirestore.instance
+                                .collection('users')
+                                .doc(currentUser!.uid);
+
                             final CollectionReference ref = FirebaseFirestore
                                 .instance
                                 .collection('ventures');
                             await ref.add({
                               'destination': country,
-                              'creator':
-                                  "Bob", // add creator iin here. Need authentication
+                              'creator': userDoc,
                               'industry': industry,
                               'description': description,
-                              'members':
-                                  [], // you would include the person who made it there, so it would be members: [user], and then when s someone joins, then it will simply just add to the array
+                              'members': [userDoc],
                               'starting_month': month,
                               'estimated_length': weeks,
                               'created_time': DateTime.now(),
