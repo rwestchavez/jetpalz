@@ -35,6 +35,20 @@ class _AuthScreenState extends State<AuthScreen> {
         email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
       );
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(userCredential.user!.uid)
+          .set({
+        'email': userCredential.user!.email,
+        'display_name': '', // Add display name if needed
+        'photo_url': '', // Add photo URL if needed
+        'created_time': Timestamp.now(), // Add creation time
+        'profession': '', // Add profession if needed
+        'countries_interest': [], // Add countries interest if needed
+        'professions_interest': [], // Add professions interest if needed
+        'description': '', // Add description if needed
+        'current_ventures': [], // Add current ventures if needed
+      });
       print("User signed up: ${userCredential.user!.email}");
     } catch (e) {
       print(e);
@@ -47,23 +61,9 @@ class _AuthScreenState extends State<AuthScreen> {
         email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
       );
-      await FirebaseFirestore.instance
-          .collection('users')
-          .doc(userCredential.user!.uid)
-          .set({
-        'email': userCredential.user!.email,
-        'displayName': '', // Add display name if needed
-        'photoUrl': '', // Add photo URL if needed
-        'createdTime': Timestamp.now(), // Add creation time
-        'profession': '', // Add profession if needed
-        'countriesInterest': [], // Add countries interest if needed
-        'professionsInterest': [], // Add professions interest if needed
-        'description': '', // Add description if needed
-        'currentVentures': [], // Add current ventures if needed
-      });
       print("User signed in: ${userCredential.user!.email}");
     } catch (e) {
-      print(e);
+      print("error: $e");
     }
   }
 

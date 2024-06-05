@@ -1,55 +1,55 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class VentureModel {
-  final String destination;
-  final DocumentReference creator;
-  final String industry;
-  final String description;
-  final List<DocumentReference> members;
-  final String startingMonth;
-  final int estimatedLength;
-  final Timestamp createdTime;
-  final int numPeople;
+  final String? country;
+  final DocumentReference? creator;
+  final String? industry;
+  final String? description;
+  final List<DocumentReference>? memberList;
+  final String? startingMonth;
+  final int? estimatedWeeks;
+  final Timestamp? createdTime;
+  final int? maxPeople;
 
   VentureModel({
-    required this.destination,
+    required this.country,
     required this.creator,
     required this.industry,
     required this.description,
-    required this.members,
+    required this.memberList,
     required this.startingMonth,
-    required this.estimatedLength,
+    required this.estimatedWeeks,
     required this.createdTime,
-    required this.numPeople,
+    required this.maxPeople,
   });
 
   // Factory method to create a VentureModel from a Firestore document
   factory VentureModel.fromDocument(DocumentSnapshot doc) {
     return VentureModel(
-      destination: doc['destination'],
+      country: doc['country'],
       creator: doc['creator'],
       industry: doc['industry'],
       description: doc['description'],
-      members: List<DocumentReference>.from(doc['members']),
+      memberList: List<DocumentReference>.from(doc['member_list']),
       startingMonth: doc['starting_month'],
-      estimatedLength: doc['estimated_length'],
+      estimatedWeeks: doc['estimated_weeks'],
       createdTime: doc['created_time'],
-      numPeople: doc['num_people'],
+      maxPeople: doc['max_people'],
     );
   }
 
   // Method to convert a VentureModel to a map for Firestore
   Map<String, dynamic> toMap() {
     return {
-      'destination': destination,
+      'country': country,
       'creator': creator,
       'industry': industry,
       'description': description,
-      'members': members,
+      'member_list': memberList,
       'starting_month': startingMonth,
-      'estimated_length': estimatedLength,
+      'estimated_weeks': estimatedWeeks,
       'created_time': createdTime,
-      'num_people': numPeople,
+      'max_people': maxPeople,
     };
   }
 }

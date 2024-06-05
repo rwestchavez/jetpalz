@@ -6,7 +6,7 @@ class UserModel {
   final String photoUrl;
   final String uid;
   final Timestamp createdTime;
-  final double profession;
+  final String profession;
   final List<String> countriesInterest;
   final List<String> professionsInterest;
   final String description;
@@ -29,7 +29,7 @@ class UserModel {
   factory UserModel.fromDocument(DocumentSnapshot doc) {
     return UserModel(
       email: doc['email'],
-      displayName: doc['displayName'],
+      displayName: doc['display_name'],
       photoUrl: doc['photo_url'],
       uid: doc['uid'],
       createdTime: doc['created_time'],
@@ -45,7 +45,7 @@ class UserModel {
   Map<String, dynamic> toMap() {
     return {
       'email': email,
-      'displayName': displayName,
+      'display_name': displayName,
       'photo_url': photoUrl,
       'uid': uid,
       'created_time': createdTime,

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:jet_palz/components/my_venture.dart';
 import '../components/my_appBar.dart';
 
 class Profile extends StatelessWidget {

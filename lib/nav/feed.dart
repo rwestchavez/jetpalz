@@ -2,11 +2,11 @@ import 'package:animated_custom_dropdown/custom_dropdown.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
+import 'package:provider/provider.dart';
+import '../ListViewStuff/listview_widget.dart';
+import '../ListViewStuff/venture_provider.dart';
 import '../components/my_appBar.dart';
 import '../constants.dart';
-import '../models/venture_model.dart';
-import '../models/user_model.dart';
 
 class Feed extends StatelessWidget {
   const Feed({super.key});
@@ -14,7 +14,7 @@ class Feed extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(),
+      body: Page2(),
       floatingActionButton: FloatingActionButton(
           onPressed: () => showModalBottomSheet(
                 isScrollControlled: true,
@@ -135,11 +135,11 @@ class _CreateVentureWidgetState extends State<CreateVenture> {
                               'creator': userDoc,
                               'industry': industry,
                               'description': description,
-                              'members': [userDoc],
+                              'member_list': [userDoc],
                               'starting_month': month,
-                              'estimated_length': weeks,
+                              'estimated_weeks': weeks,
                               'created_time': DateTime.now(),
-                              'num_people': people,
+                              'max_people': people,
                             });
                             Navigator.pop(context);
                           },
@@ -278,4 +278,25 @@ class _CreateVentureWidgetState extends State<CreateVenture> {
       ),
     );
   }
+}
+
+class Page2 extends StatefulWidget {
+  const Page2({Key? key}) : super(key: key);
+
+  @override
+  _Page2State createState() => _Page2State();
+}
+
+class _Page2State extends State<Page2> {
+  @override
+  Widget build(BuildContext context) => ChangeNotifierProvider(
+        create: (context) => VentureProvider(),
+        child: Scaffold(
+          body: Consumer<VentureProvider>(
+            builder: (context, usersProvider, _) => ListViewWidget(
+              usersProvider: usersProvider,
+            ),
+          ),
+        ),
+      );
 }
