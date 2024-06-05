@@ -131,7 +131,7 @@ class _CreateVentureWidgetState extends State<CreateVenture> {
                                 .instance
                                 .collection('ventures');
                             await ref.add({
-                              'destination': country,
+                              'country': country,
                               'creator': userDoc,
                               'industry': industry,
                               'description': description,

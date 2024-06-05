@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:jet_palz/components/my_button.dart';
 
 import '../components/my_venture.dart';
 import 'venture_provider.dart';
@@ -46,81 +47,140 @@ class _ListViewWidgetState extends State<ListViewWidget> {
 
   @override
   Widget build(BuildContext context) => ListView(
-        //its not a listview builder since you already know the amount of items you are getting and you dont need them to be loaded dynamically.
         controller: scrollController,
         padding: EdgeInsets.all(12),
         children: [
-          ...widget
-              .usersProvider // const otherNumbers = [0, ...numbers, 4]; // Becomes [0, 1, 2, 3, 4] when numbers = [1,2,3]
-              .ventures // creates a list of listtiles from the list of objects.
-              .map((venture) {
-            return Container(
-              child: Column(
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          ...widget.usersProvider.ventures
+              .map(
+                (venture) => Container(
+                  margin: EdgeInsets.only(bottom: 20.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text("hello there"),
                       Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text(
-                            '${venture.memberList!.length} / ${venture.maxPeople}',
+                          Text("${venture.country}",
+                              style: TextStyle(
+                                  fontWeight: FontWeight.w900, fontSize: 30)),
+                          Row(
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.only(right: 8),
+                                child: Text(
+                                  '${venture.memberList!.length} / ${venture.maxPeople}',
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 20),
+                                ),
+                              ),
+                              Icon(Icons.people_alt),
+                            ],
                           ),
-                          Icon(Icons.people_alt),
+                        ],
+                      ),
+                      Container(
+                        constraints: BoxConstraints(maxWidth: 300.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            FutureBuilder<DocumentSnapshot>(
+                              future: venture.creator!.get(),
+                              builder: (context, snapshot) {
+                                if (snapshot.connectionState ==
+                                    ConnectionState.waiting) {
+                                  return CircularProgressIndicator();
+                                } else if (snapshot.hasError) {
+                                  return Text('Error: ${snapshot.error}');
+                                } else if (snapshot.hasData) {
+                                  var creatorData = snapshot.data?.data()
+                                      as Map<String, dynamic>?;
+                                  return Text(
+                                      creatorData?['display_name'] ?? "error",
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.w700,
+                                          fontSize: 20));
+                                } else {
+                                  return Text('Unkheeeon');
+                                }
+                              },
+                            ),
+                            Row(
+                              children: [
+                                Text("Profession",
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 15)),
+                                Padding(
+                                  padding: const EdgeInsets.only(left: 8),
+                                  child: Text("${venture.industry}"),
+                                )
+                              ],
+                            )
+                          ],
+                        ),
+                      ),
+                      Text(venture.description!),
+                      SizedBox(
+                        height: 24,
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Expanded(
+                            child: Container(
+                              alignment: Alignment.centerLeft,
+                              child: Container(
+                                constraints: BoxConstraints(maxWidth: 150),
+                                child: MyButton(
+                                  onPressed: () {},
+                                  text: 'Join',
+                                ),
+                              ),
+                            ),
+                          ),
+                          Padding(
+                            padding: EdgeInsets.only(right: 0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: [
+                                    Text(
+                                      'Month ',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.w700,
+                                      ),
+                                    ),
+                                    Text(
+                                      '${venture.startingMonth}',
+                                    ),
+                                  ],
+                                ),
+                                Row(
+                                  children: [
+                                    Text(
+                                      'Duration ',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.w700,
+                                      ),
+                                    ),
+                                    Text(
+                                      '${venture.estimatedWeeks}',
+                                    ),
+                                    Text(" Weeks")
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
                         ],
                       ),
                     ],
                   ),
-                  Container(
-                    constraints: BoxConstraints(maxWidth: 300.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        FutureBuilder<DocumentSnapshot>(
-                          future: venture.creator!.get(),
-                          builder: (context, snapshot) {
-                            if (snapshot.connectionState ==
-                                ConnectionState.waiting) {
-                              return CircularProgressIndicator();
-                            } else if (snapshot.hasError) {
-                              return Text('Error: ${snapshot.error}');
-                            } else if (snapshot.hasData) {
-                              var creatorData = snapshot.data?.data()
-                                  as Map<String, dynamic>?;
-                              return Text(
-                                  creatorData?['display_name'] ?? "error");
-                            } else {
-                              return Text('Unknown');
-                            }
-                          },
-                        ),
-                        Text(venture.industry!),
-                      ],
-                    ),
-                  ),
-                  Text(venture.description!),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      ElevatedButton(
-                        onPressed: () {},
-                        child: Text('Leave'),
-                      ),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text('Month ${venture.startingMonth}'),
-                            Text('Length ${venture.estimatedWeeks}'),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            );
-          }).toList(),
+                ),
+              )
+              .toList(),
           if (widget.usersProvider.hasNext)
             Center(
               child: GestureDetector(
