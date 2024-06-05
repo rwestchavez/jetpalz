@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "416263953272",
+    "project_id": "jetpalz",
+    "storage_bucket": "jetpalz.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:416263953272:android:1ea47e73ee31a35516c68d",
+        "android_client_info": {
+          "package_name": "com.jetpalz.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD_l6cTYMSn-6IY1mS6P97IcTovF_pUYyA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
