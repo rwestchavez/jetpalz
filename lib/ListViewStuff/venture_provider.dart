@@ -110,7 +110,7 @@ class VentureProvider extends ChangeNotifier {
       _hasNext = filteredVentures.length == documentLimit;
 
       notifyListeners();
-    } catch (error) {
+    } catch (error) 
       _errorMessage = error.toString();
       notifyListeners();
     }
