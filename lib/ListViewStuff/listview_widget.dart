@@ -48,12 +48,15 @@ class _ListViewWidgetState extends State<ListViewWidget> {
   @override
   Widget build(BuildContext context) => ListView(
         controller: scrollController,
-        padding: EdgeInsets.all(12),
         children: [
           ...widget.usersProvider.ventures
               .map(
                 (venture) => Container(
-                  margin: EdgeInsets.only(bottom: 20.0),
+                  padding: EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                        width: 1, color: Color.fromARGB(255, 214, 214, 214)),
+                  ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
