@@ -9,21 +9,21 @@ class AppState extends ChangeNotifier {
   // Getter to access the singleton instance
   factory AppState() => _instance;
 
-  List<String> ventureCountries = [];
-  List<String> ventureIndustries = [];
+  String? ventureCountry;
+  String? ventureIndustry;
   int? maxPeople;
   String? ventureMonth;
   int? estimatedWeeks;
 
   void updateFilters({
-    required List<String> countries,
-    required List<String> industries,
+    String? country,
+    String? industry,
     int? people,
     String? month,
     int? weeks,
   }) {
-    ventureCountries = countries;
-    ventureIndustries = industries;
+    ventureCountry = country;
+    ventureIndustry = industry;
     maxPeople = people;
     ventureMonth = month;
     estimatedWeeks = weeks;

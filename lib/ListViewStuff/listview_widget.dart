@@ -2,7 +2,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:jet_palz/components/my_button.dart';
 
 import '../app_state.dart';
-import '../components/my_venture.dart';
 import 'venture_provider.dart';
 import 'package:flutter/material.dart';
 
@@ -52,12 +51,12 @@ class _ListViewWidgetState extends State<ListViewWidget> {
   @override
   Widget build(BuildContext context) {
     print('ListViewWidget rebuilding...');
-    print(widget.usersProvider.filteredVentures); // Add print statement here
+    print(widget.usersProvider.ventures); // Add print statement here
 
     return ListView(
       controller: scrollController,
       children: [
-        ...widget.usersProvider.filteredVentures
+        ...widget.usersProvider.ventures
             .map(
               (venture) => Container(
                 padding: EdgeInsets.all(12),
