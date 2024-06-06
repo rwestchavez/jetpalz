@@ -45,17 +45,20 @@ class _FilterVentureState extends State<FilterVenture> {
 
   void resetFilters() {
     setState(() {
+      print(peopleController.value);
+
       selectedCountries = [];
       selectedIndustries = [];
-      selectedPeople = null;
-      selectedMonth = null;
-      selectedWeeks = null;
+      selectedPeople;
+      selectedMonth;
+      selectedWeeks;
 
-      peopleController.value = null;
-      monthController.value = null;
+      peopleController.value;
+      monthController.value;
       weeksController.value = null;
       countryController.clear();
       industryController.clear();
+      print(peopleController.value);
     });
   }
 
@@ -120,7 +123,7 @@ class _FilterVentureState extends State<FilterVenture> {
                       items: countries,
                       onListChanged: (selected) {
                         selectedCountries = selected;
-                        print('changing value to: $selected');
+                        print('changing countries value to: $selected');
                       },
                     ),
                     const SizedBox(height: 12),
@@ -136,7 +139,7 @@ class _FilterVentureState extends State<FilterVenture> {
                       items: industries,
                       onListChanged: (selected) {
                         selectedIndustries = selected;
-                        print('changing value to: $selected');
+                        print('changing industry value to: $selected');
                       },
                     ),
                     const SizedBox(height: 12),
@@ -152,7 +155,7 @@ class _FilterVentureState extends State<FilterVenture> {
                       items: numbers,
                       onChanged: (selected) {
                         selectedPeople = int.parse(selected!);
-                        print('changing value to: $selected');
+                        print('changing people value to: $selected');
                       },
                     ),
                     const SizedBox(height: 12),
@@ -168,7 +171,7 @@ class _FilterVentureState extends State<FilterVenture> {
                       items: months,
                       onChanged: (selected) {
                         selectedMonth = selected;
-                        print('changing value to: $selected');
+                        print('changing month value to: $selected');
                       },
                     ),
                     const SizedBox(height: 12),
@@ -184,7 +187,7 @@ class _FilterVentureState extends State<FilterVenture> {
                       items: numbers,
                       onChanged: (selected) {
                         selectedWeeks = int.parse(selected!);
-                        print('changing value to: $selected');
+                        print('changing week value to: $selected');
                       },
                     ),
                     const SizedBox(height: 12),
@@ -196,10 +199,20 @@ class _FilterVentureState extends State<FilterVenture> {
                               appState.updateFilters(
                                 countries: selectedCountries,
                                 industries: selectedIndustries,
-                                maxPeople: selectedPeople,
+                                people: selectedPeople,
                                 month: selectedMonth,
                                 weeks: selectedWeeks,
                               );
+
+                              print('Current state of appState:');
+                              print(
+                                  'Venture countries: ${appState.ventureCountries}');
+                              print(
+                                  'Venture industries: ${appState.ventureIndustries}');
+                              print('Max people: ${appState.maxPeople}');
+                              print('Venture month: ${appState.ventureMonth}');
+                              print(
+                                  'Estimated weeks: ${appState.estimatedWeeks}');
                               Navigator.pop(
                                   context); // Close the filter screen after applying
                             },

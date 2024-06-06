@@ -24,17 +24,19 @@ class VentureModel {
   });
 
   // Factory method to create a VentureModel from a Firestore document
-  factory VentureModel.fromDocument(DocumentSnapshot doc) {
+  factory VentureModel.fromDocument(Map<String, dynamic> data) {
     return VentureModel(
-      country: doc['country'],
-      creator: doc['creator'],
-      industry: doc['industry'],
-      description: doc['description'],
-      memberList: List<DocumentReference>.from(doc['member_list']),
-      startingMonth: doc['starting_month'],
-      estimatedWeeks: doc['estimated_weeks'],
-      createdTime: doc['created_time'],
-      maxPeople: doc['max_people'],
+      country: data['country'] ?? 'Unknown',
+      creator: data['creator'],
+      industry: data['industry'] ?? 'Unknown',
+      description: data['description'] ?? 'No description',
+      memberList: data['member_list'] != null
+          ? List<DocumentReference>.from(data['member_list'])
+          : [],
+      startingMonth: data['starting_month'] ?? 'Unknown',
+      estimatedWeeks: data['estimated_weeks'] ?? 0,
+      createdTime: (data['created_time'] as Timestamp? ?? Timestamp.now()),
+      maxPeople: data['max_people'] ?? 0,
     );
   }
 

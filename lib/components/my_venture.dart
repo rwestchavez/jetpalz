@@ -31,7 +31,8 @@ class _MyVentureWidgetState extends State<MyVentureWidget> {
                     .collection('ventures')
                     .doc(widget.ventureRef!.id)
                     .snapshots()
-                    .map((snapshot) => VentureModel.fromDocument(snapshot)),
+                    .map((snapshot) => VentureModel.fromDocument(
+                        snapshot as Map<String, dynamic>)),
                 builder: (context, snapshot) {
                   if (!snapshot.hasData) {
                     return CircularProgressIndicator();
@@ -47,7 +48,8 @@ class _MyVentureWidgetState extends State<MyVentureWidget> {
                         .collection('ventures')
                         .doc(widget.ventureRef!.id)
                         .snapshots()
-                        .map((snapshot) => VentureModel.fromDocument(snapshot)),
+                        .map((snapshot) => VentureModel.fromDocument(
+                            snapshot as Map<String, dynamic>)),
                     builder: (context, snapshot) {
                       if (!snapshot.hasData) {
                         return CircularProgressIndicator();
@@ -89,7 +91,8 @@ class _MyVentureWidgetState extends State<MyVentureWidget> {
                       .collection('ventures')
                       .doc(widget.ventureRef!.id)
                       .snapshots()
-                      .map((snapshot) => VentureModel.fromDocument(snapshot)),
+                      .map((snapshot) => VentureModel.fromDocument(
+                          snapshot as Map<String, dynamic>)),
                   builder: (context, snapshot) {
                     if (!snapshot.hasData) {
                       return CircularProgressIndicator();
@@ -109,7 +112,8 @@ class _MyVentureWidgetState extends State<MyVentureWidget> {
                       .collection('ventures')
                       .doc(widget.ventureRef!.id)
                       .snapshots()
-                      .map((snapshot) => VentureModel.fromDocument(snapshot)),
+                      .map((snapshot) => VentureModel.fromDocument(
+                          snapshot as Map<String, dynamic>)),
                   builder: (context, snapshot) {
                     if (!snapshot.hasData) {
                       return CircularProgressIndicator();

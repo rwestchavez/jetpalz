@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../ListViewStuff/listview_widget.dart';
 import '../ListViewStuff/venture_provider.dart';
+import '../app_state.dart';
 import '../components/my_appBar.dart';
 import '../components/my_button.dart';
 import '../constants.dart';
@@ -18,24 +19,28 @@ class Feed extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: VentureFeed(),
-      floatingActionButton: FloatingActionButton(
-          onPressed: () => showModalBottomSheet(
-                isScrollControlled: true,
-                context: context,
-                builder: (BuildContext context) {
-                  return FractionallySizedBox(
-                      heightFactor:
-                          0.6, // Adjust this factor to control the height
-                      child: CreateVenture());
-                },
-              ),
-          backgroundColor: Theme.of(context).colorScheme.secondary,
-          elevation: 5,
-          child: Icon(
-            Icons.airplanemode_active,
-            color: Theme.of(context).colorScheme.onSecondary,
-            size: 40,
-          )),
+      floatingActionButton: Padding(
+        padding: const EdgeInsets.only(bottom: 48),
+        child: FloatingActionButton(
+            highlightElevation: 15,
+            onPressed: () => showModalBottomSheet(
+                  isScrollControlled: true,
+                  context: context,
+                  builder: (BuildContext context) {
+                    return FractionallySizedBox(
+                        heightFactor:
+                            0.6, // Adjust this factor to control the height
+                        child: CreateVenture());
+                  },
+                ),
+            backgroundColor: Theme.of(context).colorScheme.secondary,
+            elevation: 10,
+            child: Icon(
+              Icons.airplanemode_active,
+              color: Theme.of(context).colorScheme.onSecondary,
+              size: 50,
+            )),
+      ),
       appBar: MyAppBar(
         title: "Feed",
         actions: [
@@ -68,14 +73,16 @@ class VentureFeed extends StatefulWidget {
 
 class _Page2State extends State<VentureFeed> {
   @override
-  Widget build(BuildContext context) => ChangeNotifierProvider(
-        create: (context) => VentureProvider(),
-        child: Scaffold(
-          body: Consumer<VentureProvider>(
-            builder: (context, usersProvider, _) => ListViewWidget(
-              usersProvider: usersProvider,
-            ),
+  Widget build(BuildContext context) {
+    return Consumer2<AppState, VentureProvider>(
+      builder: (context, appState, ventureProvider, _) {
+        return Scaffold(
+          body: ListViewWidget(
+            appState: appState,
+            usersProvider: ventureProvider,
           ),
-        ),
-      );
+        );
+      },
+    );
+  }
 }
