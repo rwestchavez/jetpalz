@@ -1,7 +1,21 @@
 import 'package:animated_custom_dropdown/custom_dropdown.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../app_state.dart';
 
 import '../constants.dart';
+
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:animated_custom_dropdown/custom_dropdown.dart';
+import '../constants.dart';
+import '../app_state.dart';
+
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:animated_custom_dropdown/custom_dropdown.dart';
+import '../constants.dart';
+import '../app_state.dart';
 
 class FilterVenture extends StatefulWidget {
   const FilterVenture({super.key});
@@ -11,16 +25,44 @@ class FilterVenture extends StatefulWidget {
 }
 
 class _FilterVentureState extends State<FilterVenture> {
-  String? description = "";
-  String? country = "";
-  String? industry = "";
-  int? people = 0;
+  List<String> selectedCountries = [];
+  List<String> selectedIndustries = [];
+  int? selectedPeople;
+  String? selectedMonth;
+  int? selectedWeeks;
 
-  String? month = "";
-  int? weeks = 0;
+  final SingleSelectController<String?> peopleController =
+      SingleSelectController<String?>(null);
+  final SingleSelectController<String?> monthController =
+      SingleSelectController<String?>(null);
+  final SingleSelectController<String?> weeksController =
+      SingleSelectController<String?>(null);
+
+  final MultiSelectController<String> countryController =
+      MultiSelectController<String>([]);
+  final MultiSelectController<String> industryController =
+      MultiSelectController<String>([]);
+
+  void resetFilters() {
+    setState(() {
+      selectedCountries = [];
+      selectedIndustries = [];
+      selectedPeople = null;
+      selectedMonth = null;
+      selectedWeeks = null;
+
+      peopleController.value = null;
+      monthController.value = null;
+      weeksController.value = null;
+      countryController.clear();
+      industryController.clear();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
+    final appState = Provider.of<AppState>(context);
+
     return Container(
       width: double.infinity,
       height: double.infinity,
@@ -34,7 +76,6 @@ class _FilterVentureState extends State<FilterVenture> {
             child: Row(
               children: [
                 const Icon(Icons.filter_alt_rounded),
-                // Add logic to close the widget
                 const Padding(
                   padding: EdgeInsets.only(left: 8.0),
                   child: Text(
@@ -68,6 +109,7 @@ class _FilterVentureState extends State<FilterVenture> {
                   mainAxisSize: MainAxisSize.max,
                   children: [
                     CustomDropdown<String>.multiSelect(
+                      multiSelectController: countryController,
                       decoration: CustomDropdownDecoration(
                         closedBorder: Border.all(
                           color: Colors.grey
@@ -76,14 +118,14 @@ class _FilterVentureState extends State<FilterVenture> {
                       ),
                       hintText: 'Countries',
                       items: countries,
-                      onListChanged: (value) {
-                        print('changing value to: $value');
+                      onListChanged: (selected) {
+                        selectedCountries = selected;
+                        print('changing value to: $selected');
                       },
-                      listValidator: (value) =>
-                          value.isEmpty ? "Required" : null,
                     ),
                     const SizedBox(height: 12),
                     CustomDropdown<String>.multiSelect(
+                      multiSelectController: industryController,
                       decoration: CustomDropdownDecoration(
                         closedBorder: Border.all(
                           color: Colors.grey
@@ -92,11 +134,10 @@ class _FilterVentureState extends State<FilterVenture> {
                       ),
                       hintText: 'Industries',
                       items: industries,
-                      onListChanged: (value) {
-                        print('changing value to: $value');
+                      onListChanged: (selected) {
+                        selectedIndustries = selected;
+                        print('changing value to: $selected');
                       },
-                      listValidator: (value) =>
-                          value.isEmpty ? "Required" : null,
                     ),
                     const SizedBox(height: 12),
                     CustomDropdown<String>(
@@ -106,11 +147,12 @@ class _FilterVentureState extends State<FilterVenture> {
                               .withOpacity(0.3), // Light border color
                         ),
                       ),
+                      controller: peopleController,
                       hintText: 'Number of people',
                       items: numbers,
-                      onChanged: (value) {
-                        people = int.parse(value!);
-                        print('changing value to: $value');
+                      onChanged: (selected) {
+                        selectedPeople = int.parse(selected!);
+                        print('changing value to: $selected');
                       },
                     ),
                     const SizedBox(height: 12),
@@ -121,11 +163,12 @@ class _FilterVentureState extends State<FilterVenture> {
                               .withOpacity(0.3), // Light border color
                         ),
                       ),
+                      controller: monthController,
                       hintText: 'Starting month',
                       items: months,
-                      onChanged: (value) {
-                        month = value;
-                        print('changing value to: $value');
+                      onChanged: (selected) {
+                        selectedMonth = selected;
+                        print('changing value to: $selected');
                       },
                     ),
                     const SizedBox(height: 12),
@@ -136,11 +179,12 @@ class _FilterVentureState extends State<FilterVenture> {
                               .withOpacity(0.3), // Light border color
                         ),
                       ),
+                      controller: weeksController,
                       hintText: 'Estimated weeks',
                       items: numbers,
-                      onChanged: (value) {
-                        weeks = int.parse(value!);
-                        print('changing value to: $value');
+                      onChanged: (selected) {
+                        selectedWeeks = int.parse(selected!);
+                        print('changing value to: $selected');
                       },
                     ),
                     const SizedBox(height: 12),
@@ -149,7 +193,15 @@ class _FilterVentureState extends State<FilterVenture> {
                         Expanded(
                           child: ElevatedButton(
                             onPressed: () {
-                              // Implement apply filter logic here
+                              appState.updateFilters(
+                                countries: selectedCountries,
+                                industries: selectedIndustries,
+                                maxPeople: selectedPeople,
+                                month: selectedMonth,
+                                weeks: selectedWeeks,
+                              );
+                              Navigator.pop(
+                                  context); // Close the filter screen after applying
                             },
                             child: const Text("Apply Filter"),
                           ),
@@ -157,9 +209,7 @@ class _FilterVentureState extends State<FilterVenture> {
                         const SizedBox(width: 8),
                         Expanded(
                           child: ElevatedButton(
-                            onPressed: () {
-                              // Implement reset filter logic here
-                            },
+                            onPressed: resetFilters,
                             child: const Text("Reset Filter"),
                           ),
                         ),

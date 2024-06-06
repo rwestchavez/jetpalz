@@ -25,7 +25,7 @@ class Feed extends StatelessWidget {
                 builder: (BuildContext context) {
                   return FractionallySizedBox(
                       heightFactor:
-                          0.5, // Adjust this factor to control the height
+                          0.6, // Adjust this factor to control the height
                       child: CreateVenture());
                 },
               ),
@@ -47,7 +47,7 @@ class Feed extends StatelessWidget {
                   builder: (BuildContext context) {
                     return FractionallySizedBox(
                         heightFactor:
-                            0.5, // Adjust this factor to control the height
+                            0.6, // Adjust this factor to control the height
                         child: FilterVenture());
                   },
                 );
