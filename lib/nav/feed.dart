@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../ListViewStuff/listview_widget.dart';
 import '../ListViewStuff/venture_provider.dart';
+import '../app_state.dart';
 import '../components/my_appBar.dart';
 import '../components/my_button.dart';
 import '../constants.dart';
@@ -68,14 +69,16 @@ class VentureFeed extends StatefulWidget {
 
 class _Page2State extends State<VentureFeed> {
   @override
-  Widget build(BuildContext context) => ChangeNotifierProvider(
-        create: (context) => VentureProvider(),
-        child: Scaffold(
-          body: Consumer<VentureProvider>(
-            builder: (context, usersProvider, _) => ListViewWidget(
-              usersProvider: usersProvider,
-            ),
+  Widget build(BuildContext context) {
+    return Consumer2<AppState, VentureProvider>(
+      builder: (context, appState, ventureProvider, _) {
+        return Scaffold(
+          body: ListViewWidget(
+            appState: appState,
+            usersProvider: ventureProvider,
           ),
-        ),
-      );
+        );
+      },
+    );
+  }
 }
