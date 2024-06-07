@@ -1,14 +1,17 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:jet_palz/components/my_button.dart';
 
+import '../app_state.dart';
 import '../components/my_venture.dart';
 import 'venture_provider.dart';
 import 'package:flutter/material.dart';
 
 class ListViewWidget extends StatefulWidget {
   final VentureProvider usersProvider;
+  final AppState appState;
 
   const ListViewWidget({
+    required this.appState,
     required this.usersProvider,
     Key? key,
   }) : super(key: key);
