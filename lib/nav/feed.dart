@@ -19,26 +19,20 @@ class Feed extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: VentureFeed(),
-      floatingActionButton: FloatingActionButton(
-          onPressed: () => showModalBottomSheet(
-                isScrollControlled: true,
-                context: context,
-                builder: (BuildContext context) {
-                  return FractionallySizedBox(
-                      heightFactor:
-                          0.6, // Adjust this factor to control the height
-                      child: CreateVenture());
-                },
-              ),
-          backgroundColor: Theme.of(context).colorScheme.secondary,
-          elevation: 5,
-          child: Icon(
-            Icons.airplanemode_active,
-            color: Theme.of(context).colorScheme.onSecondary,
-            size: 40,
-          )),
       appBar: MyAppBar(
         title: "Feed",
+        leading: IconButton(
+            onPressed: () => showModalBottomSheet(
+                  isScrollControlled: true,
+                  context: context,
+                  builder: (BuildContext context) {
+                    return FractionallySizedBox(
+                        heightFactor:
+                            0.6, // Adjust this factor to control the height
+                        child: CreateVenture());
+                  },
+                ),
+            icon: Icon(Icons.airplanemode_active)),
         actions: [
           IconButton(
               onPressed: () {
@@ -53,7 +47,7 @@ class Feed extends StatelessWidget {
                   },
                 );
               },
-              icon: const Icon(Icons.filter_alt_outlined)),
+              icon: const Icon(Icons.filter_alt_rounded)),
         ],
       ),
     );

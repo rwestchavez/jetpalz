@@ -115,7 +115,7 @@ class _FilterVentureState extends State<FilterVenture> {
                               .withOpacity(0.3), // Light border color
                         ),
                       ),
-                      hintText: 'Countries',
+                      hintText: 'Country',
                       items: countries,
                       onChanged: (selected) {
                         selectedCountry = selected;
@@ -131,7 +131,7 @@ class _FilterVentureState extends State<FilterVenture> {
                               .withOpacity(0.3), // Light border color
                         ),
                       ),
-                      hintText: 'Industries',
+                      hintText: 'Industry',
                       items: industries,
                       onChanged: (selected) {
                         selectedIndustry = selected;

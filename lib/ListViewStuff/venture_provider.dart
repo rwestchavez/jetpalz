@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:jet_palz/app_state.dart';
 import 'package:jet_palz/models/venture_model.dart';
 import "venture_provider.dart";
 import 'package:flutter/material.dart';
@@ -46,11 +47,17 @@ class VentureProvider extends ChangeNotifier {
     _isFetchingVentures = true;
 
     try {
+      final appState = AppState();
       final snap = await FirebaseApi.getUsers(
         // get users still just gets even if its first page or next page
         documentLimit,
         startAfter:
             _venturesSnapshot.isNotEmpty ? _venturesSnapshot.last : null,
+        country: appState.ventureCountry,
+        industry: appState.ventureIndustry,
+        people: appState.maxPeople,
+        month: appState.ventureMonth,
+        weeks: appState.estimatedWeeks,
       );
       _venturesSnapshot.addAll(snap.docs);
 
