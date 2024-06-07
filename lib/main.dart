@@ -2,6 +2,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:jet_palz/firebase_options.dart';
 import 'package:provider/provider.dart';
+import 'ListViewStuff/venture_provider.dart';
 import 'nav/chat.dart';
 import 'nav/feed.dart';
 import 'nav/profile.dart';
@@ -12,8 +13,13 @@ import 'app_state.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  runApp(ChangeNotifierProvider(
-      create: (context) => AppState(), child: const MyApp()));
+  runApp(MultiProvider(
+    providers: [
+      ChangeNotifierProvider(create: (_) => AppState()),
+      ChangeNotifierProvider(create: (_) => VentureProvider()),
+    ],
+    child: MyApp(),
+  ));
 }
 
 class MyApp extends StatelessWidget {
@@ -23,7 +29,8 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'JetPalz', // Add a title for your app
+
       home: const Main(),
       theme: lightModeTheme.themeData,
       darkTheme: darkModeTheme.themeData,
@@ -42,6 +49,30 @@ class Main extends StatefulWidget {
 class MainState extends State<Main> {
   int _index = 0;
   final List<Widget> screens = [const Chat(), const Feed(), const Profile()];
+
+  /*void _handleAppStateChange() {
+    Provider.of<VentureProvider>(context, listen: false)
+        .updateFilteredVentures();
+  }*/
+
+  /*void listenToAppStateChanges() {
+    Provider.of<AppState>(context, listen: false).addListener(() {
+      _handleAppStateChange();
+    });
+  }*/
+
+  @override
+  void initState() {
+    super.initState();
+    // listenToAppStateChanges();
+  }
+
+  @override
+  void dispose() {
+    // Provider.of<AppState>(context, listen: false)
+    //     .removeListener(_handleAppStateChange);
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
