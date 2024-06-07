@@ -174,7 +174,7 @@ class _CreateVentureWidgetState extends State<CreateVenture> {
                             ), // Light border color
                           ),
                           hintText: 'Number of people',
-                          items: numbers,
+                          items: peopleNum,
                           onChanged: (value) {
                             setState(() {
                               people = int.parse(value!);
@@ -210,7 +210,7 @@ class _CreateVentureWidgetState extends State<CreateVenture> {
                             ), // Light border color
                           ),
                           hintText: 'Estimated weeks',
-                          items: numbers,
+                          items: weekNum,
                           onChanged: (value) {
                             setState(() {
                               weeks = int.parse(value!);

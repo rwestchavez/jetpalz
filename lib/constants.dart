@@ -247,8 +247,7 @@ final List<String> months = [
   'December'
 ];
 
-
-final List<String> numbers = [
+final List<String> weekNum = [
   '1',
   '2',
   '3',
@@ -258,5 +257,21 @@ final List<String> numbers = [
   '7',
   '8',
   '9',
-  '10'
+  '10',
+  '11',
+  '12'
+];
+
+final List<String> peopleNum = [
+  '2',
+  '3',
+  '4',
+  '5',
+  '6',
+  '7',
+  '8',
+  '9',
+  '10',
+  '11',
+  '12'
 ];

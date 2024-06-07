@@ -149,7 +149,7 @@ class _FilterVentureState extends State<FilterVenture> {
                       ),
                       controller: peopleController,
                       hintText: 'Number of people',
-                      items: numbers,
+                      items: peopleNum,
                       onChanged: (selected) {
                         selectedPeople = int.parse(selected!);
                         print('changing people value to: $selected');
@@ -181,7 +181,7 @@ class _FilterVentureState extends State<FilterVenture> {
                       ),
                       controller: weeksController,
                       hintText: 'Estimated weeks',
-                      items: numbers,
+                      items: weekNum,
                       onChanged: (selected) {
                         selectedWeeks = int.parse(selected!);
                         print('changing week value to: $selected');

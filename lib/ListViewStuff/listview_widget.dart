@@ -2,7 +2,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:jet_palz/components/my_button.dart';
 
 import '../app_state.dart';
-import '../components/my_venture.dart';
 import 'venture_provider.dart';
 import 'package:flutter/material.dart';
 
@@ -53,6 +52,12 @@ class _ListViewWidgetState extends State<ListViewWidget> {
   Widget build(BuildContext context) {
     print(widget.appState.estimatedWeeks);
     print("Building...");
+
+    if (widget.usersProvider.ventures.isEmpty) {
+      return Center(
+        child: Text('No ventures found'),
+      );
+    }
     return ListView(
       controller: scrollController,
       children: [
