@@ -5,38 +5,37 @@ class FirebaseApi {
   static Future<QuerySnapshot> getUsers(
     int limit, {
     DocumentSnapshot? startAfter,
-    //   required AppState appState,
+    String? country,
+    String? industry,
+    int? people,
+    String? month,
+    int? weeks,
   }) async {
     // here is where we do the server side filtering. You get ref users based on filter properties.
-    var refUsers = FirebaseFirestore.instance
-        .collection('ventures')
-        .orderBy('created_time')
-        .limit(limit);
-    /*
-    if (appState.ventureCountry != null) {
-      refUsers = refUsers.where('country', isEqualTo: appState.ventureCountry);
+    CollectionReference venturesRef =
+        FirebaseFirestore.instance.collection('ventures');
+    Query query = venturesRef.orderBy('created_time').limit(limit);
+
+    if (country != null) {
+      query = query.where('country', isEqualTo: country);
     }
-    if (appState.ventureIndustry != null) {
-      refUsers =
-          refUsers.where('industry', isEqualTo: appState.ventureIndustry);
+    if (industry != null) {
+      query = query.where('industry', isEqualTo: industry);
     }
-    if (appState.maxPeople != null) {
-      refUsers = refUsers.where('max_people', isEqualTo: appState.maxPeople);
+    if (people != null) {
+      query = query.where('max_people', isEqualTo: people);
     }
-    if (appState.ventureMonth != null) {
-      refUsers =
-          refUsers.where('starting_month', isEqualTo: appState.ventureMonth);
+    if (month != null) {
+      query = query.where('starting_month', isEqualTo: month);
     }
-    if (appState.estimatedWeeks != null) {
-      refUsers =
-          refUsers.where('estimated_weeks', isEqualTo: appState.estimatedWeeks);
-    } */
-    print(refUsers as Map<String, dynamic>);
+    if (weeks != null) {
+      query = query.where('estimated_weeks', isEqualTo: weeks);
+    }
 
     if (startAfter == null) {
-      return refUsers.get();
+      return query.get();
     } else {
-      return refUsers.startAfterDocument(startAfter).get();
+      return query.startAfterDocument(startAfter).get();
     }
   }
 }

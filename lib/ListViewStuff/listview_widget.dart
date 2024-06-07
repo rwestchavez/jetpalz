@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:jet_palz/components/my_button.dart';
 
 import '../app_state.dart';
+import '../components/my_venture.dart';
 import 'venture_provider.dart';
 import 'package:flutter/material.dart';
 
@@ -50,9 +51,8 @@ class _ListViewWidgetState extends State<ListViewWidget> {
 
   @override
   Widget build(BuildContext context) {
-    print('ListViewWidget rebuilding...');
-    print(widget.usersProvider.ventures); // Add print statement here
-
+    print(widget.appState.estimatedWeeks);
+    print("Building...");
     return ListView(
       controller: scrollController,
       children: [
@@ -193,13 +193,11 @@ class _ListViewWidgetState extends State<ListViewWidget> {
         if (widget.usersProvider.hasNext)
           Center(
             child: GestureDetector(
-              onTap: () {
-                // widget.usersProvider.fetchNextUsers;
-              },
+              onTap: () {}, // widget.usersProvider.fetchNextUsers,
               child: Container(
                 height: 25,
                 width: 25,
-                //child: CircularProgressIndicator(),
+                child: CircularProgressIndicator(),
               ),
             ),
           ),

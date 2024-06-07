@@ -155,7 +155,7 @@ class _CreateVentureWidgetState extends State<CreateVenture> {
                               color: Colors.grey.withOpacity(0.3),
                             ), // Light border color
                           ),
-                          hintText: 'Industry',
+                          hintText: 'Profession',
                           items: industries,
                           onChanged: (value) {
                             setState(() {

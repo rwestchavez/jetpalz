@@ -1,6 +1,7 @@
 import 'package:animated_custom_dropdown/custom_dropdown.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../ListViewStuff/venture_provider.dart';
 import '../app_state.dart';
 
 import '../constants.dart';
@@ -44,17 +45,17 @@ class _FilterVentureState extends State<FilterVenture> {
 
   void resetFilters() {
     setState(() {
-      selectedCountry;
-      selectedIndustry;
-      selectedPeople;
-      selectedMonth;
-      selectedWeeks;
+      selectedCountry = null;
+      selectedIndustry = null;
+      selectedPeople = null;
+      selectedMonth = null;
+      selectedWeeks = null;
 
-      peopleController.value;
-      monthController.value;
-      weeksController.value;
-      countryController.value;
-      industryController.value;
+      peopleController.value = null;
+      monthController.value = null;
+      weeksController.value = null;
+      countryController.value = null;
+      industryController.value = null;
     });
   }
 
@@ -119,7 +120,7 @@ class _FilterVentureState extends State<FilterVenture> {
                       items: countries,
                       onChanged: (selected) {
                         selectedCountry = selected;
-                        print('changing countries value to: $selected');
+                        print('changing value to: $selected');
                       },
                     ),
                     const SizedBox(height: 12),
@@ -131,11 +132,11 @@ class _FilterVentureState extends State<FilterVenture> {
                               .withOpacity(0.3), // Light border color
                         ),
                       ),
-                      hintText: 'Industry',
+                      hintText: 'Profession',
                       items: industries,
                       onChanged: (selected) {
                         selectedIndustry = selected;
-                        print('changing industry value to: $selected');
+                        print('changing value to: $selected');
                       },
                     ),
                     const SizedBox(height: 12),
@@ -199,16 +200,9 @@ class _FilterVentureState extends State<FilterVenture> {
                                 month: selectedMonth,
                                 weeks: selectedWeeks,
                               );
-
-                              print('Current state of appState:');
-                              print(
-                                  'Venture countries: ${appState.ventureCountry}');
-                              print(
-                                  'Venture industries: ${appState.ventureIndustry}');
-                              print('Max people: ${appState.maxPeople}');
-                              print('Venture month: ${appState.ventureMonth}');
-                              print(
-                                  'Estimated weeks: ${appState.estimatedWeeks}');
+                              Provider.of<VentureProvider>(context,
+                                      listen: false)
+                                  .fetchNextUsers(reset: true);
                               Navigator.pop(
                                   context); // Close the filter screen after applying
                             },
