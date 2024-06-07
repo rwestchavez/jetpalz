@@ -25,8 +25,8 @@ class FilterVenture extends StatefulWidget {
 }
 
 class _FilterVentureState extends State<FilterVenture> {
-  List<String> selectedCountries = [];
-  List<String> selectedIndustries = [];
+  String? selectedCountry;
+  String? selectedIndustry;
   int? selectedPeople;
   String? selectedMonth;
   int? selectedWeeks;
@@ -37,16 +37,15 @@ class _FilterVentureState extends State<FilterVenture> {
       SingleSelectController<String?>(null);
   final SingleSelectController<String?> weeksController =
       SingleSelectController<String?>(null);
-
-  final MultiSelectController<String> countryController =
-      MultiSelectController<String>([]);
-  final MultiSelectController<String> industryController =
-      MultiSelectController<String>([]);
+  final SingleSelectController<String?> countryController =
+      SingleSelectController<String?>(null);
+  final SingleSelectController<String?> industryController =
+      SingleSelectController<String?>(null);
 
   void resetFilters() {
     setState(() {
-      selectedCountries = [];
-      selectedIndustries = [];
+      selectedCountry = null;
+      selectedIndustry = null;
       selectedPeople = null;
       selectedMonth = null;
       selectedWeeks = null;
@@ -54,8 +53,8 @@ class _FilterVentureState extends State<FilterVenture> {
       peopleController.value = null;
       monthController.value = null;
       weeksController.value = null;
-      countryController.clear();
-      industryController.clear();
+      countryController.value = null;
+      industryController.value = null;
     });
   }
 
@@ -108,8 +107,8 @@ class _FilterVentureState extends State<FilterVenture> {
                 child: Column(
                   mainAxisSize: MainAxisSize.max,
                   children: [
-                    CustomDropdown<String>.multiSelect(
-                      multiSelectController: countryController,
+                    CustomDropdown<String>(
+                      controller: countryController,
                       decoration: CustomDropdownDecoration(
                         closedBorder: Border.all(
                           color: Colors.grey
@@ -118,14 +117,14 @@ class _FilterVentureState extends State<FilterVenture> {
                       ),
                       hintText: 'Countries',
                       items: countries,
-                      onListChanged: (selected) {
-                        selectedCountries = selected;
+                      onChanged: (selected) {
+                        selectedCountry = selected;
                         print('changing value to: $selected');
                       },
                     ),
                     const SizedBox(height: 12),
-                    CustomDropdown<String>.multiSelect(
-                      multiSelectController: industryController,
+                    CustomDropdown<String>(
+                      controller: industryController,
                       decoration: CustomDropdownDecoration(
                         closedBorder: Border.all(
                           color: Colors.grey
@@ -134,8 +133,8 @@ class _FilterVentureState extends State<FilterVenture> {
                       ),
                       hintText: 'Industries',
                       items: industries,
-                      onListChanged: (selected) {
-                        selectedIndustries = selected;
+                      onChanged: (selected) {
+                        selectedIndustry = selected;
                         print('changing value to: $selected');
                       },
                     ),
@@ -194,9 +193,9 @@ class _FilterVentureState extends State<FilterVenture> {
                           child: ElevatedButton(
                             onPressed: () {
                               appState.updateFilters(
-                                countries: selectedCountries,
-                                industries: selectedIndustries,
-                                maxPeople: selectedPeople,
+                                country: selectedCountry,
+                                industry: selectedIndustry,
+                                people: selectedPeople,
                                 month: selectedMonth,
                                 weeks: selectedWeeks,
                               );

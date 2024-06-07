@@ -1,24 +1,32 @@
 import 'package:flutter/material.dart';
 
 class AppState extends ChangeNotifier {
-  List<String> ventureCountries = [];
-  List<String> ventureIndustries = [];
+  AppState._privateConstructor();
+
+  // Singleton instance
+  static final AppState _instance = AppState._privateConstructor();
+
+  // Getter to access the singleton instance
+  factory AppState() => _instance;
+
+  String? ventureCountry;
+  String? ventureIndustry;
   int? maxPeople;
   String? ventureMonth;
   int? estimatedWeeks;
 
   void updateFilters({
-    List<String>? countries,
-    List<String>? industries,
-    int? maxPeople,
+    String? country,
+    String? industry,
+    int? people,
     String? month,
     int? weeks,
   }) {
-    ventureCountries = countries ?? ventureCountries;
-    ventureIndustries = industries ?? ventureIndustries;
-    maxPeople = maxPeople ?? maxPeople;
-    ventureMonth = month ?? ventureMonth;
-    estimatedWeeks = weeks ?? estimatedWeeks;
+    ventureCountry = country;
+    ventureIndustry = industry;
+    maxPeople = people;
+    ventureMonth = month;
+    estimatedWeeks = weeks;
 
     notifyListeners();
   }
