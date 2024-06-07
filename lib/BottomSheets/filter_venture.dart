@@ -1,6 +1,7 @@
 import 'package:animated_custom_dropdown/custom_dropdown.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../ListViewStuff/venture_provider.dart';
 import '../app_state.dart';
 
 import '../constants.dart';
@@ -131,7 +132,7 @@ class _FilterVentureState extends State<FilterVenture> {
                               .withOpacity(0.3), // Light border color
                         ),
                       ),
-                      hintText: 'Industry',
+                      hintText: 'Profession',
                       items: industries,
                       onChanged: (selected) {
                         selectedIndustry = selected;
@@ -199,6 +200,9 @@ class _FilterVentureState extends State<FilterVenture> {
                                 month: selectedMonth,
                                 weeks: selectedWeeks,
                               );
+                              Provider.of<VentureProvider>(context,
+                                      listen: false)
+                                  .fetchNextUsers(reset: true);
                               Navigator.pop(
                                   context); // Close the filter screen after applying
                             },

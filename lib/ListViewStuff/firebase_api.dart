@@ -22,13 +22,13 @@ class FirebaseApi {
       query = query.where('industry', isEqualTo: industry);
     }
     if (people != null) {
-      query = query.where('maxPeople', isEqualTo: people);
+      query = query.where('max_people', isEqualTo: people);
     }
     if (month != null) {
-      query = query.where('ventureMonth', isEqualTo: month);
+      query = query.where('starting_month', isEqualTo: month);
     }
     if (weeks != null) {
-      query = query.where('estimatedWeeks', isEqualTo: weeks);
+      query = query.where('estimated_weeks', isEqualTo: weeks);
     }
 
     if (startAfter == null) {

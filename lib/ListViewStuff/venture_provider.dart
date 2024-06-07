@@ -39,12 +39,18 @@ class VentureProvider extends ChangeNotifier {
         );
       }).toList();
 
-  Future fetchNextUsers() async {
+  Future fetchNextUsers({bool reset = false}) async {
     if (_isFetchingVentures)
       return; // quits early if already fetching users. Return stops function
 
     _errorMessage = '';
     _isFetchingVentures = true;
+
+    if (reset) {
+      _venturesSnapshot.clear();
+      _hasNext = true;
+      notifyListeners();
+    }
 
     try {
       final appState = AppState();
