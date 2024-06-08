@@ -155,7 +155,7 @@ class _CreateVentureWidgetState extends State<CreateVenture> {
                               color: Colors.grey.withOpacity(0.3),
                             ), // Light border color
                           ),
-                          hintText: 'Profession',
+                          hintText: 'Profession looking for',
                           items: industries,
                           onChanged: (value) {
                             setState(() {
@@ -209,7 +209,7 @@ class _CreateVentureWidgetState extends State<CreateVenture> {
                               color: Colors.grey.withOpacity(0.3),
                             ), // Light border color
                           ),
-                          hintText: 'Estimated weeks',
+                          hintText: 'Estimated duration (weeks)',
                           items: weekNum,
                           onChanged: (value) {
                             setState(() {

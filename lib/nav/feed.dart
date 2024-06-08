@@ -21,33 +21,46 @@ class Feed extends StatelessWidget {
       body: VentureFeed(),
       appBar: MyAppBar(
         title: "Feed",
-        leading: IconButton(
-            onPressed: () => showModalBottomSheet(
-                  isScrollControlled: true,
-                  context: context,
-                  builder: (BuildContext context) {
-                    return FractionallySizedBox(
-                        heightFactor:
-                            0.6, // Adjust this factor to control the height
-                        child: CreateVenture());
-                  },
-                ),
-            icon: Icon(Icons.airplanemode_active)),
+        leading: Padding(
+          padding: const EdgeInsets.only(left: 16.0),
+          child: IconButton(
+              splashColor: Colors.transparent, // Remove the tap color
+              highlightColor: Colors.transparent,
+              onPressed: () => showModalBottomSheet(
+                    isScrollControlled: true,
+                    context: context,
+                    builder: (BuildContext context) {
+                      return FractionallySizedBox(
+                          heightFactor:
+                              0.5, // Adjust this factor to control the height
+                          child: CreateVenture());
+                    },
+                  ),
+              icon: Icon(Icons.airplanemode_active, size: 40)),
+        ),
         actions: [
-          IconButton(
-              onPressed: () {
-                showModalBottomSheet(
-                  isScrollControlled: true,
-                  context: context,
-                  builder: (BuildContext context) {
-                    return FractionallySizedBox(
-                        heightFactor:
-                            0.6, // Adjust this factor to control the height
-                        child: FilterVenture());
-                  },
-                );
-              },
-              icon: const Icon(Icons.filter_alt_rounded)),
+          Padding(
+            padding: const EdgeInsets.only(right: 16.0),
+            child: IconButton(
+                splashColor: Colors.transparent, // Remove the tap color
+                highlightColor: Colors.transparent,
+                onPressed: () {
+                  showModalBottomSheet(
+                    isScrollControlled: true,
+                    context: context,
+                    builder: (BuildContext context) {
+                      return FractionallySizedBox(
+                          heightFactor:
+                              0.5, // Adjust this factor to control the height
+                          child: FilterVenture());
+                    },
+                  );
+                },
+                icon: const Icon(
+                  Icons.filter_alt_rounded,
+                  size: 40,
+                )),
+          ),
         ],
       ),
     );

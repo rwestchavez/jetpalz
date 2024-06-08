@@ -132,7 +132,7 @@ class _FilterVentureState extends State<FilterVenture> {
                               .withOpacity(0.3), // Light border color
                         ),
                       ),
-                      hintText: 'Profession',
+                      hintText: 'Profession looking for',
                       items: industries,
                       onChanged: (selected) {
                         selectedIndustry = selected;
@@ -180,7 +180,7 @@ class _FilterVentureState extends State<FilterVenture> {
                         ),
                       ),
                       controller: weeksController,
-                      hintText: 'Estimated weeks',
+                      hintText: 'Estimated duration (weeks)',
                       items: weekNum,
                       onChanged: (selected) {
                         selectedWeeks = int.parse(selected!);

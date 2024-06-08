@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:jet_palz/theme/light_mode_theme.dart';
 
 class MyAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
@@ -15,6 +16,11 @@ class MyAppBar extends StatelessWidget implements PreferredSizeWidget {
   Widget build(BuildContext context) {
     return AppBar(
       title: Text(title), //add some style to it later
+      titleTextStyle: const TextStyle(
+          color: lightModeTheme.primaryText,
+          fontSize: 28,
+          fontWeight: FontWeight.w600),
+
       actions: actions,
       leading: leading,
       centerTitle: true,

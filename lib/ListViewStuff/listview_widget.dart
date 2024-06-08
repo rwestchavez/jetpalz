@@ -53,7 +53,8 @@ class _ListViewWidgetState extends State<ListViewWidget> {
     print(widget.appState.estimatedWeeks);
     print("Building...");
 
-    if (widget.usersProvider.ventures.isEmpty) {
+    if (widget.usersProvider.ventures.isEmpty &&
+        !widget.usersProvider.hasNext) {
       return Center(
         child: Text('No ventures found'),
       );
@@ -64,7 +65,7 @@ class _ListViewWidgetState extends State<ListViewWidget> {
         ...widget.usersProvider.ventures
             .map(
               (venture) => Container(
-                padding: EdgeInsets.all(12),
+                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 decoration: BoxDecoration(
                   border: Border.all(
                       width: 1, color: Color.fromARGB(255, 214, 214, 214)),
@@ -134,9 +135,12 @@ class _ListViewWidgetState extends State<ListViewWidget> {
                         ],
                       ),
                     ),
+                    SizedBox(
+                      height: 8,
+                    ),
                     Text(venture.description!),
                     SizedBox(
-                      height: 24,
+                      height: 12,
                     ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.start,
