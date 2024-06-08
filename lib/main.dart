@@ -1,5 +1,10 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:jet_palz/auth/forgot_password.dart';
+import 'package:jet_palz/auth/onboarding.dart';
+import 'package:jet_palz/auth/sign_in.dart';
+import 'package:jet_palz/auth/sign_up.dart';
+import 'package:jet_palz/auth/email_sign_up.dart';
 import 'package:jet_palz/firebase_options.dart';
 import 'package:provider/provider.dart';
 import 'ListViewStuff/venture_provider.dart';
@@ -30,8 +35,13 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'JetPalz', // Add a title for your app
-
-      home: const Main(),
+      routes: {
+        '/': (context) => const SignUp(),
+        '/signIn': (context) => SignIn(),
+        '/forgotPassword': (context) => const ForgotPassword(),
+        '/feed': (context) => const Main(),
+        '/onboarding': (context) => const Onboarding(),
+      },
       theme: lightModeTheme.themeData,
       darkTheme: darkModeTheme.themeData,
       debugShowCheckedModeBanner: false,
@@ -47,7 +57,7 @@ class Main extends StatefulWidget {
 }
 
 class MainState extends State<Main> {
-  int _index = 0;
+  int _index = 1;
   final List<Widget> screens = [const Chat(), const Feed(), const Profile()];
 
   /*void _handleAppStateChange() {

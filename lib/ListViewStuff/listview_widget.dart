@@ -152,7 +152,7 @@ class _ListViewWidgetState extends State<ListViewWidget> {
                               constraints: BoxConstraints(maxWidth: 150),
                               child: MyButton(
                                 onPressed: () {},
-                                text: 'Join',
+                                child: Text("Join"),
                               ),
                             ),
                           ),
