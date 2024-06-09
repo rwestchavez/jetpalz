@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -18,6 +19,21 @@ Future<void> googleAuth(BuildContext context) async {
         await _auth.signInWithCredential(credential);
 
     print("User signed in: ${userCredential.user!.email}");
+
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(userCredential.user!.uid)
+        .set({
+      'email': userCredential.user!.email,
+      'display_name': '', // Add display name if needed
+      'photo_url': '', // Add photo URL if needed
+      'created_time': Timestamp.now(), // Add creation time
+      'profession': '', // Add profession if needed
+      'countries_interest': [], // Add countries interest if needed
+      'professions_interest': [], // Add professions interest if needed
+      'description': '', // Add description if needed
+      'current_ventures': [], // Add current ventures if needed
+    });
 
     // Navigate to the next screen or perform any necessary action
     Navigator.pushReplacementNamed(context, '/onboarding');

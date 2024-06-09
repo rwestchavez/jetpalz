@@ -72,7 +72,7 @@ class _SignUpState extends State<SignUp> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Align(
-                                alignment: AlignmentDirectional(0.0, 0.0),
+                                alignment: Alignment.center,
                                 child: Text(
                                   'Create an account',
                                   style: TextStyle(
@@ -90,10 +90,14 @@ class _SignUpState extends State<SignUp> {
                                     0.0,
                                     24.0,
                                   ),
-                                  child: Text(
-                                    'Let\'s get started by filling out the form below.',
-                                    style: TextStyle(
-                                      fontSize: 16.0,
+                                  child: Align(
+                                    alignment: Alignment.center,
+                                    child: Text(
+                                      'Let\'s get started by filling out the form below.',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                        fontSize: 16.0,
+                                      ),
                                     ),
                                   ),
                                 ),

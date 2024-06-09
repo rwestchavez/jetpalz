@@ -5,16 +5,19 @@ class MyAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
   final List<Widget> actions;
   final Widget? leading;
+  bool automaticallyImplyLeading;
 
-  const MyAppBar({
+  MyAppBar({
     required this.title,
     this.actions = const [],
     this.leading,
+    this.automaticallyImplyLeading = true,
   });
 
   @override
   Widget build(BuildContext context) {
     return AppBar(
+      automaticallyImplyLeading: automaticallyImplyLeading,
       title: Text(title), //add some style to it later
       titleTextStyle: const TextStyle(
           color: lightModeTheme.primaryText,

@@ -166,9 +166,11 @@ class _EmailSignUpWidgetState extends State<EmailSignUp> {
                       child: Text("Create Account",
                           style: TextStyle(fontWeight: FontWeight.bold)),
                       onPressed: () async {
-                        if (_formKey.currentState!.validate()) await _signUp();
-                        Navigator.pushReplacementNamed(
-                            context, '/onboarding'); // Call the sign-up method
+                        if (_formKey.currentState!.validate()) {
+                          await _signUp();
+                          Navigator.pushReplacementNamed(
+                              context, '/onboarding');
+                        } // Call the sign-up method
                       },
                     ),
                     SizedBox(height: 16),

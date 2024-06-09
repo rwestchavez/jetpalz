@@ -148,7 +148,7 @@ class _OnboardingWidgetState extends State<Onboarding> {
                       Align(
                         alignment: AlignmentDirectional(0.0, 1.0),
                         child: Padding(
-                          padding: EdgeInsets.fromLTRB(16.0, 0.0, 0.0, 16.0),
+                          padding: EdgeInsets.fromLTRB(0, 0.0, 0.0, 8.0),
                           child: SmoothPageIndicator(
                             controller: _pageController,
                             count: 4,
@@ -179,7 +179,7 @@ class _OnboardingWidgetState extends State<Onboarding> {
                 ),
               ),
               Padding(
-                padding: EdgeInsets.fromLTRB(0.0, 16.0, 0.0, 48.0),
+                padding: EdgeInsets.fromLTRB(0.0, 0, 0.0, 8),
                 child: Container(
                   constraints: BoxConstraints(maxWidth: 200),
                   child: MyButton(
@@ -239,7 +239,7 @@ class OnboardTextWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return SingleChildScrollView(
         child: Padding(
-      padding: EdgeInsets.fromLTRB(16, 140.0, 16, 0),
+      padding: EdgeInsets.fromLTRB(16, 16, 16, 0),
       child: Column(
         children: [
           Text(

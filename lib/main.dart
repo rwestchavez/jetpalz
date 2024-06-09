@@ -1,5 +1,7 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:jet_palz/auth/forgot_password.dart';
 import 'package:jet_palz/auth/onboarding.dart';
 import 'package:jet_palz/auth/sign_in.dart';
@@ -33,21 +35,27 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      top: true,
-      child: MaterialApp(
-        title: 'JetPalz', // Add a title for your app
-        routes: {
-          '/': (context) => const SignUp(),
-          '/signIn': (context) => SignIn(),
-          '/forgotPassword': (context) => const ForgotPassword(),
-          '/feed': (context) => const Main(),
-          '/onboarding': (context) => const Onboarding(),
-        },
-        theme: lightModeTheme.themeData,
-        darkTheme: darkModeTheme.themeData,
-        debugShowCheckedModeBanner: false,
-      ),
+    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent,
+      systemNavigationBarColor: Colors
+          .transparent, // Change this to the desired color// Optional: Set this to transparent if you don't want a status bar color
+    ));
+    User? user = FirebaseAuth.instance.currentUser;
+
+    return MaterialApp(
+      title: 'JetPalz', // Add a title for your app
+      routes: {
+        '/signIn': (context) => SignIn(),
+        '/forgotPassword': (context) => const ForgotPassword(),
+        '/feed': (context) => const Main(),
+        '/onboarding': (context) => const Onboarding(),
+      },
+      home: user != null ? const Main() : const SignUp(),
+
+      initialRoute: user != null ? '/feed' : '/',
+      theme: lightModeTheme.themeData,
+      darkTheme: darkModeTheme.themeData,
+      debugShowCheckedModeBanner: false,
     );
   }
 }
@@ -63,27 +71,13 @@ class MainState extends State<Main> {
   int _index = 1;
   final List<Widget> screens = [const Chat(), const Feed(), const Profile()];
 
-  /*void _handleAppStateChange() {
-    Provider.of<VentureProvider>(context, listen: false)
-        .updateFilteredVentures();
-  }*/
-
-  /*void listenToAppStateChanges() {
-    Provider.of<AppState>(context, listen: false).addListener(() {
-      _handleAppStateChange();
-    });
-  }*/
-
   @override
   void initState() {
     super.initState();
-    // listenToAppStateChanges();
   }
 
   @override
   void dispose() {
-    // Provider.of<AppState>(context, listen: false)
-    //     .removeListener(_handleAppStateChange);
     super.dispose();
   }
 

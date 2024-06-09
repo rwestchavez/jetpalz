@@ -11,9 +11,6 @@ class Chat extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(child: AuthScreen()),
-      appBar: MyAppBar(
-        title: "Chat",
-      ),
     );
   }
 }
@@ -79,9 +76,7 @@ class _AuthScreenState extends State<AuthScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Firebase Auth'),
-      ),
+      appBar: MyAppBar(automaticallyImplyLeading: false, title: "Chat"),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(

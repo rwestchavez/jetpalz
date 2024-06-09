@@ -122,6 +122,7 @@ class _SignInWidgetState extends State<SignIn> {
                     SizedBox(height: 12.0),
                     Text(
                       'Sign in to pick up where you left off',
+                      textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 16.0,
                       ),
@@ -162,8 +163,11 @@ class _SignInWidgetState extends State<SignIn> {
                     SizedBox(height: 16.0),
                     MyButton(
                       onPressed: () async {
-                        if (_formKey.currentState!.validate()) await _signIn();
-                        Navigator.pushReplacementNamed(context, '/onboarding');
+                        if (_formKey.currentState!.validate()) {
+                          await _signIn();
+                          Navigator.pushReplacementNamed(
+                              context, '/onboarding');
+                        }
                       },
                       child: Text('Sign in',
                           style: TextStyle(fontWeight: FontWeight.bold)),
@@ -235,7 +239,6 @@ class _SignInWidgetState extends State<SignIn> {
                         ),
                       ),
                     ),
-                    SizedBox(height: 16.0),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
