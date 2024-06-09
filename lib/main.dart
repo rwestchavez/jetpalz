@@ -33,18 +33,21 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'JetPalz', // Add a title for your app
-      routes: {
-        '/': (context) => const SignUp(),
-        '/signIn': (context) => SignIn(),
-        '/forgotPassword': (context) => const ForgotPassword(),
-        '/feed': (context) => const Main(),
-        '/onboarding': (context) => const Onboarding(),
-      },
-      theme: lightModeTheme.themeData,
-      darkTheme: darkModeTheme.themeData,
-      debugShowCheckedModeBanner: false,
+    return SafeArea(
+      top: true,
+      child: MaterialApp(
+        title: 'JetPalz', // Add a title for your app
+        routes: {
+          '/': (context) => const SignUp(),
+          '/signIn': (context) => SignIn(),
+          '/forgotPassword': (context) => const ForgotPassword(),
+          '/feed': (context) => const Main(),
+          '/onboarding': (context) => const Onboarding(),
+        },
+        theme: lightModeTheme.themeData,
+        darkTheme: darkModeTheme.themeData,
+        debugShowCheckedModeBanner: false,
+      ),
     );
   }
 }
