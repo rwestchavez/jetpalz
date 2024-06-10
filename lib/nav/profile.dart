@@ -316,6 +316,7 @@ class _ProfileWidgetState extends State<Profile> {
                     icon: Icons.airplanemode_active,
                     text: 'My Ventures',
                     onTap: () {
+                      Navigator.pushNamed(context, '/myVentures');
                       // Handle My Ventures tap
                     },
                   ),
@@ -323,6 +324,7 @@ class _ProfileWidgetState extends State<Profile> {
                     icon: Icons.settings_outlined,
                     text: 'Account Settings',
                     onTap: () {
+                      Navigator.pushNamed(context, '/settings');
                       // Handle Account Settings tap
                     },
                   ),

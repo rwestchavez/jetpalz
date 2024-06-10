@@ -56,7 +56,11 @@ class _ListViewWidgetState extends State<ListViewWidget> {
     if (widget.usersProvider.ventures.isEmpty &&
         !widget.usersProvider.hasNext) {
       return Center(
-        child: Text('No ventures found'),
+        child: Text(
+          'No Ventures found  \n\nTry using a different filter!',
+          style: TextStyle(fontSize: 18),
+          textAlign: TextAlign.center,
+        ),
       );
     }
     return ListView(

@@ -67,7 +67,7 @@ class _CreateVentureWidgetState extends State<CreateVenture> {
                               final CollectionReference ref = FirebaseFirestore
                                   .instance
                                   .collection('ventures');
-                              await ref.add({
+                              final newVentureRef = await ref.add({
                                 'country': country,
                                 'creator': userDoc,
                                 'industry': industry,
@@ -78,7 +78,26 @@ class _CreateVentureWidgetState extends State<CreateVenture> {
                                 'created_time': DateTime.now(),
                                 'max_people': people,
                               });
-                              Navigator.pop(context);
+                              try {
+                                // Get the current list of ventures
+                                DocumentSnapshot userSnapshot =
+                                    await userDoc.get();
+                                List<dynamic> currentVentures =
+                                    userSnapshot.get('current_ventures') ?? [];
+
+                                // Add the new venture reference to the list
+                                currentVentures.add(newVentureRef);
+
+                                // Update the user document with the new list of ventures
+                                await userDoc.update(
+                                    {'current_ventures': currentVentures});
+
+                                // Navigate back to the previous screen
+                                Navigator.pop(context);
+                              } catch (e) {
+                                // Handle errors
+                                print('Error updating user document: $e');
+                              }
                             }
                           },
                           child: Text(

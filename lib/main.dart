@@ -8,7 +8,11 @@ import 'package:jet_palz/auth/sign_in.dart';
 import 'package:jet_palz/auth/sign_up.dart';
 import 'package:jet_palz/auth/email_sign_up.dart';
 import 'package:jet_palz/firebase_options.dart';
+import 'package:jet_palz/profile/change_email.dart';
+import 'package:jet_palz/profile/change_password.dart';
 import 'package:jet_palz/profile/edit_profile.dart';
+import 'package:jet_palz/profile/my_ventures.dart';
+import 'package:jet_palz/profile/settings.dart';
 import 'package:provider/provider.dart';
 import 'ListViewStuff/venture_provider.dart';
 import 'nav/chat.dart';
@@ -51,6 +55,10 @@ class MyApp extends StatelessWidget {
         '/feed': (context) => const Main(),
         '/onboarding': (context) => const Onboarding(),
         '/editProfile': (context) => const EditProfile(),
+        '/myVentures': (context) => MyVenturesListView(),
+        '/settings': (context) => Settings(),
+        '/changeEmail': (context) => const ChangeEmail(),
+        '/changePassword': (context) => const ChangePassword(),
       },
       home: user != null ? const Main() : const SignUp(),
       theme: lightModeTheme.themeData,

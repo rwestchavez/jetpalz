@@ -53,7 +53,7 @@ class SingleLineWidget extends StatelessWidget {
                     child: Icon(
                       icon,
                       color: Theme.of(context).colorScheme.onSurface,
-                      size: 32.0, // Increase icon size
+                      size: 28.0, // Increase icon size
                     ),
                   ),
                   Padding(
@@ -61,11 +61,14 @@ class SingleLineWidget extends StatelessWidget {
                         start: 16.0), // Increase space between icon and text
                     child: Text(
                       text,
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            fontSize: 20.0, // Increase font size
-                            fontWeight:
-                                FontWeight.bold, // Make text bold if needed
-                          ),
+                      style: TextStyle(
+                              color:
+                                  Theme.of(context).textTheme.bodyLarge?.color)
+                          .copyWith(
+                        fontSize: 16, // Increase font size
+                        fontWeight:
+                            FontWeight.normal, // Make text bold if needed
+                      ),
                     ),
                   ),
                   Spacer(), // This will push the arrow icon to the right edge
@@ -75,7 +78,7 @@ class SingleLineWidget extends StatelessWidget {
                     child: Icon(
                       Icons.arrow_forward_ios,
                       color: Theme.of(context).colorScheme.onSurface,
-                      size: 24.0, // Increase arrow icon size
+                      size: 16.0, // Increase arrow icon size
                     ),
                   ),
                 ],
