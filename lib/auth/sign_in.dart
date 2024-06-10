@@ -5,6 +5,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:jet_palz/components/my_button.dart';
 import 'package:jet_palz/components/my_textField.dart';
 import 'package:jet_palz/main.dart';
+import '../components/my_snack_bar.dart';
 import 'google_auth.dart';
 
 class SignIn extends StatefulWidget {
@@ -70,13 +71,15 @@ class _SignInWidgetState extends State<SignIn> {
           snackBarMessage = 'An error occurred. Please try again later.';
       }
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(snackBarMessage)),
+      MySnackBar.show(
+        context,
+        content: Text(snackBarMessage),
       );
     } catch (e) {
       print("Error signing in: $e");
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("An error occurred. Please try again later.")),
+      MySnackBar.show(
+        context,
+        content: Text("An error occurred. Please try again later."),
       );
     }
   }
@@ -132,7 +135,6 @@ class _SignInWidgetState extends State<SignIn> {
                       hintText: "Email",
                       focusNode: emailAddressFocusNode,
                       controller: _emailController,
-                      autofocus: true,
                       keyboardType: TextInputType.emailAddress,
                       validator: (value) {
                         if (value == null || value.isEmpty) {

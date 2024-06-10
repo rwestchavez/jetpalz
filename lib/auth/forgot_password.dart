@@ -5,6 +5,8 @@ import 'package:jet_palz/components/my_button.dart';
 import 'package:jet_palz/components/my_textField.dart';
 import 'package:jet_palz/main.dart';
 
+import '../components/my_snack_bar.dart';
+
 class ForgotPassword extends StatefulWidget {
   const ForgotPassword({Key? key}) : super(key: key);
 
@@ -35,19 +37,12 @@ class _ForgotPasswordWidgetState extends State<ForgotPassword> {
   Future<void> _resetPassword(String email) async {
     try {
       await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Password reset email sent!'),
-        ),
-      );
+      MySnackBar.show(context, content: Text("Password reset email sent!"));
     } catch (error) {
       print('Password reset failed: $error');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
+      MySnackBar.show(context,
           content:
-              Text('Failed to send password reset email. Please try again.'),
-        ),
-      );
+              Text("Failed to send password reset email. Please try again."));
     }
   }
 

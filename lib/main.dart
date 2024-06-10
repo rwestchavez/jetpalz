@@ -8,6 +8,7 @@ import 'package:jet_palz/auth/sign_in.dart';
 import 'package:jet_palz/auth/sign_up.dart';
 import 'package:jet_palz/auth/email_sign_up.dart';
 import 'package:jet_palz/firebase_options.dart';
+import 'package:jet_palz/profile/edit_profile.dart';
 import 'package:provider/provider.dart';
 import 'ListViewStuff/venture_provider.dart';
 import 'nav/chat.dart';
@@ -49,10 +50,9 @@ class MyApp extends StatelessWidget {
         '/forgotPassword': (context) => const ForgotPassword(),
         '/feed': (context) => const Main(),
         '/onboarding': (context) => const Onboarding(),
+        '/editProfile': (context) => const EditProfile(),
       },
       home: user != null ? const Main() : const SignUp(),
-
-      initialRoute: user != null ? '/feed' : '/',
       theme: lightModeTheme.themeData,
       darkTheme: darkModeTheme.themeData,
       debugShowCheckedModeBanner: false,

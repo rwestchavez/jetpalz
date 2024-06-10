@@ -110,8 +110,7 @@ class _ListViewWidgetState extends State<ListViewWidget> {
                               } else if (snapshot.hasData) {
                                 var creatorData = snapshot.data?.data()
                                     as Map<String, dynamic>?;
-                                return Text(
-                                    creatorData?['display_name'] ?? "error",
+                                return Text(creatorData?['username'] ?? "error",
                                     style: TextStyle(
                                         fontWeight: FontWeight.w700,
                                         fontSize: 20));

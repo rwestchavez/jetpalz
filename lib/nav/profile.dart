@@ -23,6 +23,10 @@ class _ProfileWidgetState extends State<Profile> {
     _fetchUserData();
   }
 
+  Future<String?> _fetchPhotoUrl() async {
+    return _userData['photo_url'];
+  }
+
   Future<void> _fetchUserData() async {
     if (_user != null) {
       try {
@@ -42,221 +46,288 @@ class _ProfileWidgetState extends State<Profile> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
       appBar: MyAppBar(
         automaticallyImplyLeading: false,
-        title: "My Profile",
+        title: "Profile",
       ),
       body: SafeArea(
         child: Padding(
           padding: EdgeInsets.fromLTRB(8, 0, 8, 0.0),
           child: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.max,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisSize: MainAxisSize.max,
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    CircleAvatar(
-                      radius: 50,
-                      backgroundColor: Colors.grey,
-                      child: Icon(
-                        Icons.person,
-                        size: 50,
-                        color: Colors.white,
+            child: Padding(
+              padding: const EdgeInsets.only(top: 20),
+              child: Column(
+                mainAxisSize: MainAxisSize.max,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisSize: MainAxisSize.max,
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      FutureBuilder<String?>(
+                        future: _fetchPhotoUrl(),
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState ==
+                                  ConnectionState.waiting ||
+                              snapshot.data == null) {
+                            return CircleAvatar(
+                              radius: 50,
+                              backgroundColor: Colors.lightBlue[200],
+                              child: CircularProgressIndicator(),
+                            );
+                          } else if (snapshot.hasError) {
+                            return CircleAvatar(
+                              radius: 50,
+                              backgroundColor: Colors.lightBlue[200],
+                              child: Icon(
+                                Icons.error,
+                                size: 50,
+                                color: Colors.white,
+                              ),
+                            );
+                          } else if (snapshot.hasData &&
+                              snapshot.data != null) {
+                            return CircleAvatar(
+                              radius: 50,
+                              backgroundColor: Colors.lightBlue[200],
+                              child: ClipOval(
+                                child: Image.network(
+                                  snapshot.data!,
+                                  width: 100,
+                                  height: 100,
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+                            );
+                          } else {
+                            return CircleAvatar(
+                              radius: 50,
+                              backgroundColor: Colors.lightBlue[200],
+                              child: Icon(
+                                Icons.person,
+                                size: 50,
+                                color: Colors.white,
+                              ),
+                            );
+                          }
+                        },
+                      ),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Text(
+                            '${_userData['username'] ?? 'Loading...'}',
+                            style: TextStyle(
+                                color: Theme.of(context)
+                                    .textTheme
+                                    .bodyLarge
+                                    ?.color,
+                                fontSize: 28,
+                                fontWeight: FontWeight.bold),
+                          ),
+                          Text(
+                            '${_userData['profession'] ?? 'Loading...'}',
+                            style: TextStyle(
+                                fontWeight: FontWeight.normal,
+                                fontSize: 18,
+                                color: Theme.of(context)
+                                    .textTheme
+                                    .bodyLarge
+                                    ?.color),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                  Padding(
+                    padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0.0),
+                    child: Container(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          (_userData['description'] != null &&
+                                  _userData['description'].isNotEmpty)
+                              ? Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    SizedBox(height: 32),
+                                    Text(
+                                      _userData['description'],
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.normal,
+                                          fontSize: 18,
+                                          color: Theme.of(context)
+                                              .textTheme
+                                              .bodyLarge
+                                              ?.color),
+                                    ),
+                                  ],
+                                )
+                              : Text(""),
+                        ],
                       ),
                     ),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Text(
-                          '${_userData['display_name'] ?? 'Loading...'}',
-                          style: TextStyle(
-                              color:
-                                  Theme.of(context).textTheme.bodyLarge?.color,
-                              fontSize: 28,
-                              fontWeight: FontWeight.bold),
-                        ),
-                        Text(
-                          '${_userData['profession'] ?? 'Loading...'}',
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
-                            color:
-                                Theme.of(context).textTheme.bodyMedium?.color,
+                  ),
+                  Padding(
+                    padding: EdgeInsets.fromLTRB(16.0, 12.0, 16.0, 0.0),
+                    child: Container(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Countries I want to visit',
+                            style: TextStyle(
+                                color: Theme.of(context)
+                                    .textTheme
+                                    .bodyLarge
+                                    ?.color,
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold),
                           ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-                Padding(
-                  padding: EdgeInsets.fromLTRB(16.0, 24.0, 16.0, 0.0),
-                  child: Container(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Description',
-                          style: TextStyle(
-                              color:
-                                  Theme.of(context).textTheme.bodyLarge?.color,
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold),
-                        ),
-                        SizedBox(height: 8),
-                        Text(
-                          '${_userData['description'] ?? 'No description provided'}',
-                          style: TextStyle(fontSize: 16),
-                        ),
-                      ],
+                          SizedBox(height: 8),
+                          SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            child: Row(
+                              children: (_userData['countries_interest'] !=
+                                          null &&
+                                      _userData['countries_interest']
+                                          .isNotEmpty)
+                                  ? (_userData['countries_interest']
+                                          as List<dynamic>)
+                                      .map((country) {
+                                      return Padding(
+                                          padding:
+                                              const EdgeInsets.only(right: 8.0),
+                                          child: Container(
+                                            padding: EdgeInsets.symmetric(
+                                                horizontal: 12, vertical: 6),
+                                            decoration: BoxDecoration(
+                                              color: Color.fromARGB(
+                                                  255, 255, 198, 40),
+                                              borderRadius:
+                                                  BorderRadius.circular(20),
+                                            ),
+                                            child: Text(
+                                              country.toString(),
+                                              style: TextStyle(
+                                                  fontSize: 18,
+                                                  color: Theme.of(context)
+                                                      .colorScheme
+                                                      .surface),
+                                            ),
+                                          ));
+                                    }).toList()
+                                  : [
+                                      Text(
+                                        'Add countries by editing your profile...',
+                                        style: TextStyle(fontSize: 16),
+                                      ),
+                                    ],
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-                ),
-                Padding(
-                  padding: EdgeInsets.fromLTRB(16.0, 12.0, 16.0, 0.0),
-                  child: Container(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Countries I want to visit',
-                          style: TextStyle(
-                              color:
-                                  Theme.of(context).textTheme.bodyLarge?.color,
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold),
-                        ),
-                        SizedBox(height: 8),
-                        SingleChildScrollView(
-                          scrollDirection: Axis.horizontal,
-                          child: Row(
-                            children: _userData['countries_interest'] != null
-                                ? (_userData['countries_interest']
-                                        as List<dynamic>)
-                                    .map((country) {
-                                    return Padding(
-                                      padding:
-                                          const EdgeInsets.only(right: 8.0),
-                                      child: Chip(
-                                        label: Text(
-                                          country.toString(),
-                                          style: TextStyle(fontSize: 18),
-                                        ),
-                                        backgroundColor: Colors.orangeAccent,
-                                        shape: RoundedRectangleBorder(
-                                          side: BorderSide.none,
-                                          borderRadius:
-                                              BorderRadius.circular(20),
-                                        ),
-                                      ),
-                                    );
-                                  }).toList()
-                                : [
-                                    Chip(
-                                      label: Text(
-                                        'No countries provided',
-                                        style: TextStyle(fontSize: 18),
-                                      ),
-                                      backgroundColor: Colors.grey,
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(20),
-                                      ),
-                                    ),
-                                  ],
+                  Padding(
+                    padding: EdgeInsets.fromLTRB(16.0, 12.0, 16.0, 0.0),
+                    child: Container(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Professions I am interested in',
+                            style: TextStyle(
+                                color: Theme.of(context)
+                                    .textTheme
+                                    .bodyLarge
+                                    ?.color,
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold),
                           ),
-                        ),
-                      ],
+                          SizedBox(height: 8),
+                          SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            child: Row(
+                              children: (_userData['professions_interest'] !=
+                                          null &&
+                                      _userData['professions_interest']
+                                          .isNotEmpty)
+                                  ? (_userData['professions_interest']
+                                          as List<dynamic>)
+                                      .map((profession) {
+                                      return Padding(
+                                        padding:
+                                            const EdgeInsets.only(right: 8.0),
+                                        child: Container(
+                                          padding: EdgeInsets.symmetric(
+                                              horizontal: 12, vertical: 6),
+                                          decoration: BoxDecoration(
+                                            color: Color.fromARGB(255, 71, 200,
+                                                255), // Same background color as the Chip
+                                            borderRadius: BorderRadius.circular(
+                                                20), // Same border radius as the Chip
+                                          ),
+                                          child: Text(
+                                            profession.toString(),
+                                            style: TextStyle(
+                                                fontSize: 18,
+                                                color: Theme.of(context)
+                                                    .colorScheme
+                                                    .surface
+                                                // Adjust text color as needed
+                                                ),
+                                          ),
+                                        ),
+                                      );
+                                    }).toList()
+                                  : [
+                                      Text(
+                                        'Add professions by editing your profile...',
+                                        style: TextStyle(fontSize: 16),
+                                      ),
+                                    ],
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-                ),
-                Padding(
-                  padding: EdgeInsets.fromLTRB(16.0, 12.0, 16.0, 0.0),
-                  child: Container(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Professions I am interested in',
-                          style: TextStyle(
-                              color:
-                                  Theme.of(context).textTheme.bodyLarge?.color,
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold),
-                        ),
-                        SizedBox(height: 8),
-                        SingleChildScrollView(
-                          scrollDirection: Axis.horizontal,
-                          child: Row(
-                            children: _userData['professions_interest'] != null
-                                ? (_userData['professions_interest']
-                                        as List<dynamic>)
-                                    .map((profession) {
-                                    return Padding(
-                                      padding:
-                                          const EdgeInsets.only(right: 8.0),
-                                      child: Chip(
-                                        label: Text(
-                                          profession.toString(),
-                                          style: TextStyle(fontSize: 18),
-                                        ),
-                                        backgroundColor: Colors.lightBlueAccent,
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(20),
-                                        ),
-                                      ),
-                                    );
-                                  }).toList()
-                                : [
-                                    Chip(
-                                      label: Text(
-                                        'No professions provided',
-                                        style: TextStyle(fontSize: 18),
-                                      ),
-                                      backgroundColor: Colors.grey,
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(20),
-                                      ),
-                                    ),
-                                  ],
-                          ),
-                        ),
-                      ],
-                    ),
+                  Divider(
+                    height: 44.0,
+                    thickness: 1.0,
+                    indent: 24.0,
+                    endIndent: 24.0,
+                    color: Colors.grey,
                   ),
-                ),
-                Divider(
-                  height: 44.0,
-                  thickness: 1.0,
-                  indent: 24.0,
-                  endIndent: 24.0,
-                  color: Colors.grey,
-                ),
-                SingleLineWidget(
-                  icon: Icons.account_circle_outlined,
-                  text: 'Edit Profile',
-                  onTap: () {
-                    // Handle Edit Profile tap
-                  },
-                ),
-                SingleLineWidget(
-                  icon: Icons.airplanemode_active,
-                  text: 'My Ventures',
-                  onTap: () {
-                    // Handle My Ventures tap
-                  },
-                ),
-                SingleLineWidget(
-                  icon: Icons.settings_outlined,
-                  text: 'Account Settings',
-                  onTap: () {
-                    // Handle Account Settings tap
-                  },
-                ),
-              ],
+                  SingleLineWidget(
+                    icon: Icons.account_circle_outlined,
+                    text: 'Edit Profile',
+                    onTap: () async {
+                      final changesMade =
+                          await Navigator.pushNamed(context, '/editProfile');
+                      if (changesMade == true) {
+                        // Reload user data if changes were made
+                        _fetchUserData();
+                      }
+                    },
+                  ),
+                  SingleLineWidget(
+                    icon: Icons.airplanemode_active,
+                    text: 'My Ventures',
+                    onTap: () {
+                      // Handle My Ventures tap
+                    },
+                  ),
+                  SingleLineWidget(
+                    icon: Icons.settings_outlined,
+                    text: 'Account Settings',
+                    onTap: () {
+                      // Handle Account Settings tap
+                    },
+                  ),
+                ],
+              ),
             ),
           ),
         ),

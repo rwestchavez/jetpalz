@@ -6,6 +6,8 @@ import 'package:jet_palz/components/my_appBar.dart';
 import 'package:jet_palz/components/my_button.dart';
 import 'package:jet_palz/components/my_textField.dart';
 
+import '../components/my_snack_bar.dart';
+
 class EmailSignUp extends StatefulWidget {
   const EmailSignUp({
     Key? key,
@@ -59,7 +61,7 @@ class _EmailSignUpWidgetState extends State<EmailSignUp> {
           .doc(userCredential.user!.uid)
           .set({
         'email': userCredential.user!.email,
-        'display_name': '', // Add display name if needed
+        'username': '', // Add display name if needed
         'photo_url': '', // Add photo URL if needed
         'created_time': Timestamp.now(), // Add creation time
         'profession': '', // Add profession if needed
@@ -91,16 +93,15 @@ class _EmailSignUpWidgetState extends State<EmailSignUp> {
         default:
           snackBarMessage = 'An error occurred. Please try again later.';
       }
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(snackBarMessage)),
+      MySnackBar.show(
+        context,
+        content: Text(snackBarMessage),
       );
     } catch (e) {
       // Handle other errors
       print("Error signing up: $e");
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("An error occurred. Please try again later.")),
-      );
+      MySnackBar.show(context,
+          content: Text("An error occurred. Please try again later."));
     }
   }
 

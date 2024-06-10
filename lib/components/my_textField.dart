@@ -11,9 +11,11 @@ class MyTextField extends StatelessWidget {
   final FocusNode? focusNode;
   final Iterable<String>? autofillHints;
   String? Function(String?)? validator;
+  int? maxLines;
 
   MyTextField(
       {super.key,
+      this.maxLines,
       this.controller,
       this.hintText,
       this.obscureText = false,
@@ -28,6 +30,7 @@ class MyTextField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return TextFormField(
+        maxLines: maxLines,
         validator: validator,
         controller: controller,
         obscureText: obscureText,

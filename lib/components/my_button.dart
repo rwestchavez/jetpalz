@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class MyButton extends StatelessWidget {
-  final Function() onPressed;
+  final void Function()? onPressed;
   final Widget child;
 
   const MyButton({super.key, required this.onPressed, required this.child});

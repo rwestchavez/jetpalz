@@ -6,6 +6,9 @@ import 'package:jet_palz/components/my_button.dart';
 import 'package:jet_palz/components/my_textField.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
+import '../components/my_snack_bar.dart';
+import '../helpers/is_username_available.dart';
+
 class Onboarding extends StatefulWidget {
   const Onboarding({Key? key}) : super(key: key);
 
@@ -34,15 +37,6 @@ class _OnboardingWidgetState extends State<Onboarding> {
     _pageController.dispose();
     _usernameTextController.dispose();
     super.dispose();
-  }
-
-  Future<bool> _isUsernameAvailable(String username) async {
-    final querySnapshot = await FirebaseFirestore.instance
-        .collection('users')
-        .where('username', isEqualTo: username)
-        .get();
-
-    return querySnapshot.docs.isEmpty;
   }
 
   @override
@@ -121,7 +115,6 @@ class _OnboardingWidgetState extends State<Onboarding> {
                                       SizedBox(height: 24.0),
                                       MyTextField(
                                         controller: _usernameTextController,
-                                        autofocus: true,
                                         hintText: "Username",
                                         validator: (value) {
                                           if (value == null || value.isEmpty) {
@@ -129,6 +122,9 @@ class _OnboardingWidgetState extends State<Onboarding> {
                                           }
                                           if (value.length < 3) {
                                             return 'Username must be at least 3 characters long';
+                                          }
+                                          if (value.length > 30) {
+                                            return 'Username must be below 30 characters long';
                                           }
                                           if (!RegExp(r'^[a-zA-Z0-9_]+$')
                                               .hasMatch(value)) {
@@ -187,25 +183,26 @@ class _OnboardingWidgetState extends State<Onboarding> {
                       if (_pageController.page == 3 &&
                           _formKey.currentState!.validate()) {
                         final username = _usernameTextController.text;
-                        final isAvailable =
-                            await _isUsernameAvailable(username);
+                        final isNotAvailable =
+                            await isUsernameAvailable(username);
 
-                        if (isAvailable) {
+                        if (!isNotAvailable) {
                           // Username is available, proceed with registration
                           await FirebaseFirestore.instance
                               .collection('users')
                               .doc(userId)
                               .update({
-                            'display_name': username,
+                            'username': username,
+                            'photo_url':
+                                'https://firebasestorage.googleapis.com/v0/b/jetpalz.appspot.com/o/assets%2Fpfp.png?alt=media&token=f13f281f-f92d-484f-8119-0ba572034891',
                           });
                           Navigator.pushReplacementNamed(context, '/feed');
                         } else {
                           // Username is not available, inform the user
-                          (
-                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                              content: Text(
-                                  'Username is not available. Please choose a different one.'),
-                            )),
+                          MySnackBar.show(
+                            context,
+                            content: Text(
+                                'Username is not available. Please choose a different one.'),
                           );
                         }
                       } else {

@@ -15,7 +15,8 @@ class SingleLineWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsetsDirectional.fromSTEB(16.0, 12.0, 16.0, 0.0),
+      padding: EdgeInsetsDirectional.fromSTEB(
+          4, 12, 12, 4), // Increase top and bottom padding
       child: InkWell(
         splashColor: Colors.transparent,
         focusColor: Colors.transparent,
@@ -26,46 +27,55 @@ class SingleLineWidget extends StatelessWidget {
           color: Colors.transparent,
           elevation: 0.0,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12.0),
+            borderRadius: BorderRadius.circular(16.0), // Increase border radius
           ),
           child: Container(
             width: double.infinity,
+            height: 60, // Adjust the height of the container
             decoration: BoxDecoration(
               color: Theme.of(context).colorScheme.surface,
-              borderRadius: BorderRadius.circular(12.0),
+              borderRadius:
+                  BorderRadius.circular(16.0), // Increase border radius
               border: Border.all(
                 color: Colors.grey,
-                width: 1.0,
+                width: 1.5, // Increase border width
               ),
             ),
             child: Padding(
-              padding: EdgeInsetsDirectional.fromSTEB(8.0, 12.0, 8.0, 12.0),
+              padding: EdgeInsetsDirectional.fromSTEB(16.0, 16.0, 16.0,
+                  16.0), // Increase padding inside the container
               child: Row(
                 mainAxisSize: MainAxisSize.max,
                 children: [
                   Padding(
-                    padding: EdgeInsetsDirectional.fromSTEB(8.0, 0.0, 0.0, 0.0),
+                    padding: EdgeInsetsDirectional.only(
+                        start: 8.0), // Adjust padding
                     child: Icon(
                       icon,
                       color: Theme.of(context).colorScheme.onSurface,
-                      size: 24.0,
+                      size: 32.0, // Increase icon size
                     ),
                   ),
                   Padding(
-                    padding:
-                        EdgeInsetsDirectional.fromSTEB(12.0, 0.0, 0.0, 0.0),
+                    padding: EdgeInsetsDirectional.only(
+                        start: 16.0), // Increase space between icon and text
                     child: Text(
                       text,
-                      style: Theme.of(context).textTheme.bodyMedium,
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                            fontSize: 20.0, // Increase font size
+                            fontWeight:
+                                FontWeight.bold, // Make text bold if needed
+                          ),
                     ),
                   ),
                   Spacer(), // This will push the arrow icon to the right edge
                   Padding(
-                    padding: EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 8.0, 0.0),
+                    padding:
+                        EdgeInsetsDirectional.only(end: 8.0), // Adjust padding
                     child: Icon(
                       Icons.arrow_forward_ios,
                       color: Theme.of(context).colorScheme.onSurface,
-                      size: 16.0, // Slightly smaller arrow icon
+                      size: 24.0, // Increase arrow icon size
                     ),
                   ),
                 ],

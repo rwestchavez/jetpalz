@@ -3,6 +3,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
+import '../components/my_snack_bar.dart';
+
 Future<void> googleAuth(BuildContext context) async {
   try {
     final _auth = FirebaseAuth.instance;
@@ -25,7 +27,7 @@ Future<void> googleAuth(BuildContext context) async {
         .doc(userCredential.user!.uid)
         .set({
       'email': userCredential.user!.email,
-      'display_name': '', // Add display name if needed
+      'username': '', // Add display name if needed
       'photo_url': '', // Add photo URL if needed
       'created_time': Timestamp.now(), // Add creation time
       'profession': '', // Add profession if needed
@@ -39,8 +41,9 @@ Future<void> googleAuth(BuildContext context) async {
     Navigator.pushReplacementNamed(context, '/onboarding');
   } catch (e) {
     print('Google sign in failed: $e');
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Google sign in failed. Please try again later.')),
+    MySnackBar.show(
+      context,
+      content: Text('Google sign in failed. Please try again later.'),
     );
   }
 }

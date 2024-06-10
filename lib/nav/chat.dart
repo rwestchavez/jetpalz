@@ -37,7 +37,7 @@ class _AuthScreenState extends State<AuthScreen> {
           .doc(userCredential.user!.uid)
           .set({
         'email': userCredential.user!.email,
-        'display_name': '', // Add display name if needed
+        'username': '', // Add display name if needed
         'photo_url': '', // Add photo URL if needed
         'created_time': Timestamp.now(), // Add creation time
         'profession': '', // Add profession if needed

@@ -114,7 +114,6 @@ class _SignUpState extends State<SignUp> {
                                   child: MyTextField(
                                       controller: _emailAddressTextController,
                                       focusNode: _emailAddressFocusNode,
-                                      autofocus: true,
                                       hintText: "Email",
                                       autofillHints: [AutofillHints.email],
                                       obscureText: false,
