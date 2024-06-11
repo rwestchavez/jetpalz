@@ -16,7 +16,6 @@ class ChangeEmail extends StatefulWidget {
 class _ChangeEmailWidgetState extends State<ChangeEmail> {
   late TextEditingController _emailAddressController;
   late FocusNode _focusNode;
-  String _currentEmail = '';
   final userId = FirebaseAuth.instance.currentUser?.uid;
   final _formKey = GlobalKey<FormState>();
 
@@ -25,7 +24,6 @@ class _ChangeEmailWidgetState extends State<ChangeEmail> {
     super.initState();
     _emailAddressController = TextEditingController();
     _focusNode = FocusNode();
-    _getCurrentUserEmail();
   }
 
   @override
@@ -35,18 +33,17 @@ class _ChangeEmailWidgetState extends State<ChangeEmail> {
     super.dispose();
   }
 
-  Future<void> _getCurrentUserEmail() async {
+  Future<String> _getCurrentUserEmail() async {
     if (userId != null) {
       final userDataSnapshot = await FirebaseFirestore.instance
           .collection('users')
           .doc(userId)
           .get();
       if (userDataSnapshot.exists) {
-        setState(() {
-          _currentEmail = userDataSnapshot.data()?['email'] ?? '';
-        });
+        return userDataSnapshot.data()?['email'] ?? '';
       }
     }
+    return '';
   }
 
   Future<void> _changeEmail() async {
@@ -83,44 +80,55 @@ class _ChangeEmailWidgetState extends State<ChangeEmail> {
         appBar: MyAppBar(
           title: "Update email",
         ),
-        body: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Current Email: $_currentEmail',
-                  style: TextStyle(fontSize: 16),
-                ),
-                SizedBox(height: 8),
-                MyTextField(
-                  hintText: "Enter your new email",
-                  controller: _emailAddressController,
-                  focusNode: _focusNode,
-                  keyboardType: TextInputType.emailAddress,
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter your email';
-                    }
-                    if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
-                      return 'Please enter a valid email';
-                    }
-                    return null; // Validation passed
-                  },
-                ),
-                SizedBox(height: 16),
-                MyButton(
-                  onPressed: _changeEmail,
-                  child: Text(
-                    'Change Email',
-                    style: TextStyle(fontWeight: FontWeight.bold),
+        body: FutureBuilder<String>(
+          future: _getCurrentUserEmail(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return Center(child: CircularProgressIndicator());
+            } else if (snapshot.hasError) {
+              return Center(child: Text('Error: ${snapshot.error}'));
+            } else {
+              return Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Current Email: ${snapshot.data}',
+                        style: TextStyle(fontSize: 16),
+                      ),
+                      SizedBox(height: 8),
+                      MyTextField(
+                        hintText: "Enter your new email",
+                        controller: _emailAddressController,
+                        focusNode: _focusNode,
+                        keyboardType: TextInputType.emailAddress,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter your email';
+                          }
+                          if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
+                            return 'Please enter a valid email';
+                          }
+                          return null; // Validation passed
+                        },
+                      ),
+                      SizedBox(height: 16),
+                      MyButton(
+                        onPressed: _changeEmail,
+                        child: Text(
+                          'Change Email',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-              ],
-            ),
-          ),
+              );
+            }
+          },
         ),
       ),
     );
