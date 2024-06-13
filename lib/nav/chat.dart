@@ -15,6 +15,9 @@ class Chat extends StatelessWidget {
         appBar: MyAppBar(
           title: "Venture Chats",
           automaticallyImplyLeading: false,
+          actions: [
+            IconButton(onPressed: () {}, icon: Icon(Icons.notifications))
+          ],
         ),
         body: VentureChatRoom());
   }

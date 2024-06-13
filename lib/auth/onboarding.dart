@@ -183,10 +183,9 @@ class _OnboardingWidgetState extends State<Onboarding> {
                       if (_pageController.page == 3 &&
                           _formKey.currentState!.validate()) {
                         final username = _usernameTextController.text;
-                        final isNotAvailable =
-                            await isUsernameAvailable(username);
+                        final isAvailable = await isUsernameAvailable(username);
 
-                        if (!isNotAvailable) {
+                        if (isAvailable) {
                           // Username is available, proceed with registration
                           await FirebaseFirestore.instance
                               .collection('users')

@@ -38,7 +38,34 @@ class _VentureChatState extends State<VentureChat> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: MyAppBar(title: widget.chatName),
+      appBar: AppBar(
+          actions: [TextButton(onPressed: () {}, child: Text("Leave"))],
+          centerTitle: true,
+          title: Column(children: [
+            Text(
+              widget.chatName,
+              style: TextStyle(fontSize: 18),
+            ),
+            StreamBuilder<DocumentSnapshot>(
+              stream: FirebaseFirestore.instance
+                  .collection('venture_chats')
+                  .doc(widget.chatId)
+                  .snapshots(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return Container();
+                }
+
+                var chatData = snapshot.data!.data() as Map<String, dynamic>;
+                List<dynamic> members = chatData['members'] ?? [];
+
+                return Text(
+                  '${members.length} members',
+                  style: TextStyle(fontSize: 14.0),
+                );
+              },
+            ),
+          ])),
       body: SafeArea(
         child: GestureDetector(
           onTap: () {
@@ -63,12 +90,11 @@ class _VentureChatState extends State<VentureChat> {
                     }
 
                     if (snapshot.connectionState == ConnectionState.waiting) {
-                      return CircularProgressIndicator();
+                      return Container();
                     }
 
                     List<Message> messages = snapshot.data!.docs.map((doc) {
-                      Map<String, dynamic> data =
-                          doc.data() as Map<String, dynamic>;
+                      var data = doc.data() as Map<String, dynamic>;
                       return Message(
                         senderId: data['senderId'] ?? '',
                         sender: data['sender'] ?? '',
@@ -83,11 +109,36 @@ class _VentureChatState extends State<VentureChat> {
                       itemCount: messages.length,
                       itemBuilder: (context, index) {
                         Message message = messages[index];
-                        return MessageBubble(
-                          sender: message.sender,
-                          content: message.content,
-                          isMe: message.senderId == getCurrentUserId(),
-                        );
+                        return StreamBuilder<DocumentSnapshot>(
+                            stream: FirebaseFirestore.instance
+                                .collection('users')
+                                .doc(message.senderId)
+                                .snapshots(),
+                            builder: (context, snapshot) {
+                              if (snapshot.connectionState ==
+                                  ConnectionState.waiting) {
+                                // Show a loading indicator or placeholder widget
+                                return Container();
+                              }
+
+                              if (!snapshot.hasData || snapshot.data == null) {
+                                // Handle the case where snapshot.data is null
+                                return Text('No user data found');
+                              }
+
+                              var userData =
+                                  snapshot.data!.data() as Map<String, dynamic>;
+                              String pfp = userData['photo_url'];
+
+                              return MessageBubble(
+                                senderId: message.senderId,
+                                sender: message.sender,
+                                content: message.content,
+                                isMe: message.senderId == getCurrentUserId(),
+                                pfp: pfp,
+                                messageTime: message.timestamp.toDate(),
+                              );
+                            });
                       },
                     );
                   },
@@ -112,8 +163,10 @@ class _VentureChatState extends State<VentureChat> {
                           border: InputBorder.none,
                         ),
                         onSubmitted: (message) {
-                          sendMessage(widget.chatId, message);
-                          _messageController.clear();
+                          if (message != "") {
+                            sendMessage(widget.chatId, message);
+                            _messageController.clear();
+                          }
                         },
                       ),
                     ),
@@ -166,14 +219,20 @@ class _VentureChatState extends State<VentureChat> {
 }
 
 class MessageBubble extends StatelessWidget {
+  final String senderId;
   final String sender;
   final String content;
   final bool isMe;
+  final String pfp;
+  final DateTime messageTime;
 
   MessageBubble({
+    required this.pfp,
+    required this.senderId,
     required this.sender,
     required this.content,
     required this.isMe,
+    required this.messageTime,
   });
 
   @override
@@ -181,32 +240,61 @@ class MessageBubble extends StatelessWidget {
     return Container(
       margin: EdgeInsets.only(bottom: 16.0),
       alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
-      child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-        decoration: BoxDecoration(
-          color: isMe ? Colors.blue : Colors.grey[300],
-          borderRadius: BorderRadius.circular(16.0),
-        ),
-        child: Column(
-          crossAxisAlignment:
-              isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
-          children: [
-            Text(
-              sender,
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                color: isMe ? Colors.white : Colors.black,
-              ),
+      child: Column(
+        crossAxisAlignment:
+            isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+        children: [
+          if (!isMe) ...[
+            Row(
+              children: [
+                CircleAvatar(
+                  backgroundImage: NetworkImage(
+                      pfp), // Replace pfp with the URL of the profile picture
+                  radius: 16.0,
+                ),
+                SizedBox(
+                  width: 8,
+                ),
+                Text(
+                  sender,
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
+                  ),
+                ),
+              ],
             ),
-            SizedBox(height: 4.0),
-            Text(
-              content,
-              style: TextStyle(
-                color: isMe ? Colors.white : Colors.black,
-              ),
-            ),
+            SizedBox(height: 8.0),
           ],
-        ),
+          Container(
+            padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+            decoration: BoxDecoration(
+              color: isMe ? Colors.blue : Colors.grey[300],
+              borderRadius: BorderRadius.circular(16.0),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  content,
+                  style: TextStyle(
+                    color: isMe ? Colors.white : Colors.black,
+                  ),
+                ),
+                SizedBox(
+                    height:
+                        4.0), // Add some spacing between content and timestamp
+                Text(
+                  '${messageTime.hour}:${messageTime.minute}',
+                  style: TextStyle(
+                    color: isMe ? Colors.white : Colors.black,
+                    fontSize: 12.0,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

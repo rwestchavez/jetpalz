@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:jet_palz/components/my_button.dart';
-
 import '../app_state.dart';
 import 'venture_provider.dart';
 import 'package:flutter/material.dart';
@@ -38,9 +38,7 @@ class _ListViewWidgetState extends State<ListViewWidget> {
   }
 
   void scrollListener() {
-    if (scrollController.offset >=
-            scrollController.position
-                .maxScrollExtent && // you can do /2 to make it faster and seamless
+    if (scrollController.offset >= scrollController.position.maxScrollExtent &&
         !scrollController.position.outOfRange) {
       if (widget.usersProvider.hasNext) {
         widget.usersProvider.fetchNextUsers();
@@ -48,11 +46,24 @@ class _ListViewWidgetState extends State<ListViewWidget> {
     }
   }
 
+  Future<void> sendJoinRequest(String ventureId) async {
+    final user = FirebaseAuth.instance.currentUser;
+    ; // Assuming you have a currentUser in your AppState
+    if (user != null) {
+      final requestRef =
+          FirebaseFirestore.instance.collection('requests').doc();
+      await requestRef.set({
+        'requestId': requestRef.id,
+        'requesterId': user.uid,
+        'ventureId': ventureId,
+        'status': 'pending',
+        'timestamp': FieldValue.serverTimestamp(),
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    print(widget.appState.estimatedWeeks);
-    print("Building...");
-
     if (widget.usersProvider.ventures.isEmpty &&
         !widget.usersProvider.hasNext) {
       return Center(
@@ -119,7 +130,7 @@ class _ListViewWidgetState extends State<ListViewWidget> {
                                         fontWeight: FontWeight.w700,
                                         fontSize: 20));
                               } else {
-                                return Text('Unkheeeon');
+                                return Text('Unknown');
                               }
                             },
                           ),
@@ -154,7 +165,10 @@ class _ListViewWidgetState extends State<ListViewWidget> {
                             child: Container(
                               constraints: BoxConstraints(maxWidth: 150),
                               child: MyButton(
-                                onPressed: () {},
+                                onPressed: () {
+                                  sendJoinRequest(
+                                      venture.ventureId); // Pass ventureId here
+                                },
                                 child: Text("Join"),
                               ),
                             ),

@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class VentureModel {
+  final String ventureId;
+
   final String? country;
   final DocumentReference? creator;
   final String? industry;
@@ -12,6 +14,7 @@ class VentureModel {
   final int? maxPeople;
 
   VentureModel({
+    required this.ventureId,
     required this.country,
     required this.creator,
     required this.industry,
@@ -24,8 +27,10 @@ class VentureModel {
   });
 
   // Factory method to create a VentureModel from a Firestore document
-  factory VentureModel.fromDocument(Map<String, dynamic> data) {
+  factory VentureModel.fromDocument(DocumentSnapshot doc) {
+    var data = doc.data() as Map<String, dynamic>;
     return VentureModel(
+      ventureId: doc.id,
       country: data['country'] ?? 'Unknown',
       creator: data['creator'],
       industry: data['industry'] ?? 'Unknown',
