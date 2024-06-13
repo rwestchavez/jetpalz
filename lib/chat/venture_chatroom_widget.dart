@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'venture_chat.dart';
 
@@ -11,14 +12,37 @@ class VentureChatRoomWidget extends StatelessWidget {
   final String chatId;
 
   const VentureChatRoomWidget({
-    super.key,
+    Key? key,
     required this.chatId,
     required this.chatName,
     required this.lastMessage,
     required this.lastMessageTime,
     required this.lastMessageSentBy,
     required this.members,
-  });
+  }) : super(key: key);
+
+  Stream<int> getUnreadMessagesCountStream(String chatId, String userId) {
+    var firestore = FirebaseFirestore.instance;
+    var chatRef = firestore.collection('venture_chats').doc(chatId);
+    var userRef = firestore.collection('users').doc(userId);
+
+    return userRef.snapshots().asyncMap((userSnap) async {
+      var userData = userSnap.data() as Map<String, dynamic>?;
+      var lastReadTimestamp = userData?['lastRead']?[chatId] as Timestamp?;
+
+      var messagesQuery = chatRef.collection('messages').where(
+            'timestamp',
+            isGreaterThan: lastReadTimestamp ?? Timestamp(0, 0),
+          );
+
+      var messagesSnap = await messagesQuery.get();
+      var unreadMessages = messagesSnap.docs
+          .where((doc) => !doc.data()['seenBy'].contains(userId))
+          .toList();
+
+      return unreadMessages.length;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -58,93 +82,91 @@ class VentureChatRoomWidget extends StatelessWidget {
         );
       },
       child: Container(
-        width: double.infinity,
+        padding: EdgeInsets.all(16.0),
         decoration: BoxDecoration(
-          border: Border.all(
-            color: Colors.grey, // Set the border color to light grey
-            width: 2.0, // Set the border width
+          border: Border(
+            bottom: BorderSide(
+              color: Colors.grey[300]!,
+              width: 1.0,
+            ),
           ),
-          borderRadius: BorderRadius.circular(
-              8.0), // Add rounded corners to the container
         ),
-        child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Display chatName
-                    if (chatName.isNotEmpty) ...[
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Text(
-                              chatName,
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.normal,
-                                color: Colors.black,
-                              ),
-                            ),
-                          ),
-                          SizedBox(width: 8.0),
-                          Container(
-                            width: 20.0,
-                            height: 20.0,
-                            decoration: BoxDecoration(
-                              color: Colors
-                                  .red, // Placeholder color for unread messages
-                              shape: BoxShape.circle,
-                            ),
-                            child: Center(
-                              child: Text(
-                                '3', // Placeholder for number of unread messages
-                                style: TextStyle(color: Colors.white),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: 4),
-                    ],
-
-                    // Display last message
-                    if (lastMessage.isNotEmpty) ...[
-                      Row(
-                        children: [
-                          if (lastMessageSentBy != null)
-                            Text('$lastMessageSentBy: ')
-                          else
-                            Text(''),
-                          Expanded(
-                            child: Text(
-                              lastMessage,
-                              textAlign: TextAlign.start,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                          if (timeAgo.isNotEmpty) ...[
-                            Align(
-                              alignment: AlignmentDirectional.centerEnd,
-                              child: Text(
-                                timeAgo,
-                                textAlign: TextAlign.start,
-                              ),
-                            ),
-                          ],
-                        ],
-                      ),
-                    ],
-                  ],
+        child: Stack(
+          children: [
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Chat Name
+                Text(
+                  chatName,
+                  style: TextStyle(
+                    fontSize: 18.0,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
+                SizedBox(height: 8.0),
+                // Last Message
+                Text(
+                  lastMessage.isNotEmpty
+                      ? '${lastMessageSentBy ?? ''}: $lastMessage'
+                      : 'No messages yet',
+                  style: TextStyle(
+                    fontSize: 14.0,
+                    color: Colors.grey[600],
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                SizedBox(height: 8.0),
+                // Time Ago
+                Text(
+                  timeAgo,
+                  style: TextStyle(
+                    fontSize: 12.0,
+                    color: Colors.grey[600],
+                  ),
+                ),
+              ],
+            ),
+            Positioned(
+              top: 0,
+              right: 0,
+              child: StreamBuilder<int>(
+                stream:
+                    getUnreadMessagesCountStream(chatId, getCurrentUserId()),
+                builder: (context, snapshot) {
+                  int unreadCount = snapshot.data ?? 0;
+                  return unreadCount > 0
+                      ? Container(
+                          padding: EdgeInsets.all(8.0),
+                          decoration: BoxDecoration(
+                            color: Colors.red,
+                            shape: BoxShape.circle,
+                          ),
+                          child: Text(
+                            '$unreadCount',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 12.0,
+                            ),
+                          ),
+                        )
+                      : SizedBox.shrink();
+                },
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
+  }
+
+  String getCurrentUserId() {
+    FirebaseAuth auth = FirebaseAuth.instance;
+    User? currentUser = auth.currentUser;
+    return currentUser!.uid;
   }
 }

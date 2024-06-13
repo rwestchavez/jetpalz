@@ -57,12 +57,12 @@ class _SignUpState extends State<SignUp> {
                   ),
                   Container(
                     width: double.infinity,
-                    constraints: BoxConstraints(
+                    constraints: const BoxConstraints(
                       maxWidth: 430.0,
                     ),
-                    decoration: BoxDecoration(),
+                    decoration: const BoxDecoration(),
                     child: Align(
-                      alignment: AlignmentDirectional(0.0, 0.0),
+                      alignment: const AlignmentDirectional(0.0, 0.0),
                       child: Padding(
                         padding: EdgeInsets.all(24.0),
                         child: Form(
@@ -71,7 +71,7 @@ class _SignUpState extends State<SignUp> {
                             mainAxisSize: MainAxisSize.max,
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Align(
+                              const Align(
                                 alignment: Alignment.center,
                                 child: Text(
                                   'Create an account',
@@ -81,7 +81,7 @@ class _SignUpState extends State<SignUp> {
                                   ),
                                 ),
                               ),
-                              Align(
+                              const Align(
                                 alignment: AlignmentDirectional(0.0, 0.0),
                                 child: Padding(
                                   padding: EdgeInsetsDirectional.fromSTEB(
@@ -103,19 +103,21 @@ class _SignUpState extends State<SignUp> {
                                 ),
                               ),
                               Padding(
-                                padding: EdgeInsetsDirectional.fromSTEB(
+                                padding: const EdgeInsetsDirectional.fromSTEB(
                                   0.0,
                                   0.0,
                                   0.0,
                                   16.0,
                                 ),
-                                child: Container(
+                                child: SizedBox(
                                   width: double.infinity,
                                   child: MyTextField(
                                       controller: _emailAddressTextController,
                                       focusNode: _emailAddressFocusNode,
                                       hintText: "Email",
-                                      autofillHints: [AutofillHints.email],
+                                      autofillHints: const [
+                                        AutofillHints.email
+                                      ],
                                       obscureText: false,
                                       keyboardType: TextInputType.emailAddress,
                                       validator: (value) {

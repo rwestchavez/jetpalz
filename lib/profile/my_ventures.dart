@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:jet_palz/components/my_appbar.dart';
-import 'package:jet_palz/components/my_button.dart'; // Assuming you're using Firestore
 
 class MyVenturesListView extends StatelessWidget {
   @override

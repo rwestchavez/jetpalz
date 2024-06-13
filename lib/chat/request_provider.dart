@@ -7,7 +7,7 @@ import '../models/request_model.dart';
 class RequestProvider with ChangeNotifier {
   List<JoinRequest> _requests = [];
   bool _isLoading = true;
-  String _userId = FirebaseAuth.instance.currentUser!.uid;
+  final String _userId = FirebaseAuth.instance.currentUser!.uid;
 
   List<JoinRequest> get requests => _requests;
   bool get isLoading => _isLoading;
@@ -35,7 +35,7 @@ class RequestProvider with ChangeNotifier {
 
     if (status == 'accepted') {
       var requesterRef = firestore.collection("users").doc(request.requesterId);
-      // need to get the user ref, then get the chat reference, and look up that chat and add user refeence to aht chat
+      // need to get the user ref, then get the chat reference, and look up that chat and add user reference to chat
       var ventureSnap =
           await firestore.collection("ventures").doc(request.ventureId).get();
       var ventureData = ventureSnap.data() as Map<String, dynamic>;
@@ -73,8 +73,12 @@ class RequestProvider with ChangeNotifier {
       await firestore.collection('requests').doc(request.requestId).update({
         'status': status,
       });
+    } else if (status == 'rejected') {
+      // Handle rejection logic here
+      await firestore.collection('requests').doc(request.requestId).update({
+        'status': status,
+      });
     }
-    if (status == 'rejected') {}
     _fetchRequests();
   }
 }

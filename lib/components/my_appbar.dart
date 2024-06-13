@@ -8,6 +8,7 @@ class MyAppBar extends StatelessWidget implements PreferredSizeWidget {
   bool automaticallyImplyLeading;
 
   MyAppBar({
+    super.key,
     required this.title,
     this.actions = const [],
     this.leading,

@@ -1,8 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/material.dart';
-import 'package:jet_palz/components/my_appBar.dart';
-import 'package:jet_palz/main.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
 
 class VentureChat extends StatefulWidget {
   final String chatName;
@@ -30,9 +28,40 @@ class _VentureChatState extends State<VentureChat> {
   final TextEditingController _messageController = TextEditingController();
 
   @override
+  void initState() {
+    super.initState();
+    updateLastRead();
+  }
+
+  @override
   void dispose() {
     _messageController.dispose();
     super.dispose();
+  }
+
+  Future<void> markMessageAsSeen(
+      String chatId, String messageId, String userId) async {
+    var messageRef = FirebaseFirestore.instance
+        .collection('venture_chats')
+        .doc(chatId)
+        .collection('messages')
+        .doc(messageId);
+
+    // Update the seenBy array to include the current user's ID
+    await messageRef.update({
+      'seenBy': FieldValue.arrayUnion([userId]),
+    });
+
+    // Update the lastRead timestamp for the current user
+    await updateLastRead();
+  }
+
+  Future<void> updateLastRead() async {
+    var userRef =
+        FirebaseFirestore.instance.collection('users').doc(getCurrentUserId());
+    await userRef.update({
+      'lastRead.${widget.chatId}': FieldValue.serverTimestamp(),
+    });
   }
 
   @override
@@ -100,6 +129,7 @@ class _VentureChatState extends State<VentureChat> {
                         sender: data['sender'] ?? '',
                         content: data['content'] ?? '',
                         timestamp: data['timestamp'] ?? 0,
+                        seenBy: data['seenBy'] ?? [],
                       );
                     }).toList();
 
@@ -109,6 +139,15 @@ class _VentureChatState extends State<VentureChat> {
                       itemCount: messages.length,
                       itemBuilder: (context, index) {
                         Message message = messages[index];
+                        bool isSeenByCurrentUser =
+                            message.seenBy.contains(getCurrentUserId());
+                        if (!isSeenByCurrentUser) {
+                          markMessageAsSeen(
+                              widget.chatId,
+                              snapshot.data!.docs[index].id,
+                              getCurrentUserId());
+                        }
+
                         return StreamBuilder<DocumentSnapshot>(
                             stream: FirebaseFirestore.instance
                                 .collection('users')
@@ -131,6 +170,7 @@ class _VentureChatState extends State<VentureChat> {
                               String pfp = userData['photo_url'];
 
                               return MessageBubble(
+                                seenBy: message.seenBy,
                                 senderId: message.senderId,
                                 sender: message.sender,
                                 content: message.content,
@@ -208,6 +248,14 @@ class _VentureChatState extends State<VentureChat> {
       'sender': sender,
       'content': message,
       'timestamp': Timestamp.now(),
+      'seenBy': [currentUserId],
+    });
+
+    // Update lastMessage and lastMessageTime in chat document
+    await firestore.collection('venture_chats').doc(chatId).update({
+      'last_message': message,
+      'last_message_time': Timestamp.now(),
+      'last_message_sent_by': userRef,
     });
   }
 
@@ -225,6 +273,7 @@ class MessageBubble extends StatelessWidget {
   final bool isMe;
   final String pfp;
   final DateTime messageTime;
+  final List<dynamic> seenBy;
 
   MessageBubble({
     required this.pfp,
@@ -233,6 +282,7 @@ class MessageBubble extends StatelessWidget {
     required this.content,
     required this.isMe,
     required this.messageTime,
+    required this.seenBy,
   });
 
   @override
@@ -269,28 +319,48 @@ class MessageBubble extends StatelessWidget {
           Container(
             padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
             decoration: BoxDecoration(
-              color: isMe ? Colors.blue : Colors.grey[300],
-              borderRadius: BorderRadius.circular(16.0),
+              color: isMe ? Colors.blue[200] : Colors.grey[300],
+              borderRadius: isMe
+                  ? BorderRadius.only(
+                      topLeft: Radius.circular(16.0),
+                      topRight: Radius.circular(16.0),
+                      bottomLeft: Radius.circular(16.0),
+                    )
+                  : BorderRadius.only(
+                      bottomRight: Radius.circular(16.0),
+                      topRight: Radius.circular(16.0),
+                      bottomLeft: Radius.circular(16.0),
+                    ),
             ),
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment:
+                  isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
               children: [
                 Text(
                   content,
                   style: TextStyle(
-                    color: isMe ? Colors.white : Colors.black,
+                    fontSize: 16.0,
+                    color: Colors.black,
                   ),
                 ),
-                SizedBox(
-                    height:
-                        4.0), // Add some spacing between content and timestamp
+                SizedBox(height: 4.0),
                 Text(
-                  '${messageTime.hour}:${messageTime.minute}',
+                  getMessageTime(messageTime),
                   style: TextStyle(
-                    color: isMe ? Colors.white : Colors.black,
                     fontSize: 12.0,
+                    color: Colors.grey[600],
                   ),
                 ),
+                if (isMe) ...[
+                  SizedBox(height: 4.0),
+                  /* Text(
+                    seenBy.length > 1 ? 'Seen' : 'Sent',
+                    style: TextStyle(
+                      fontSize: 12.0,
+                      color: Colors.grey[600],
+                    ),
+                  ),*/
+                ],
               ],
             ),
           ),
@@ -298,15 +368,31 @@ class MessageBubble extends StatelessWidget {
       ),
     );
   }
+
+  String getMessageTime(DateTime timestamp) {
+    final now = DateTime.now();
+    final difference = now.difference(timestamp);
+
+    if (difference.inDays > 0) {
+      return '${timestamp.month}/${timestamp.day}/${timestamp.year}';
+    } else {
+      final hours = timestamp.hour.toString().padLeft(2, '0');
+      final minutes = timestamp.minute.toString().padLeft(2, '0');
+      final period = timestamp.hour >= 12 ? 'PM' : 'AM';
+      return '$hours:$minutes $period';
+    }
+  }
 }
 
 class Message {
+  final List seenBy;
   final String senderId;
   final String sender;
   final String content;
   final Timestamp timestamp;
 
   Message({
+    required this.seenBy,
     required this.senderId,
     required this.sender,
     required this.content,

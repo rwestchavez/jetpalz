@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:animated_custom_dropdown/custom_dropdown.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -15,7 +14,7 @@ import '../constants.dart';
 import '../helpers/is_username_available.dart';
 
 class EditProfile extends StatefulWidget {
-  const EditProfile({Key? key}) : super(key: key);
+  const EditProfile({super.key});
 
   @override
   State<EditProfile> createState() => _ProfileWidgetState();

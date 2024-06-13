@@ -1,22 +1,9 @@
 import 'package:animated_custom_dropdown/custom_dropdown.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../ListViewStuff/venture_provider.dart';
 import '../app_state.dart';
-
 import '../constants.dart';
-
-import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:animated_custom_dropdown/custom_dropdown.dart';
-import '../constants.dart';
-import '../app_state.dart';
-
-import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:animated_custom_dropdown/custom_dropdown.dart';
-import '../constants.dart';
-import '../app_state.dart';
+import '../feed/venture_provider.dart';
 
 class FilterVenture extends StatefulWidget {
   const FilterVenture({super.key});

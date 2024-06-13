@@ -1,10 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 import 'package:jet_palz/components/my_button.dart';
 import 'package:jet_palz/components/my_textField.dart';
-import 'package:jet_palz/main.dart';
 import '../components/my_snack_bar.dart';
 import 'google_auth.dart';
 

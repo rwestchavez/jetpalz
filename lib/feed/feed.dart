@@ -1,14 +1,10 @@
-import 'package:animated_custom_dropdown/custom_dropdown.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../ListViewStuff/listview_widget.dart';
-import '../ListViewStuff/venture_provider.dart';
+import 'listview_widget.dart';
+import 'venture_provider.dart';
 import '../app_state.dart';
 import '../components/my_appBar.dart';
-import '../components/my_button.dart';
-import '../constants.dart';
+
 import '../BottomSheets/create_venture.dart';
 import '../BottomSheets/filter_venture.dart';
 

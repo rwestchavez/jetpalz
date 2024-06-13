@@ -1,5 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:jet_palz/app_state.dart';
 
 class FirebaseApi {
   static Future<QuerySnapshot> getUsers(

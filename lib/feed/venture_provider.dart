@@ -1,10 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:jet_palz/app_state.dart';
 import 'package:jet_palz/models/venture_model.dart';
-import '../app_state.dart';
-import "venture_provider.dart";
 import 'package:flutter/material.dart';
-import '../models/user_model.dart';
 import 'firebase_api.dart';
 
 // this is meant to get ventures, not users

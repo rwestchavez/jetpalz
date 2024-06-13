@@ -6,7 +6,7 @@ import 'package:jet_palz/auth/forgot_password.dart';
 import 'package:jet_palz/auth/onboarding.dart';
 import 'package:jet_palz/auth/sign_in.dart';
 import 'package:jet_palz/auth/sign_up.dart';
-import 'package:jet_palz/auth/email_sign_up.dart';
+import 'package:jet_palz/chat/chat.dart';
 import 'package:jet_palz/chat/notifications_ui.dart';
 import 'package:jet_palz/chat/request_provider.dart';
 import 'package:jet_palz/firebase_options.dart';
@@ -16,10 +16,10 @@ import 'package:jet_palz/profile/edit_profile.dart';
 import 'package:jet_palz/profile/my_ventures.dart';
 import 'package:jet_palz/profile/settings.dart';
 import 'package:provider/provider.dart';
-import 'ListViewStuff/venture_provider.dart';
-import 'nav/chat.dart';
-import 'nav/feed.dart';
-import 'nav/profile.dart';
+import 'feed/venture_provider.dart';
+import 'chat/chat_provider.dart';
+import 'feed/feed.dart';
+import 'profile/profile.dart';
 import 'theme/dark_mode_theme.dart';
 import 'theme/light_mode_theme.dart';
 import 'app_state.dart';
@@ -31,7 +31,8 @@ Future<void> main() async {
     providers: [
       ChangeNotifierProvider(create: (_) => AppState()),
       ChangeNotifierProvider(create: (_) => VentureProvider()),
-      ChangeNotifierProvider(create: (_) => RequestProvider())
+      ChangeNotifierProvider(create: (_) => RequestProvider()),
+      ChangeNotifierProvider(create: (_) => ChatProvider()),
     ],
     child: MyApp(),
   ));

@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:jet_palz/components/my_appBar.dart';
 import 'package:jet_palz/components/my_button.dart';
 import 'package:jet_palz/components/my_textField.dart';
-import 'package:jet_palz/main.dart';
 
 import '../components/my_snack_bar.dart';
 
