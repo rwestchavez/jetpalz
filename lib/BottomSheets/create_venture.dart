@@ -67,16 +67,11 @@ class _CreateVentureWidgetState extends State<CreateVenture> {
                                   .doc(currentUser!.uid);
                               final venturesRef =
                                   firestore.collection('ventures');
-                              final chatsRef =
-                                  firestore.collection('venture_chats');
 
                               await firestore
                                   .runTransaction((transaction) async {
                                 DocumentSnapshot userSnapshot =
                                     await transaction.get(userDoc);
-
-                                String chatName =
-                                    "${userSnapshot["username"]}'s Venture";
 
                                 Map<String, dynamic> ventureData = {
                                   'country': country,
@@ -88,34 +83,18 @@ class _CreateVentureWidgetState extends State<CreateVenture> {
                                   'estimated_weeks': weeks,
                                   'created_time': DateTime.now(),
                                   'max_people': people,
-                                  'chat': null, // We'll update this later
+                                  'chat': null,
                                 };
 
                                 DocumentReference newVentureRef =
                                     venturesRef.doc();
                                 transaction.set(newVentureRef, ventureData);
 
-                                Map<String, dynamic> chatData = {
-                                  'name': chatName,
-                                  'members': [userDoc],
-                                  'created_time': DateTime.now(),
-                                  'last_message': '',
-                                  'last_message_time': null,
-                                  'last_message_sent_by': null,
-                                };
-
-                                DocumentReference newChatRef = chatsRef.doc();
-                                transaction.set(newChatRef, chatData);
-
                                 List<dynamic> currentVentures =
                                     userSnapshot.get('current_ventures') ?? [];
                                 currentVentures.add(newVentureRef);
                                 transaction.update(userDoc,
                                     {'current_ventures': currentVentures});
-
-                                ventureData['chat'] =
-                                    newChatRef; // Update the ventureData with the new chat reference
-                                transaction.update(newVentureRef, ventureData);
                               });
                               print("Transaction comoplete");
 

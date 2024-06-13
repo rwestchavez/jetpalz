@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:jet_palz/app_state.dart';
 import 'package:jet_palz/models/venture_model.dart';
 import '../app_state.dart';
 import "venture_provider.dart";
@@ -25,14 +26,13 @@ class VentureProvider extends ChangeNotifier {
         final doc = snap.data() as Map<String, dynamic>;
 
         return VentureModel(
+          ventureId: snap.id,
           // Init a new object for each snapshot document
           country: doc['country'] ?? 'Unknown',
           creator: doc['creator'],
           industry: doc['industry'] ?? 'Unknown',
           description: doc['description'] ?? 'No description',
-          memberList: doc['member_list'] != null
-              ? List<DocumentReference>.from(doc['member_list'])
-              : [],
+          memberNum: doc['member_num'] ?? 0,
           startingMonth: doc['starting_month'] ?? 'Unknown',
           estimatedWeeks: doc['estimated_weeks'] ?? 0,
           createdTime: (doc['created_time'] as Timestamp? ?? Timestamp.now()),
@@ -40,20 +40,32 @@ class VentureProvider extends ChangeNotifier {
         );
       }).toList();
 
-  Future fetchNextUsers() async {
+  Future fetchNextUsers({bool reset = false}) async {
     if (_isFetchingVentures)
       return; // quits early if already fetching users. Return stops function
 
     _errorMessage = '';
     _isFetchingVentures = true;
 
+    if (reset) {
+      _venturesSnapshot.clear();
+      _hasNext = true;
+      notifyListeners();
+    }
+
     try {
+      final appState = AppState();
       final snap = await FirebaseApi.getUsers(
         //appState: appState,
         // get users still just gets even if its first page or next page
         documentLimit,
         startAfter:
             _venturesSnapshot.isNotEmpty ? _venturesSnapshot.last : null,
+        country: appState.ventureCountry,
+        industry: appState.ventureIndustry,
+        people: appState.maxPeople,
+        month: appState.ventureMonth,
+        weeks: appState.estimatedWeeks,
       );
       _venturesSnapshot.addAll(snap.docs);
 

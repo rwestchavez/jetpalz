@@ -7,6 +7,8 @@ import 'package:jet_palz/auth/onboarding.dart';
 import 'package:jet_palz/auth/sign_in.dart';
 import 'package:jet_palz/auth/sign_up.dart';
 import 'package:jet_palz/auth/email_sign_up.dart';
+import 'package:jet_palz/chat/notifications_ui.dart';
+import 'package:jet_palz/chat/request_provider.dart';
 import 'package:jet_palz/firebase_options.dart';
 import 'package:jet_palz/profile/change_email.dart';
 import 'package:jet_palz/profile/change_password.dart';
@@ -29,6 +31,7 @@ Future<void> main() async {
     providers: [
       ChangeNotifierProvider(create: (_) => AppState()),
       ChangeNotifierProvider(create: (_) => VentureProvider()),
+      ChangeNotifierProvider(create: (_) => RequestProvider())
     ],
     child: MyApp(),
   ));
@@ -59,10 +62,11 @@ class MyApp extends StatelessWidget {
         '/settings': (context) => Settings(),
         '/changeEmail': (context) => const ChangeEmail(),
         '/changePassword': (context) => const ChangePassword(),
+        '/notifications': (context) => NotificationsUI(),
       },
       home: user != null ? const Main() : const SignUp(),
       theme: lightModeTheme.themeData,
-      darkTheme: darkModeTheme.themeData,
+      darkTheme: darkModeTheme.themeData, // disable dark theme
       debugShowCheckedModeBanner: false,
     );
   }

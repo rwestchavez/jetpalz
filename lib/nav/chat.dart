@@ -16,7 +16,11 @@ class Chat extends StatelessWidget {
           title: "Venture Chats",
           automaticallyImplyLeading: false,
           actions: [
-            IconButton(onPressed: () {}, icon: Icon(Icons.notifications))
+            IconButton(
+                onPressed: () {
+                  Navigator.pushNamed(context, '/notifications');
+                },
+                icon: Icon(Icons.notifications))
           ],
         ),
         body: VentureChatRoom());

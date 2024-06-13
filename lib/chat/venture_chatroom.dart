@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-
 import 'venture_chatroom_widget.dart';
 
 class VentureChatRoom extends StatefulWidget {
@@ -28,8 +27,7 @@ class _VentureChatState extends State<VentureChatRoom> {
     venturesRef = FirebaseFirestore.instance.collection('ventures');
     chatsRef = FirebaseFirestore.instance.collection('venture_chats');
 
-    query = FirebaseFirestore.instance
-        .collection('venture_chats')
+    query = chatsRef
         .where('members', arrayContains: userDoc)
         .orderBy('last_message_time', descending: true);
   }
@@ -41,38 +39,49 @@ class _VentureChatState extends State<VentureChatRoom> {
         stream: query.snapshots(),
         builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            // Handle the loading state if needed
-            return CircularProgressIndicator();
+            return Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
-            // Handle the error state if an error occurred
-            return Text('Error: ${snapshot.error}');
+            return Center(child: Text('Error: ${snapshot.error}'));
           } else if (snapshot.hasData) {
             final chatDocuments = snapshot.data!.docs;
 
             return ListView.builder(
               itemCount: chatDocuments.length,
               itemBuilder: (context, index) {
-                final chatName = chatDocuments[index]['name'] as String;
-                final members = chatDocuments[index]['members'] as List;
-                final lastMessage =
-                    chatDocuments[index]['last_message'] as String;
-                final lastMessageTime =
-                    chatDocuments[index]['last_message_time'] as Timestamp;
-                final lastMessageSentByRef = chatDocuments[index]
-                    ['last_message_sent_by'] as DocumentReference;
+                final String chatName = chatDocuments[index]['name'];
+                final List members = chatDocuments[index]['members'];
+                final String lastMessage = chatDocuments[index]['last_message'];
+                final Timestamp? lastMessageTime =
+                    chatDocuments[index]['last_message_time'];
+                final DocumentReference? lastMessageSentByRef =
+                    chatDocuments[index]['last_message_sent_by'];
+
+                if (lastMessageSentByRef == null) {
+                  return VentureChatRoomWidget(
+                    chatName: chatName,
+                    lastMessage: lastMessage,
+                    lastMessageTime: lastMessageTime,
+                    lastMessageSentBy: null,
+                    members: members,
+                    chatId: chatDocuments[index].id,
+                  );
+                }
+
                 return StreamBuilder<DocumentSnapshot>(
                   stream: lastMessageSentByRef.snapshots(),
                   builder: (BuildContext context,
                       AsyncSnapshot<DocumentSnapshot> userSnapshot) {
                     if (userSnapshot.connectionState ==
                         ConnectionState.waiting) {
-                      return CircularProgressIndicator();
+                      return Center(child: CircularProgressIndicator());
                     } else if (userSnapshot.hasError) {
-                      return Text('Error: ${userSnapshot.error}');
-                    } else if (userSnapshot.hasData) {
+                      return Center(
+                          child: Text('Error: ${userSnapshot.error}'));
+                    } else if (userSnapshot.hasData &&
+                        userSnapshot.data!.exists) {
                       final data =
-                          userSnapshot.data?.data() as Map<String, dynamic>;
-                      final lastMessageSentBy = data['username'] as String;
+                          userSnapshot.data!.data() as Map<String, dynamic>;
+                      final String lastMessageSentBy = data['username'];
 
                       return VentureChatRoomWidget(
                         chatName: chatName,
@@ -83,15 +92,21 @@ class _VentureChatState extends State<VentureChatRoom> {
                         chatId: chatDocuments[index].id,
                       );
                     } else {
-                      return Text('No user data available');
+                      return VentureChatRoomWidget(
+                        chatName: chatName,
+                        lastMessage: lastMessage,
+                        lastMessageTime: lastMessageTime,
+                        lastMessageSentBy: null,
+                        members: members,
+                        chatId: chatDocuments[index].id,
+                      );
                     }
                   },
                 );
               },
-            ); // Replace YourWidget with the widget you want to return
+            );
           } else {
-            // Handle the case when there is no data
-            return Text('No data available');
+            return Center(child: Text('No data available'));
           }
         },
       ),

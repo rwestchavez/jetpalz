@@ -6,8 +6,10 @@ class JoinRequest {
   final String ventureId;
   final String status;
   final DateTime timestamp;
+  final String requester;
 
   JoinRequest({
+    required this.requester,
     required this.requestId,
     required this.requesterId,
     required this.ventureId,
@@ -17,6 +19,7 @@ class JoinRequest {
 
   factory JoinRequest.fromDocument(DocumentSnapshot doc) {
     return JoinRequest(
+      requester: doc['requester'],
       requestId: doc['requestId'],
       requesterId: doc['requesterId'],
       ventureId: doc['ventureId'],

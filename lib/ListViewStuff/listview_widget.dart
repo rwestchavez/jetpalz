@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:jet_palz/components/my_button.dart';
 import '../app_state.dart';
 import 'venture_provider.dart';
@@ -47,19 +48,28 @@ class _ListViewWidgetState extends State<ListViewWidget> {
   }
 
   Future<void> sendJoinRequest(String ventureId) async {
-    final user = FirebaseAuth.instance.currentUser;
-    ; // Assuming you have a currentUser in your AppState
-    if (user != null) {
-      final requestRef =
-          FirebaseFirestore.instance.collection('requests').doc();
-      await requestRef.set({
-        'requestId': requestRef.id,
-        'requesterId': user.uid,
-        'ventureId': ventureId,
-        'status': 'pending',
-        'timestamp': FieldValue.serverTimestamp(),
-      });
-    }
+    final userId = FirebaseAuth.instance.currentUser!.uid;
+    final firestore = FirebaseFirestore.instance;
+    final userSnap = await firestore.collection('users').doc(userId).get();
+    final userData = userSnap.data() as Map<String, dynamic>;
+    final String requester = userData['username'];
+
+    final venture = firestore.collection('ventures').doc(ventureId);
+    final requestRef = firestore.collection('requests').doc();
+    final snap = await venture.get();
+    final data = snap.data() as Map<String, dynamic>;
+    final DocumentReference creator = data["creator"];
+    final creatorId = creator.id;
+
+    await requestRef.set({
+      'creatorId': creatorId,
+      'requestId': requestRef.id,
+      'requesterId': userId,
+      'requester': requester,
+      'ventureId': ventureId,
+      'status': 'pending',
+      'timestamp': FieldValue.serverTimestamp(),
+    });
   }
 
   @override
@@ -99,7 +109,7 @@ class _ListViewWidgetState extends State<ListViewWidget> {
                             Padding(
                               padding: const EdgeInsets.only(right: 8),
                               child: Text(
-                                '${venture.memberList!.length} / ${venture.maxPeople}',
+                                '${venture.memberNum} / ${venture.maxPeople}',
                                 style: TextStyle(
                                     fontWeight: FontWeight.bold, fontSize: 20),
                               ),
@@ -219,7 +229,7 @@ class _ListViewWidgetState extends State<ListViewWidget> {
         if (widget.usersProvider.hasNext)
           Center(
             child: GestureDetector(
-              onTap: () {}, // widget.usersProvider.fetchNextUsers,
+              onTap: () {},
               child: Container(
                 height: 25,
                 width: 25,

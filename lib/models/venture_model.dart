@@ -7,7 +7,7 @@ class VentureModel {
   final DocumentReference? creator;
   final String? industry;
   final String? description;
-  final List<DocumentReference>? memberList;
+  final int memberNum;
   final String? startingMonth;
   final int? estimatedWeeks;
   final Timestamp? createdTime;
@@ -19,7 +19,7 @@ class VentureModel {
     required this.creator,
     required this.industry,
     required this.description,
-    required this.memberList,
+    required this.memberNum,
     required this.startingMonth,
     required this.estimatedWeeks,
     required this.createdTime,
@@ -35,9 +35,7 @@ class VentureModel {
       creator: data['creator'],
       industry: data['industry'] ?? 'Unknown',
       description: data['description'] ?? 'No description',
-      memberList: data['member_list'] != null
-          ? List<DocumentReference>.from(data['member_list'])
-          : [],
+      memberNum: data['member_num'] ?? 1,
       startingMonth: data['starting_month'] ?? 'Unknown',
       estimatedWeeks: data['estimated_weeks'] ?? 0,
       createdTime: (data['created_time'] as Timestamp? ?? Timestamp.now()),
@@ -52,7 +50,7 @@ class VentureModel {
       'creator': creator,
       'industry': industry,
       'description': description,
-      'member_list': memberList,
+      'member_num': memberNum,
       'starting_month': startingMonth,
       'estimated_weeks': estimatedWeeks,
       'created_time': createdTime,

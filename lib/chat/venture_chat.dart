@@ -7,8 +7,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 class VentureChat extends StatefulWidget {
   final String chatName;
   final String lastMessage;
-  final Timestamp lastMessageTime;
-  final String lastMessageSentBy;
+  final Timestamp? lastMessageTime;
+  final String? lastMessageSentBy;
   final List<dynamic> members;
   final String chatId;
 
