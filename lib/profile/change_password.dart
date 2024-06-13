@@ -42,9 +42,20 @@ class _ChangePasswordWidgetState extends State<ChangePassword> {
           content: Text('Password reset email sent'),
         );
       } on FirebaseAuthException catch (e) {
+        String errorMessage;
+        switch (e.code) {
+          case 'user-not-found':
+            errorMessage = 'No user found with this email address.';
+            break;
+          case 'invalid-email':
+            errorMessage = 'The email address is not valid.';
+            break;
+          default:
+            errorMessage = 'Failed to send password reset email: ${e.message}';
+        }
         MySnackBar.show(
           context,
-          content: Text('Failed to send password reset email: ${e.message}'),
+          content: Text(errorMessage),
         );
       }
     }

@@ -58,46 +58,68 @@ class _CreateVentureWidgetState extends State<CreateVenture> {
                         child: TextButton(
                           onPressed: () async {
                             if (_formKey.currentState!.validate()) {
+                              FirebaseFirestore firestore =
+                                  FirebaseFirestore.instance;
                               final currentUser =
                                   FirebaseAuth.instance.currentUser;
-                              final userDoc = FirebaseFirestore.instance
+                              final userDoc = firestore
                                   .collection('users')
                                   .doc(currentUser!.uid);
+                              final venturesRef =
+                                  firestore.collection('ventures');
+                              final chatsRef =
+                                  firestore.collection('venture_chats');
 
-                              final CollectionReference ref = FirebaseFirestore
-                                  .instance
-                                  .collection('ventures');
-                              final newVentureRef = await ref.add({
-                                'country': country,
-                                'creator': userDoc,
-                                'industry': industry,
-                                'description': description,
-                                'member_list': [userDoc],
-                                'starting_month': month,
-                                'estimated_weeks': weeks,
-                                'created_time': DateTime.now(),
-                                'max_people': people,
-                              });
-                              try {
-                                // Get the current list of ventures
+                              await firestore
+                                  .runTransaction((transaction) async {
                                 DocumentSnapshot userSnapshot =
-                                    await userDoc.get();
+                                    await transaction.get(userDoc);
+
+                                String chatName =
+                                    "${userSnapshot["username"]}'s Venture";
+
+                                Map<String, dynamic> ventureData = {
+                                  'country': country,
+                                  'creator': userDoc,
+                                  'industry': industry,
+                                  'description': description,
+                                  'member_num': 1,
+                                  'starting_month': month,
+                                  'estimated_weeks': weeks,
+                                  'created_time': DateTime.now(),
+                                  'max_people': people,
+                                  'chat': null, // We'll update this later
+                                };
+
+                                DocumentReference newVentureRef =
+                                    venturesRef.doc();
+                                transaction.set(newVentureRef, ventureData);
+
+                                Map<String, dynamic> chatData = {
+                                  'name': chatName,
+                                  'members': [userDoc],
+                                  'created_time': DateTime.now(),
+                                  'last_message': '',
+                                  'last_message_time': null,
+                                  'last_message_sent_by': null,
+                                };
+
+                                DocumentReference newChatRef = chatsRef.doc();
+                                transaction.set(newChatRef, chatData);
+
                                 List<dynamic> currentVentures =
                                     userSnapshot.get('current_ventures') ?? [];
-
-                                // Add the new venture reference to the list
                                 currentVentures.add(newVentureRef);
-
-                                // Update the user document with the new list of ventures
-                                await userDoc.update(
+                                transaction.update(userDoc,
                                     {'current_ventures': currentVentures});
 
-                                // Navigate back to the previous screen
-                                Navigator.pop(context);
-                              } catch (e) {
-                                // Handle errors
-                                print('Error updating user document: $e');
-                              }
+                                ventureData['chat'] =
+                                    newChatRef; // Update the ventureData with the new chat reference
+                                transaction.update(newVentureRef, ventureData);
+                              });
+                              print("Transaction comoplete");
+
+                              Navigator.pop(context);
                             }
                           },
                           child: Text(

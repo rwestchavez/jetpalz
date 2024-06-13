@@ -81,7 +81,7 @@ class MyListView extends StatelessWidget {
                                   Padding(
                                     padding: const EdgeInsets.only(right: 8),
                                     child: Text(
-                                      '${ventureData['member_list'].length} / ${ventureData['max_people']}',
+                                      '${ventureData['member_num']} / ${ventureData['max_people']}',
                                       style: TextStyle(
                                           fontWeight: FontWeight.bold,
                                           fontSize: 20),
