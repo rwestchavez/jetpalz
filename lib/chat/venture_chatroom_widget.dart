@@ -10,6 +10,7 @@ class VentureChatRoomWidget extends StatelessWidget {
   final String? lastMessageSentBy;
   final List members;
   final String chatId;
+  final String? creatorPfp;
 
   const VentureChatRoomWidget({
     Key? key,
@@ -19,28 +20,23 @@ class VentureChatRoomWidget extends StatelessWidget {
     required this.lastMessageTime,
     required this.lastMessageSentBy,
     required this.members,
+    required this.creatorPfp,
   }) : super(key: key);
 
   Stream<int> fetchUnreadMessagesCount(String chatId, String userId) {
-    // Reference to the collection of messages within the chat
     var messagesQuery = FirebaseFirestore.instance
         .collection('venture_chats')
         .doc(chatId)
         .collection('messages');
 
-    // Obtain a Stream of QuerySnapshot
     return messagesQuery.snapshots().map((QuerySnapshot snapshot) {
-      // Access documents from QuerySnapshot
       List<DocumentSnapshot> documents = snapshot.docs;
 
-      // Filter unread messages logic
       var unreadMessages = documents.where((doc) {
-        var data =
-            doc.data() as Map<String, dynamic>; // Cast to Map<String, dynamic>
+        var data = doc.data() as Map<String, dynamic>;
         return !data['seenBy'].contains(userId);
       }).toList();
 
-      // Return the count of unread messages
       return unreadMessages.length;
     });
   }
@@ -66,101 +62,103 @@ class VentureChatRoomWidget extends StatelessWidget {
       }
     }
 
-    return GestureDetector(
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => VentureChat(
-              chatName: chatName,
-              lastMessage: lastMessage,
-              lastMessageTime: lastMessageTime,
-              lastMessageSentBy: lastMessageSentBy,
-              members: members,
-              chatId: chatId,
+    return StreamBuilder<int>(
+      stream: fetchUnreadMessagesCount(chatId, getCurrentUserId()),
+      builder: (context, snapshot) {
+        int unreadCount = snapshot.data ?? 0;
+        bool hasUnreadMessages = unreadCount > 0;
+
+        return GestureDetector(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => VentureChat(
+                  chatName: chatName,
+                  lastMessage: lastMessage,
+                  lastMessageTime: lastMessageTime,
+                  lastMessageSentBy: lastMessageSentBy,
+                  members: members,
+                  chatId: chatId,
+                ),
+              ),
+            );
+          },
+          child: Container(
+            padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 10.0),
+            decoration: BoxDecoration(
+              border: Border(
+                bottom: BorderSide(
+                  color: Colors.grey[300]!,
+                  width: 1.0,
+                ),
+              ),
+            ),
+            child: Row(
+              children: [
+                CircleAvatar(
+                  backgroundImage: NetworkImage(creatorPfp!),
+                  radius: 30.0, // Increased avatar size
+                ),
+                SizedBox(width: 12.0),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        chatName,
+                        style: TextStyle(
+                          fontSize: 16.0, // Increased font size
+                          fontWeight: FontWeight.bold,
+                          color: hasUnreadMessages ? Colors.black : Colors.grey,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      SizedBox(height: 4.0),
+                      Text(
+                        lastMessage.isNotEmpty
+                            ? '${lastMessageSentBy ?? ''}: $lastMessage'
+                            : 'No messages yet',
+                        style: TextStyle(
+                          fontSize: 14.0, // Increased font size
+                          color: hasUnreadMessages ? Colors.black : Colors.grey,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      SizedBox(height: 4.0),
+                      Text(
+                        timeAgo,
+                        style: TextStyle(
+                          fontSize: 12.0, // Increased font size
+                          color: hasUnreadMessages ? Colors.black : Colors.grey,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                if (hasUnreadMessages)
+                  Container(
+                    padding: EdgeInsets.all(6.0),
+                    decoration: BoxDecoration(
+                      color: Colors.red,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Text(
+                      '$unreadCount',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 12.0,
+                      ),
+                    ),
+                  ),
+              ],
             ),
           ),
         );
       },
-      child: Container(
-        padding: EdgeInsets.all(16.0),
-        decoration: BoxDecoration(
-          border: Border(
-            bottom: BorderSide(
-              color: Colors.grey[300]!,
-              width: 1.0,
-            ),
-          ),
-        ),
-        child: Stack(
-          children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Chat Name
-                Text(
-                  chatName,
-                  style: TextStyle(
-                    fontSize: 18.0,
-                    fontWeight: FontWeight.bold,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                SizedBox(height: 8.0),
-                // Last Message
-                Text(
-                  lastMessage.isNotEmpty
-                      ? '${lastMessageSentBy ?? ''}: $lastMessage'
-                      : 'No messages yet',
-                  style: TextStyle(
-                    fontSize: 14.0,
-                    color: Colors.grey[600],
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                SizedBox(height: 8.0),
-                // Time Ago
-                Text(
-                  timeAgo,
-                  style: TextStyle(
-                    fontSize: 12.0,
-                    color: Colors.grey[600],
-                  ),
-                ),
-              ],
-            ),
-            Positioned(
-              top: 0,
-              right: 0,
-              child: StreamBuilder<int>(
-                stream: fetchUnreadMessagesCount(chatId, getCurrentUserId()),
-                builder: (context, snapshot) {
-                  int unreadCount = snapshot.data ?? 0;
-                  return unreadCount > 0
-                      ? Container(
-                          padding: EdgeInsets.all(8.0),
-                          decoration: BoxDecoration(
-                            color: Colors.red,
-                            shape: BoxShape.circle,
-                          ),
-                          child: Text(
-                            '$unreadCount',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 12.0,
-                            ),
-                          ),
-                        )
-                      : SizedBox.shrink();
-                },
-              ),
-            ),
-          ],
-        ),
-      ),
     );
   }
 

@@ -35,6 +35,9 @@ class _VentureChatState extends State<VentureChatRoom> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: Text('Venture Chat Room'),
+      ),
       body: StreamBuilder<QuerySnapshot>(
         stream: query.snapshots(),
         builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
@@ -55,51 +58,64 @@ class _VentureChatState extends State<VentureChatRoom> {
                     chatDocuments[index]['last_message_time'];
                 final DocumentReference? lastMessageSentByRef =
                     chatDocuments[index]['last_message_sent_by'];
+                final DocumentReference creatorRef =
+                    chatDocuments[index]['creator'];
 
-                if (lastMessageSentByRef == null) {
-                  return VentureChatRoomWidget(
-                    chatName: chatName,
-                    lastMessage: lastMessage,
-                    lastMessageTime: lastMessageTime,
-                    lastMessageSentBy: null,
-                    members: members,
-                    chatId: chatDocuments[index].id,
-                  );
-                }
-
-                return StreamBuilder<DocumentSnapshot>(
-                  stream: lastMessageSentByRef.snapshots(),
-                  builder: (BuildContext context,
-                      AsyncSnapshot<DocumentSnapshot> userSnapshot) {
-                    if (userSnapshot.connectionState ==
+                return FutureBuilder<DocumentSnapshot>(
+                  future: creatorRef.get(),
+                  builder: (context, creatorSnapshot) {
+                    if (creatorSnapshot.connectionState ==
                         ConnectionState.waiting) {
                       return Center(child: CircularProgressIndicator());
-                    } else if (userSnapshot.hasError) {
+                    } else if (creatorSnapshot.hasError) {
                       return Center(
-                          child: Text('Error: ${userSnapshot.error}'));
-                    } else if (userSnapshot.hasData &&
-                        userSnapshot.data!.exists) {
-                      final data =
-                          userSnapshot.data!.data() as Map<String, dynamic>;
-                      final String lastMessageSentBy = data['username'];
+                          child: Text('Error: ${creatorSnapshot.error}'));
+                    } else if (creatorSnapshot.hasData &&
+                        creatorSnapshot.data!.exists) {
+                      final creatorData =
+                          creatorSnapshot.data!.data() as Map<String, dynamic>;
+                      final String creatorPfp = creatorData['photo_url'];
 
-                      return VentureChatRoomWidget(
-                        chatName: chatName,
-                        lastMessage: lastMessage,
-                        lastMessageTime: lastMessageTime,
-                        lastMessageSentBy: lastMessageSentBy,
-                        members: members,
-                        chatId: chatDocuments[index].id,
+                      return StreamBuilder<DocumentSnapshot>(
+                        stream: lastMessageSentByRef?.snapshots(),
+                        builder: (BuildContext context,
+                            AsyncSnapshot<DocumentSnapshot> userSnapshot) {
+                          if (userSnapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return Center(child: CircularProgressIndicator());
+                          } else if (userSnapshot.hasError) {
+                            return Center(
+                                child: Text('Error: ${userSnapshot.error}'));
+                          } else if (userSnapshot.hasData &&
+                              userSnapshot.data!.exists) {
+                            final data = userSnapshot.data!.data()
+                                as Map<String, dynamic>;
+                            final String lastMessageSentBy = data['username'];
+
+                            return VentureChatRoomWidget(
+                              chatName: chatName,
+                              lastMessage: lastMessage,
+                              lastMessageTime: lastMessageTime,
+                              lastMessageSentBy: lastMessageSentBy,
+                              members: members,
+                              chatId: chatDocuments[index].id,
+                              creatorPfp: creatorPfp,
+                            );
+                          } else {
+                            return VentureChatRoomWidget(
+                              chatName: chatName,
+                              lastMessage: lastMessage,
+                              lastMessageTime: lastMessageTime,
+                              lastMessageSentBy: null,
+                              members: members,
+                              chatId: chatDocuments[index].id,
+                              creatorPfp: creatorPfp,
+                            );
+                          }
+                        },
                       );
                     } else {
-                      return VentureChatRoomWidget(
-                        chatName: chatName,
-                        lastMessage: lastMessage,
-                        lastMessageTime: lastMessageTime,
-                        lastMessageSentBy: null,
-                        members: members,
-                        chatId: chatDocuments[index].id,
-                      );
+                      return Container();
                     }
                   },
                 );

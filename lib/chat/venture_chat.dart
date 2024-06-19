@@ -11,14 +11,14 @@ class VentureChat extends StatefulWidget {
   final String chatId;
 
   const VentureChat({
-    super.key,
+    Key? key,
     required this.chatId,
     required this.chatName,
     required this.lastMessage,
     required this.lastMessageTime,
     required this.lastMessageSentBy,
     required this.members,
-  });
+  }) : super(key: key);
 
   @override
   _VentureChatState createState() => _VentureChatState();
@@ -26,7 +26,83 @@ class VentureChat extends StatefulWidget {
 
 class _VentureChatState extends State<VentureChat> {
   final TextEditingController _messageController = TextEditingController();
-  var firestore = FirebaseFirestore.instance;
+  final FirebaseFirestore firestore = FirebaseFirestore.instance;
+  final ScrollController _scrollController = ScrollController();
+  final int _messageLimit = 10;
+  List<DocumentSnapshot> _messages = [];
+  DocumentSnapshot? _lastMessageSnapshot;
+  bool _isLoading = false;
+  bool _hasNext = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadMessages();
+    _scrollController.addListener(_scrollListener);
+  }
+
+  void _scrollListener() {
+    if (_scrollController.offset >=
+            _scrollController.position.maxScrollExtent &&
+        !_scrollController.position.outOfRange) {
+      if (_hasNext) {
+        _loadMoreMessages();
+      }
+    }
+  }
+
+  void _loadMessages() {
+    if (_isLoading) return;
+    setState(() {
+      _isLoading = true;
+    });
+
+    Query query = FirebaseFirestore.instance
+        .collection('venture_chats')
+        .doc(widget.chatId)
+        .collection('messages')
+        .orderBy('timestamp', descending: true)
+        .limit(_messageLimit);
+
+    query.snapshots().listen((snapshot) {
+      setState(() {
+        _messages = snapshot.docs;
+        _isLoading = false;
+        if (snapshot.docs.isEmpty) {
+          _hasNext = false;
+        } else {
+          _lastMessageSnapshot = snapshot.docs.last;
+        }
+      });
+    });
+  }
+
+  void _loadMoreMessages() {
+    if (_isLoading || !_hasNext) return;
+    setState(() {
+      _isLoading = true;
+    });
+
+    Query query = FirebaseFirestore.instance
+        .collection('venture_chats')
+        .doc(widget.chatId)
+        .collection('messages')
+        .orderBy('timestamp', descending: true)
+        .startAfterDocument(_lastMessageSnapshot!)
+        .limit(_messageLimit);
+
+    query.get().then((snapshot) {
+      setState(() {
+        _messages.addAll(snapshot.docs);
+        _isLoading = false;
+        if (snapshot.docs.length < _messageLimit) {
+          _hasNext = false;
+        } else {
+          _lastMessageSnapshot = snapshot.docs.last;
+        }
+      });
+    });
+  }
 
   void sendMessage() async {
     if (_messageController.text.trim().isEmpty) {
@@ -39,51 +115,41 @@ class _VentureChatState extends State<VentureChat> {
     String pfpUrl = userSnap["photo_url"];
     String username = userSnap['username'];
 
-    firestore
+    await firestore
         .collection('venture_chats')
         .doc(widget.chatId)
         .collection('messages')
         .add({
       'content': _messageController.text.trim(),
-      'sentBy': FirebaseAuth.instance.currentUser!.uid,
+      'sentBy': userId,
       'timestamp': Timestamp.now(),
       'pfpUrl': pfpUrl,
       'senderName': username,
       'seenBy': [userId],
     });
+
     await firestore.collection('venture_chats').doc(widget.chatId).update({
       'last_message': _messageController.text.trim(),
       'last_message_time': Timestamp.now(),
       'last_message_sent_by': userRef,
     });
+
     _messageController.clear();
+    _scrollToBottom();
   }
 
-  void markMessageSeen(String messageId) async {
-    var userId = FirebaseAuth.instance.currentUser!.uid;
-    var userRef = firestore.collection("users").doc(userId);
-
-    // Update seenBy array in the message document
-    var messageRef = firestore
-        .collection('venture_chats')
-        .doc(widget.chatId)
-        .collection('messages')
-        .doc(messageId);
-
-    // Get current seenBy array
-    var messageSnap = await messageRef.get();
-    List<dynamic> seenBy = messageSnap.get('seenBy');
-
-    // Add user reference if not already present
-    if (!seenBy.contains(userId)) {
-      seenBy.add(userId);
-      await messageRef.update({'seenBy': seenBy});
-    }
+  void _scrollToBottom() {
+    _scrollController.animateTo(
+      _scrollController.position.minScrollExtent,
+      duration: const Duration(milliseconds: 200),
+      curve: Curves.easeInOut,
+    );
   }
 
   @override
   void dispose() {
     _messageController.dispose();
+    _scrollController.dispose();
     super.dispose();
   }
 
@@ -95,12 +161,12 @@ class _VentureChatState extends State<VentureChat> {
         appBar: AppBar(
           title: Column(
             children: [
-              Text(widget.chatName, style: const TextStyle(fontSize: 18)),
-              FutureBuilder<DocumentSnapshot>(
-                future: FirebaseFirestore.instance
+              Text(widget.chatName, style: const TextStyle(fontSize: 20)),
+              StreamBuilder<DocumentSnapshot>(
+                stream: firestore
                     .collection('venture_chats')
                     .doc(widget.chatId)
-                    .get(),
+                    .snapshots(),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return Container();
@@ -128,64 +194,96 @@ class _VentureChatState extends State<VentureChat> {
         body: Column(
           children: [
             Expanded(
-              child:
-                  MessagesList(chatId: widget.chatId, check: markMessageSeen),
+              child: MessagesList(
+                chatId: widget.chatId,
+                messages: _messages,
+                scrollController: _scrollController,
+                isLoading: _isLoading,
+                markMessageSeen: markMessageSeen,
+              ),
             ),
             SendMessageBar(
               messageController: _messageController,
-              onSend: () => sendMessage(),
+              onSend: sendMessage,
             ),
           ],
         ),
       ),
     );
   }
+
+  void markMessageSeen(String messageId) async {
+    var userId = FirebaseAuth.instance.currentUser!.uid;
+
+    var messageRef = firestore
+        .collection('venture_chats')
+        .doc(widget.chatId)
+        .collection('messages')
+        .doc(messageId);
+
+    messageRef.snapshots().listen((DocumentSnapshot messageSnapshot) async {
+      if (messageSnapshot.exists) {
+        var data = messageSnapshot.data() as Map<String, dynamic>;
+        List<dynamic> seenBy = data['seenBy'] ?? [];
+
+        if (!seenBy.contains(userId)) {
+          seenBy.add(userId);
+          await messageRef.update({'seenBy': seenBy});
+        }
+      }
+    });
+  }
 }
 
 class MessagesList extends StatelessWidget {
   final String chatId;
-  final Function(String) check;
+  final List<DocumentSnapshot> messages;
+  final ScrollController scrollController;
+  final bool isLoading;
+  final Function(String) markMessageSeen;
 
-  const MessagesList({required this.chatId, required this.check});
+  const MessagesList({
+    required this.chatId,
+    required this.messages,
+    required this.scrollController,
+    required this.isLoading,
+    required this.markMessageSeen,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<QuerySnapshot>(
-      stream: FirebaseFirestore.instance
-          .collection('venture_chats')
-          .doc(chatId)
-          .collection('messages')
-          .orderBy('timestamp', descending: true)
-          .snapshots(),
-      builder: (context, snapshot) {
-        if (!snapshot.hasData) {
-          return Center(child: CircularProgressIndicator());
-        }
+    return Column(
+      children: [
+        if (isLoading)
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: CircularProgressIndicator(),
+          ),
+        Expanded(
+          child: ListView.builder(
+            controller: scrollController,
+            reverse: true,
+            itemCount: messages.length,
+            itemBuilder: (context, index) {
+              var message = messages[index];
+              var isSentByMe =
+                  message['sentBy'] == FirebaseAuth.instance.currentUser!.uid;
 
-        var messages = snapshot.data!.docs;
+              if (!isSentByMe) {
+                markMessageSeen(message.id);
+              }
 
-        return ListView.builder(
-          reverse: true,
-          itemCount: messages.length,
-          itemBuilder: (context, index) {
-            var message = messages[index];
-            var isSentByMe =
-                message['sentBy'] == FirebaseAuth.instance.currentUser!.uid;
-
-            if (!isSentByMe) {
-              check(message.id);
-            }
-
-            return MessageBubble(
-              content: message['content'],
-              timestamp: message['timestamp'],
-              isSentByMe: isSentByMe,
-              pfpUrl: message['pfpUrl'],
-              username: message['senderName'],
-            );
-          },
-        );
-      },
+              return MessageBubble(
+                content: message['content'],
+                timestamp: message['timestamp'],
+                isSentByMe: isSentByMe,
+                pfpUrl: message['pfpUrl'],
+                username: message['senderName'],
+              );
+            },
+          ),
+        ),
+      ],
     );
   }
 }
@@ -213,18 +311,6 @@ class MessageBubble extends StatelessWidget {
     var bubbleAlignment =
         isSentByMe ? MainAxisAlignment.end : MainAxisAlignment.start;
     var radius = BorderRadius.all(Radius.circular(12));
-
-    /* var radius = isSentByMe
-        ? BorderRadius.only(
-            topLeft: Radius.circular(12),
-            bottomLeft: Radius.circular(12),
-            bottomRight: Radius.circular(12),
-          )
-        : BorderRadius.only(
-            topRight: Radius.circular(12),
-            bottomRight: Radius.circular(12),
-            bottomLeft: Radius.circular(12),
-          );*/
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
@@ -256,13 +342,13 @@ class MessageBubble extends StatelessWidget {
                         username,
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
-                          fontSize: 14,
+                          fontSize: 18, // Increased font size
                         ),
                       ),
                       SizedBox(height: 4),
                       Text(
                         content,
-                        style: TextStyle(fontSize: 16),
+                        style: TextStyle(fontSize: 18), // Increased font size
                       ),
                       SizedBox(height: 4),
                       Text(
@@ -289,9 +375,8 @@ class MessageBubble extends StatelessWidget {
 
   String _formatTimestamp(Timestamp timestamp) {
     var date = timestamp.toDate();
-    String hour = date.hour.toString().padLeft(2, '0'); // Ensures 2-digit hour
-    String minute =
-        date.minute.toString().padLeft(2, '0'); // Ensures 2-digit minute
+    String hour = date.hour.toString().padLeft(2, '0');
+    String minute = date.minute.toString().padLeft(2, '0');
     return '$hour:$minute';
   }
 }
@@ -314,10 +399,8 @@ class SendMessageBar extends StatelessWidget {
           Expanded(
             child: Container(
               decoration: BoxDecoration(
-                color: const Color.fromARGB(
-                    75, 187, 222, 251), // Adjust the color here
-                borderRadius:
-                    BorderRadius.circular(20.0), // Adjust the border radius
+                color: const Color.fromARGB(75, 187, 222, 251),
+                borderRadius: BorderRadius.circular(20.0),
               ),
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -325,7 +408,7 @@ class SendMessageBar extends StatelessWidget {
                   controller: messageController,
                   decoration: InputDecoration(
                     hintText: 'Type a message...',
-                    border: InputBorder.none, // No border for the TextField
+                    border: InputBorder.none,
                   ),
                   onSubmitted: (_) {
                     onSend();

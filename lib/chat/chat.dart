@@ -85,6 +85,7 @@ class VentureChatRoom extends StatelessWidget {
             chatDocument['last_message_sent_by'];
         if (lastMessageSentByRef == null) {
           return VentureChatRoomWidget(
+            creatorPfp: null,
             chatName: chatName,
             lastMessage: lastMessage,
             lastMessageTime: lastMessageTime,
@@ -105,8 +106,10 @@ class VentureChatRoom extends StatelessWidget {
             } else if (userSnapshot.hasData && userSnapshot.data!.exists) {
               final data = userSnapshot.data!.data() as Map<String, dynamic>;
               final String lastMessageSentBy = data['username'];
+              final String creatorPfp = data['photo_url'];
 
               return VentureChatRoomWidget(
+                creatorPfp: creatorPfp,
                 chatName: chatName,
                 lastMessage: lastMessage,
                 lastMessageTime: lastMessageTime,
@@ -116,6 +119,7 @@ class VentureChatRoom extends StatelessWidget {
               );
             } else {
               return VentureChatRoomWidget(
+                creatorPfp: null,
                 chatName: chatName,
                 lastMessage: lastMessage,
                 lastMessageTime: lastMessageTime,
