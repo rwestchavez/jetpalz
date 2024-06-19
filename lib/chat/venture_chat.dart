@@ -26,11 +26,59 @@ class VentureChat extends StatefulWidget {
 
 class _VentureChatState extends State<VentureChat> {
   final TextEditingController _messageController = TextEditingController();
+  var firestore = FirebaseFirestore.instance;
 
-  @override
-  void initState() {
-    super.initState();
-    updateLastRead();
+  void sendMessage() async {
+    if (_messageController.text.trim().isEmpty) {
+      return;
+    }
+    var userId = FirebaseAuth.instance.currentUser!.uid;
+    var userRef = firestore.collection("users").doc(userId);
+    var userSnap = await userRef.get();
+
+    String pfpUrl = userSnap["photo_url"];
+    String username = userSnap['username'];
+
+    firestore
+        .collection('venture_chats')
+        .doc(widget.chatId)
+        .collection('messages')
+        .add({
+      'content': _messageController.text.trim(),
+      'sentBy': FirebaseAuth.instance.currentUser!.uid,
+      'timestamp': Timestamp.now(),
+      'pfpUrl': pfpUrl,
+      'senderName': username,
+      'seenBy': [userId],
+    });
+    await firestore.collection('venture_chats').doc(widget.chatId).update({
+      'last_message': _messageController.text.trim(),
+      'last_message_time': Timestamp.now(),
+      'last_message_sent_by': userRef,
+    });
+    _messageController.clear();
+  }
+
+  void markMessageSeen(String messageId) async {
+    var userId = FirebaseAuth.instance.currentUser!.uid;
+    var userRef = firestore.collection("users").doc(userId);
+
+    // Update seenBy array in the message document
+    var messageRef = firestore
+        .collection('venture_chats')
+        .doc(widget.chatId)
+        .collection('messages')
+        .doc(messageId);
+
+    // Get current seenBy array
+    var messageSnap = await messageRef.get();
+    List<dynamic> seenBy = messageSnap.get('seenBy');
+
+    // Add user reference if not already present
+    if (!seenBy.contains(userId)) {
+      seenBy.add(userId);
+      await messageRef.update({'seenBy': seenBy});
+    }
   }
 
   @override
@@ -39,363 +87,261 @@ class _VentureChatState extends State<VentureChat> {
     super.dispose();
   }
 
-  Future<void> markMessageAsSeen(
-      String chatId, String messageId, String userId) async {
-    var messageRef = FirebaseFirestore.instance
-        .collection('venture_chats')
-        .doc(chatId)
-        .collection('messages')
-        .doc(messageId);
-
-    // Update the seenBy array to include the current user's ID
-    await messageRef.update({
-      'seenBy': FieldValue.arrayUnion([userId]),
-    });
-
-    // Update the lastRead timestamp for the current user
-    await updateLastRead();
-  }
-
-  Future<void> updateLastRead() async {
-    var userRef =
-        FirebaseFirestore.instance.collection('users').doc(getCurrentUserId());
-    await userRef.update({
-      'lastRead.${widget.chatId}': FieldValue.serverTimestamp(),
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-          actions: [TextButton(onPressed: () {}, child: Text("Leave"))],
-          centerTitle: true,
-          title: Column(children: [
-            Text(
-              widget.chatName,
-              style: TextStyle(fontSize: 18),
-            ),
-            StreamBuilder<DocumentSnapshot>(
-              stream: FirebaseFirestore.instance
-                  .collection('venture_chats')
-                  .doc(widget.chatId)
-                  .snapshots(),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return Container();
-                }
-
-                var chatData = snapshot.data!.data() as Map<String, dynamic>;
-                List<dynamic> members = chatData['members'] ?? [];
-
-                return Text(
-                  '${members.length} members',
-                  style: TextStyle(fontSize: 14.0),
-                );
-              },
-            ),
-          ])),
-      body: SafeArea(
-        child: GestureDetector(
-          onTap: () {
-            FocusScopeNode currentFocus = FocusScope.of(context);
-            if (!currentFocus.hasPrimaryFocus) {
-              currentFocus.unfocus();
-            }
-          },
-          child: Column(
+    return GestureDetector(
+      onTap: () => FocusScope.of(context).unfocus(),
+      child: Scaffold(
+        appBar: AppBar(
+          title: Column(
             children: [
-              Expanded(
-                child: StreamBuilder<QuerySnapshot>(
-                  stream: FirebaseFirestore.instance
-                      .collection('venture_chats')
-                      .doc(widget.chatId)
-                      .collection('messages')
-                      .orderBy('timestamp', descending: true)
-                      .snapshots(),
-                  builder: (context, snapshot) {
-                    if (snapshot.hasError) {
-                      return Text('Error: ${snapshot.error}');
-                    }
+              Text(widget.chatName, style: const TextStyle(fontSize: 18)),
+              FutureBuilder<DocumentSnapshot>(
+                future: FirebaseFirestore.instance
+                    .collection('venture_chats')
+                    .doc(widget.chatId)
+                    .get(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return Container();
+                  }
 
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return Container();
-                    }
+                  var chatData = snapshot.data!.data() as Map<String, dynamic>;
+                  List<dynamic> members = chatData['members'] ?? [];
 
-                    List<Message> messages = snapshot.data!.docs.map((doc) {
-                      var data = doc.data() as Map<String, dynamic>;
-                      return Message(
-                        senderId: data['senderId'] ?? '',
-                        sender: data['sender'] ?? '',
-                        content: data['content'] ?? '',
-                        timestamp: data['timestamp'] ?? 0,
-                        seenBy: data['seenBy'] ?? [],
-                      );
-                    }).toList();
-
-                    return ListView.builder(
-                      reverse: true,
-                      padding: EdgeInsets.all(16.0),
-                      itemCount: messages.length,
-                      itemBuilder: (context, index) {
-                        Message message = messages[index];
-                        bool isSeenByCurrentUser =
-                            message.seenBy.contains(getCurrentUserId());
-                        if (!isSeenByCurrentUser) {
-                          markMessageAsSeen(
-                              widget.chatId,
-                              snapshot.data!.docs[index].id,
-                              getCurrentUserId());
-                        }
-
-                        return StreamBuilder<DocumentSnapshot>(
-                            stream: FirebaseFirestore.instance
-                                .collection('users')
-                                .doc(message.senderId)
-                                .snapshots(),
-                            builder: (context, snapshot) {
-                              if (snapshot.connectionState ==
-                                  ConnectionState.waiting) {
-                                // Show a loading indicator or placeholder widget
-                                return Container();
-                              }
-
-                              if (!snapshot.hasData || snapshot.data == null) {
-                                // Handle the case where snapshot.data is null
-                                return Text('No user data found');
-                              }
-
-                              var userData =
-                                  snapshot.data!.data() as Map<String, dynamic>;
-                              String pfp = userData['photo_url'];
-
-                              return MessageBubble(
-                                seenBy: message.seenBy,
-                                senderId: message.senderId,
-                                sender: message.sender,
-                                content: message.content,
-                                isMe: message.senderId == getCurrentUserId(),
-                                pfp: pfp,
-                                messageTime: message.timestamp.toDate(),
-                              );
-                            });
-                      },
-                    );
-                  },
-                ),
-              ),
-              Container(
-                decoration: BoxDecoration(
-                  color: Colors.grey[200],
-                  borderRadius: BorderRadius.circular(30.0),
-                ),
-                margin: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: TextField(
-                        keyboardType: TextInputType.text,
-                        controller: _messageController,
-                        decoration: InputDecoration(
-                          hintText: 'Type a message...',
-                          contentPadding:
-                              EdgeInsets.symmetric(horizontal: 16.0),
-                          border: InputBorder.none,
-                        ),
-                        onSubmitted: (message) {
-                          if (message != "") {
-                            sendMessage(widget.chatId, message);
-                            _messageController.clear();
-                          }
-                        },
-                      ),
-                    ),
-                    IconButton(
-                      icon: Icon(Icons.send),
-                      onPressed: () {
-                        String message = _messageController.text;
-                        sendMessage(widget.chatId, message);
-                        _messageController.clear();
-                      },
-                    ),
-                  ],
-                ),
+                  return Text(
+                    '${members.length} members',
+                    style: const TextStyle(fontSize: 14.0),
+                  );
+                },
               ),
             ],
           ),
+          actions: [
+            TextButton(
+              onPressed: () {},
+              child: const Text("Leave"),
+            ),
+          ],
+          centerTitle: true,
+        ),
+        body: Column(
+          children: [
+            Expanded(
+              child:
+                  MessagesList(chatId: widget.chatId, check: markMessageSeen),
+            ),
+            SendMessageBar(
+              messageController: _messageController,
+              onSend: () => sendMessage(),
+            ),
+          ],
         ),
       ),
     );
   }
+}
 
-  Future<void> sendMessage(String chatId, String message) async {
-    var firestore = FirebaseFirestore.instance;
-    FirebaseAuth auth = FirebaseAuth.instance;
-    User? currentUser = auth.currentUser;
-    String currentUserId = currentUser!.uid;
-    CollectionReference messageCollection = firestore
-        .collection('venture_chats')
-        .doc(chatId)
-        .collection('messages');
-    DocumentReference userRef =
-        firestore.collection('users').doc(currentUser.uid);
-    var userSnap = await userRef.get();
-    var userData = userSnap.data() as Map<String, dynamic>;
-    String sender = userData['username'];
+class MessagesList extends StatelessWidget {
+  final String chatId;
+  final Function(String) check;
 
-    await messageCollection.add({
-      'senderId': currentUserId,
-      'sender': sender,
-      'content': message,
-      'timestamp': Timestamp.now(),
-      'seenBy': [currentUserId],
-    });
+  const MessagesList({required this.chatId, required this.check});
 
-    // Update lastMessage and lastMessageTime in chat document
-    await firestore.collection('venture_chats').doc(chatId).update({
-      'last_message': message,
-      'last_message_time': Timestamp.now(),
-      'last_message_sent_by': userRef,
-    });
-  }
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<QuerySnapshot>(
+      stream: FirebaseFirestore.instance
+          .collection('venture_chats')
+          .doc(chatId)
+          .collection('messages')
+          .orderBy('timestamp', descending: true)
+          .snapshots(),
+      builder: (context, snapshot) {
+        if (!snapshot.hasData) {
+          return Center(child: CircularProgressIndicator());
+        }
 
-  String getCurrentUserId() {
-    FirebaseAuth auth = FirebaseAuth.instance;
-    User? currentUser = auth.currentUser;
-    return currentUser!.uid;
+        var messages = snapshot.data!.docs;
+
+        return ListView.builder(
+          reverse: true,
+          itemCount: messages.length,
+          itemBuilder: (context, index) {
+            var message = messages[index];
+            var isSentByMe =
+                message['sentBy'] == FirebaseAuth.instance.currentUser!.uid;
+
+            if (!isSentByMe) {
+              check(message.id);
+            }
+
+            return MessageBubble(
+              content: message['content'],
+              timestamp: message['timestamp'],
+              isSentByMe: isSentByMe,
+              pfpUrl: message['pfpUrl'],
+              username: message['senderName'],
+            );
+          },
+        );
+      },
+    );
   }
 }
 
 class MessageBubble extends StatelessWidget {
-  final String senderId;
-  final String sender;
   final String content;
-  final bool isMe;
-  final String pfp;
-  final DateTime messageTime;
-  final List<dynamic> seenBy;
+  final Timestamp timestamp;
+  final bool isSentByMe;
+  final String pfpUrl;
+  final String username;
 
-  MessageBubble({
-    required this.pfp,
-    required this.senderId,
-    required this.sender,
+  const MessageBubble({
     required this.content,
-    required this.isMe,
-    required this.messageTime,
-    required this.seenBy,
+    required this.timestamp,
+    required this.isSentByMe,
+    required this.pfpUrl,
+    required this.username,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: EdgeInsets.only(bottom: 16.0),
-      alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
+    var alignment =
+        isSentByMe ? CrossAxisAlignment.end : CrossAxisAlignment.start;
+    var backgroundColor = isSentByMe ? Colors.blue[200] : Colors.grey[300];
+    var bubbleAlignment =
+        isSentByMe ? MainAxisAlignment.end : MainAxisAlignment.start;
+    var radius = BorderRadius.all(Radius.circular(12));
+
+    /* var radius = isSentByMe
+        ? BorderRadius.only(
+            topLeft: Radius.circular(12),
+            bottomLeft: Radius.circular(12),
+            bottomRight: Radius.circular(12),
+          )
+        : BorderRadius.only(
+            topRight: Radius.circular(12),
+            bottomRight: Radius.circular(12),
+            bottomLeft: Radius.circular(12),
+          );*/
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
       child: Column(
-        crossAxisAlignment:
-            isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+        crossAxisAlignment: alignment,
         children: [
-          if (!isMe) ...[
-            Row(
-              children: [
+          Row(
+            mainAxisAlignment: bubbleAlignment,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (!isSentByMe) ...[
                 CircleAvatar(
-                  backgroundImage: NetworkImage(
-                      pfp), // Replace pfp with the URL of the profile picture
-                  radius: 16.0,
+                  radius: 20,
+                  backgroundImage: NetworkImage(pfpUrl),
                 ),
-                SizedBox(
-                  width: 8,
-                ),
-                Text(
-                  sender,
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
+                SizedBox(width: 8),
+              ],
+              Flexible(
+                child: Container(
+                  padding: EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: backgroundColor,
+                    borderRadius: radius,
                   ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        username,
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14,
+                        ),
+                      ),
+                      SizedBox(height: 4),
+                      Text(
+                        content,
+                        style: TextStyle(fontSize: 16),
+                      ),
+                      SizedBox(height: 4),
+                      Text(
+                        _formatTimestamp(timestamp),
+                        style: TextStyle(fontSize: 12, color: Colors.black54),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              SizedBox(width: 8),
+              if (isSentByMe) ...[
+                CircleAvatar(
+                  radius: 20,
+                  backgroundImage: NetworkImage(pfpUrl),
                 ),
               ],
-            ),
-            SizedBox(height: 8.0),
-          ],
-          Container(
-            padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-            decoration: BoxDecoration(
-              color: isMe ? Colors.blue[200] : Colors.grey[300],
-              borderRadius: isMe
-                  ? BorderRadius.only(
-                      topLeft: Radius.circular(16.0),
-                      topRight: Radius.circular(16.0),
-                      bottomLeft: Radius.circular(16.0),
-                    )
-                  : BorderRadius.only(
-                      bottomRight: Radius.circular(16.0),
-                      topRight: Radius.circular(16.0),
-                      bottomLeft: Radius.circular(16.0),
-                    ),
-            ),
-            child: Column(
-              crossAxisAlignment:
-                  isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
-              children: [
-                Text(
-                  content,
-                  style: TextStyle(
-                    fontSize: 16.0,
-                    color: Colors.black,
-                  ),
-                ),
-                SizedBox(height: 4.0),
-                Text(
-                  getMessageTime(messageTime),
-                  style: TextStyle(
-                    fontSize: 12.0,
-                    color: Colors.grey[600],
-                  ),
-                ),
-                if (isMe) ...[
-                  SizedBox(height: 4.0),
-                  /* Text(
-                    seenBy.length > 1 ? 'Seen' : 'Sent',
-                    style: TextStyle(
-                      fontSize: 12.0,
-                      color: Colors.grey[600],
-                    ),
-                  ),*/
-                ],
-              ],
-            ),
+            ],
           ),
         ],
       ),
     );
   }
 
-  String getMessageTime(DateTime timestamp) {
-    final now = DateTime.now();
-    final difference = now.difference(timestamp);
-
-    if (difference.inDays > 0) {
-      return '${timestamp.month}/${timestamp.day}/${timestamp.year}';
-    } else {
-      final hours = timestamp.hour.toString().padLeft(2, '0');
-      final minutes = timestamp.minute.toString().padLeft(2, '0');
-      final period = timestamp.hour >= 12 ? 'PM' : 'AM';
-      return '$hours:$minutes $period';
-    }
+  String _formatTimestamp(Timestamp timestamp) {
+    var date = timestamp.toDate();
+    String hour = date.hour.toString().padLeft(2, '0'); // Ensures 2-digit hour
+    String minute =
+        date.minute.toString().padLeft(2, '0'); // Ensures 2-digit minute
+    return '$hour:$minute';
   }
 }
 
-class Message {
-  final List seenBy;
-  final String senderId;
-  final String sender;
-  final String content;
-  final Timestamp timestamp;
+class SendMessageBar extends StatelessWidget {
+  final TextEditingController messageController;
+  final void Function() onSend;
 
-  Message({
-    required this.seenBy,
-    required this.senderId,
-    required this.sender,
-    required this.content,
-    required this.timestamp,
+  const SendMessageBar({
+    required this.messageController,
+    required this.onSend,
   });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Row(
+        children: [
+          Expanded(
+            child: Container(
+              decoration: BoxDecoration(
+                color: const Color.fromARGB(
+                    75, 187, 222, 251), // Adjust the color here
+                borderRadius:
+                    BorderRadius.circular(20.0), // Adjust the border radius
+              ),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: TextField(
+                  controller: messageController,
+                  decoration: InputDecoration(
+                    hintText: 'Type a message...',
+                    border: InputBorder.none, // No border for the TextField
+                  ),
+                  onSubmitted: (_) {
+                    onSend();
+                  },
+                ),
+              ),
+            ),
+          ),
+          SizedBox(width: 8),
+          IconButton(
+            icon: Icon(Icons.send),
+            color: Theme.of(context).primaryColor,
+            onPressed: onSend,
+          ),
+        ],
+      ),
+    );
+  }
 }

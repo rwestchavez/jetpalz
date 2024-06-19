@@ -21,6 +21,7 @@ class Chat extends StatelessWidget {
           Consumer<RequestProvider>(
             builder: (context, requestProvider, child) {
               int requestCount = requestProvider.requests.length;
+              print(' request count $requestCount');
 
               // Return IconButton with or without Badge based on requestCount
               if (requestCount > 0) {
@@ -67,10 +68,14 @@ class VentureChatRoom extends StatelessWidget {
     if (chatProvider.isLoading) {
       return Center(child: CircularProgressIndicator());
     }
+    print(chatProvider.chatDocuments);
 
+    // this listview builder is not showiing. Thats the problem
     return ListView.builder(
       itemCount: chatProvider.chatDocuments.length,
       itemBuilder: (context, index) {
+        print("Hello ");
+
         final chatDocument = chatProvider.chatDocuments[index];
         final String chatName = chatDocument['name'];
         final List members = chatDocument['members'];
@@ -78,7 +83,6 @@ class VentureChatRoom extends StatelessWidget {
         final Timestamp? lastMessageTime = chatDocument['last_message_time'];
         final DocumentReference? lastMessageSentByRef =
             chatDocument['last_message_sent_by'];
-
         if (lastMessageSentByRef == null) {
           return VentureChatRoomWidget(
             chatName: chatName,

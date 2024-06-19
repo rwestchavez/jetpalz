@@ -24,7 +24,6 @@ class VentureProvider extends ChangeNotifier {
 
         return VentureModel(
           ventureId: snap.id,
-          // Init a new object for each snapshot document
           country: doc['country'] ?? 'Unknown',
           creator: doc['creator'],
           industry: doc['industry'] ?? 'Unknown',
@@ -52,7 +51,7 @@ class VentureProvider extends ChangeNotifier {
 
     try {
       final appState = AppState();
-      final snap = await FirebaseApi.getUsers(
+      final snap = await FirebaseApi.getVentures(
         //appState: appState,
         // get users still just gets even if its first page or next page
         documentLimit,

@@ -1,9 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:jet_palz/components/my_button.dart';
+import 'package:jet_palz/components/my_snack_bar.dart';
 import '../app_state.dart';
 import 'venture_provider.dart';
-import 'package:flutter/material.dart';
 
 class ListViewWidget extends StatefulWidget {
   final VentureProvider usersProvider;
@@ -25,7 +27,6 @@ class _ListViewWidgetState extends State<ListViewWidget> {
   @override
   void initState() {
     super.initState();
-
     scrollController.addListener(scrollListener);
     widget.usersProvider.fetchNextUsers();
   }
@@ -33,7 +34,6 @@ class _ListViewWidgetState extends State<ListViewWidget> {
   @override
   void dispose() {
     scrollController.dispose();
-
     super.dispose();
   }
 
@@ -69,6 +69,54 @@ class _ListViewWidgetState extends State<ListViewWidget> {
       'status': 'pending',
       'timestamp': FieldValue.serverTimestamp(),
     });
+  }
+
+  Future<void> cancelJoinRequest(String ventureId) async {
+    final userId = FirebaseAuth.instance.currentUser!.uid;
+    final firestore = FirebaseFirestore.instance;
+
+    final querySnapshot = await firestore
+        .collection('requests')
+        .where('ventureId', isEqualTo: ventureId)
+        .where('requesterId', isEqualTo: userId)
+        .get();
+
+    for (var doc in querySnapshot.docs) {
+      await doc.reference.delete();
+    }
+  }
+
+  Stream<QuerySnapshot> checkRequestStatus(String ventureId) {
+    final userId = FirebaseAuth.instance.currentUser!.uid;
+    final firestore = FirebaseFirestore.instance;
+
+    return firestore
+        .collection('requests')
+        .where('ventureId', isEqualTo: ventureId)
+        .where('requesterId', isEqualTo: userId)
+        .snapshots();
+  }
+
+  Color getButtonColor(String status) {
+    switch (status) {
+      case 'accepted':
+        return Colors.green;
+      case 'pending':
+        return Colors.yellow;
+      default:
+        return Colors.blue; // Default color for 'Join' button
+    }
+  }
+
+  String getButtonText(String status) {
+    switch (status) {
+      case 'accepted':
+        return 'Accepted';
+      case 'pending':
+        return 'Undo request';
+      default:
+        return 'Join';
+    }
   }
 
   @override
@@ -173,12 +221,50 @@ class _ListViewWidgetState extends State<ListViewWidget> {
                             alignment: Alignment.centerLeft,
                             child: Container(
                               constraints: BoxConstraints(maxWidth: 150),
-                              child: MyButton(
-                                onPressed: () {
-                                  sendJoinRequest(
-                                      venture.ventureId); // Pass ventureId here
+                              child: StreamBuilder<QuerySnapshot>(
+                                stream: checkRequestStatus(venture.ventureId),
+                                builder: (context, snapshot) {
+                                  if (snapshot.connectionState ==
+                                      ConnectionState.waiting) {
+                                    return CircularProgressIndicator();
+                                  } else if (snapshot.hasError) {
+                                    return Text('Error: ${snapshot.error}');
+                                  } else if (snapshot.hasData &&
+                                      snapshot.data!.docs.isNotEmpty) {
+                                    var requestStatus =
+                                        snapshot.data!.docs.first['status'];
+                                    return MyButton(
+                                      onPressed: () {
+                                        if (requestStatus == 'pending') {
+                                          cancelJoinRequest(venture.ventureId);
+                                          MySnackBar.show(context,
+                                              content: Text(
+                                                  "You cancelled your request to join the venture"));
+                                        } else {
+                                          sendJoinRequest(venture.ventureId);
+                                        }
+                                      },
+                                      style: ButtonStyle(
+                                        backgroundColor: WidgetStateProperty
+                                            .resolveWith<Color>(
+                                          (states) =>
+                                              getButtonColor(requestStatus),
+                                        ),
+                                      ),
+                                      child: Text(getButtonText(requestStatus)),
+                                    );
+                                  } else {
+                                    return MyButton(
+                                      onPressed: () {
+                                        sendJoinRequest(venture.ventureId);
+                                        MySnackBar.show(context,
+                                            content: Text(
+                                                "You sent a request to join the venture"));
+                                      },
+                                      child: Text("Join"),
+                                    );
+                                  }
                                 },
-                                child: Text("Join"),
                               ),
                             ),
                           ),

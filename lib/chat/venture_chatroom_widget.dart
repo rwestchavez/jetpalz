@@ -21,25 +21,26 @@ class VentureChatRoomWidget extends StatelessWidget {
     required this.members,
   }) : super(key: key);
 
-  Stream<int> getUnreadMessagesCountStream(String chatId, String userId) {
-    var firestore = FirebaseFirestore.instance;
-    var chatRef = firestore.collection('venture_chats').doc(chatId);
-    var userRef = firestore.collection('users').doc(userId);
+  Stream<int> fetchUnreadMessagesCount(String chatId, String userId) {
+    // Reference to the collection of messages within the chat
+    var messagesQuery = FirebaseFirestore.instance
+        .collection('venture_chats')
+        .doc(chatId)
+        .collection('messages');
 
-    return userRef.snapshots().asyncMap((userSnap) async {
-      var userData = userSnap.data() as Map<String, dynamic>?;
-      var lastReadTimestamp = userData?['lastRead']?[chatId] as Timestamp?;
+    // Obtain a Stream of QuerySnapshot
+    return messagesQuery.snapshots().map((QuerySnapshot snapshot) {
+      // Access documents from QuerySnapshot
+      List<DocumentSnapshot> documents = snapshot.docs;
 
-      var messagesQuery = chatRef.collection('messages').where(
-            'timestamp',
-            isGreaterThan: lastReadTimestamp ?? Timestamp(0, 0),
-          );
+      // Filter unread messages logic
+      var unreadMessages = documents.where((doc) {
+        var data =
+            doc.data() as Map<String, dynamic>; // Cast to Map<String, dynamic>
+        return !data['seenBy'].contains(userId);
+      }).toList();
 
-      var messagesSnap = await messagesQuery.get();
-      var unreadMessages = messagesSnap.docs
-          .where((doc) => !doc.data()['seenBy'].contains(userId))
-          .toList();
-
+      // Return the count of unread messages
       return unreadMessages.length;
     });
   }
@@ -134,8 +135,7 @@ class VentureChatRoomWidget extends StatelessWidget {
               top: 0,
               right: 0,
               child: StreamBuilder<int>(
-                stream:
-                    getUnreadMessagesCountStream(chatId, getCurrentUserId()),
+                stream: fetchUnreadMessagesCount(chatId, getCurrentUserId()),
                 builder: (context, snapshot) {
                   int unreadCount = snapshot.data ?? 0;
                   return unreadCount > 0
@@ -167,6 +167,9 @@ class VentureChatRoomWidget extends StatelessWidget {
   String getCurrentUserId() {
     FirebaseAuth auth = FirebaseAuth.instance;
     User? currentUser = auth.currentUser;
-    return currentUser!.uid;
+    if (currentUser != null) {
+      return currentUser.uid;
+    }
+    throw Exception("No user logged in");
   }
 }

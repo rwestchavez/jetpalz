@@ -116,7 +116,7 @@ class _ProfileWidgetState extends State<ProfileView> {
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                           Text(
-                            '${_userData['username'] ?? 'Loading...'}',
+                            '${_userData['username']}',
                             style: TextStyle(
                                 color: Theme.of(context)
                                     .textTheme
@@ -126,7 +126,7 @@ class _ProfileWidgetState extends State<ProfileView> {
                                 fontWeight: FontWeight.bold),
                           ),
                           Text(
-                            '${_userData['profession'] ?? 'Loading...'}',
+                            '${_userData['profession']}',
                             style: TextStyle(
                                 fontWeight: FontWeight.normal,
                                 fontSize: 18,

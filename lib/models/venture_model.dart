@@ -5,6 +5,8 @@ class VentureModel {
 
   final String? country;
   final DocumentReference? creator;
+  // late final String creatorName;
+
   final String? industry;
   final String? description;
   final int memberNum;
@@ -17,6 +19,7 @@ class VentureModel {
     required this.ventureId,
     required this.country,
     required this.creator,
+    //required this.creatorName,
     required this.industry,
     required this.description,
     required this.memberNum,
@@ -33,6 +36,7 @@ class VentureModel {
       ventureId: doc.id,
       country: data['country'] ?? 'Unknown',
       creator: data['creator'],
+      // creatorName: data['creator_name'] ?? '',
       industry: data['industry'] ?? 'Unknown',
       description: data['description'] ?? 'No description',
       memberNum: data['member_num'] ?? 1,

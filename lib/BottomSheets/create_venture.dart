@@ -2,6 +2,7 @@ import 'package:animated_custom_dropdown/custom_dropdown.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import '../components/my_snack_bar.dart';
 import '../constants.dart';
 
 class CreateVenture extends StatefulWidget {
@@ -68,11 +69,32 @@ class _CreateVentureWidgetState extends State<CreateVenture> {
                               final venturesRef =
                                   firestore.collection('ventures');
 
+                              // Check if the user is already a venture creator
+                              QuerySnapshot venturesSnapshot = await venturesRef
+                                  .where('creator', isEqualTo: userDoc)
+                                  .get();
+
+                              /* if (venturesSnapshot.docs.isNotEmpty) {
+                                // Show a message or handle the situation when the user already has a venture
+                                showDialog(
+                                  context: context,
+                                  builder: (context) => AlertDialog(
+                                    title: Text('Error'),
+                                    content: Text(
+                                        'You can only be the creator of one venture at a time.'),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () => Navigator.pop(context),
+                                        child: Text('OK'),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                                return;
+                              } */
+
                               await firestore
                                   .runTransaction((transaction) async {
-                                DocumentSnapshot userSnapshot =
-                                    await transaction.get(userDoc);
-
                                 Map<String, dynamic> ventureData = {
                                   'country': country,
                                   'creator': userDoc,
@@ -85,19 +107,21 @@ class _CreateVentureWidgetState extends State<CreateVenture> {
                                   'max_people': people,
                                   'chat': null,
                                 };
-
+                                DocumentSnapshot userSnapshot =
+                                    await transaction.get(userDoc);
+                                List<dynamic> currentVentures =
+                                    userSnapshot.get('current_ventures') ?? [];
                                 DocumentReference newVentureRef =
                                     venturesRef.doc();
                                 transaction.set(newVentureRef, ventureData);
 
-                                List<dynamic> currentVentures =
-                                    userSnapshot.get('current_ventures') ?? [];
                                 currentVentures.add(newVentureRef);
                                 transaction.update(userDoc,
                                     {'current_ventures': currentVentures});
                               });
-                              print("Transaction comoplete");
-
+                              print("Transaction complete");
+                              MySnackBar.show(context,
+                                  content: Text("Venture Created"));
                               Navigator.pop(context);
                             }
                           },
