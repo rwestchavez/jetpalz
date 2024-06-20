@@ -6,14 +6,17 @@ import '../models/request_model.dart';
 
 class RequestProvider with ChangeNotifier {
   List<JoinRequest> _requests = [];
+  List<JoinRequest> _acceptedRequests = [];
   bool _isLoading = true;
   final String _userId = FirebaseAuth.instance.currentUser!.uid;
 
   List<JoinRequest> get requests => _requests;
+  List<JoinRequest> get acceptedRequests => _acceptedRequests;
   bool get isLoading => _isLoading;
 
   RequestProvider() {
     _fetchRequests();
+    _fetchAcceptedRequests();
   }
 
   Future<void> _fetchRequests() async {
@@ -30,12 +33,42 @@ class RequestProvider with ChangeNotifier {
     });
   }
 
+  Future<String> getCreatorUsername(String creatorId) async {
+    try {
+      var creatorSnapshot = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(creatorId)
+          .get();
+      if (creatorSnapshot.exists) {
+        var creatorData = creatorSnapshot.data() as Map<String, dynamic>;
+        return creatorData['username'] ?? 'Unknown User';
+      } else {
+        return 'Unknown User';
+      }
+    } catch (e) {
+      print("Error fetching creator username: $e");
+      return 'Unknown User';
+    }
+  }
+
+  Future<void> _fetchAcceptedRequests() async {
+    FirebaseFirestore.instance
+        .collection('requests')
+        .where('creatorId', isEqualTo: _userId)
+        .where('status', isEqualTo: 'accepted')
+        .snapshots()
+        .listen((snapshot) {
+      _acceptedRequests =
+          snapshot.docs.map((doc) => JoinRequest.fromDocument(doc)).toList();
+      notifyListeners();
+    });
+  }
+
   Future<void> respondToRequest(JoinRequest request, String status) async {
     var firestore = FirebaseFirestore.instance;
 
     if (status == 'accepted') {
       var requesterRef = firestore.collection("users").doc(request.requesterId);
-      // need to get the user ref, then get the chat reference, and look up that chat and add user reference to chat
       var ventureSnap =
           await firestore.collection("ventures").doc(request.ventureId).get();
       var ventureData = ventureSnap.data() as Map<String, dynamic>;
@@ -56,16 +89,15 @@ class RequestProvider with ChangeNotifier {
           'last_message': "",
           'last_message_time': null,
           'last_message_sent_by': null,
+          'venture': ventureRef,
         };
         await chatRef.set(chatData);
 
-        // Update the venture document with the new chat reference
         await ventureRef.update({
           'chat': chatRef,
         });
       } else {
         DocumentReference chatRef = ventureData['chat'];
-        // Add the user to the existing chat members array
         await chatRef.update({
           'members': FieldValue.arrayUnion([requesterRef]),
         });
@@ -74,11 +106,11 @@ class RequestProvider with ChangeNotifier {
         'status': status,
       });
     } else if (status == 'rejected') {
-      // Handle rejection logic here
       await firestore.collection('requests').doc(request.requestId).update({
         'status': status,
       });
     }
     _fetchRequests();
+    _fetchAcceptedRequests();
   }
 }

@@ -79,12 +79,14 @@ class VentureChatRoom extends StatelessWidget {
         final chatDocument = chatProvider.chatDocuments[index];
         final String chatName = chatDocument['name'];
         final List members = chatDocument['members'];
+        final DocumentReference ventureRef = chatDocument['venture'];
         final String lastMessage = chatDocument['last_message'];
         final Timestamp? lastMessageTime = chatDocument['last_message_time'];
         final DocumentReference? lastMessageSentByRef =
             chatDocument['last_message_sent_by'];
         if (lastMessageSentByRef == null) {
           return VentureChatRoomWidget(
+            ventureRef: ventureRef,
             creatorPfp: null,
             chatName: chatName,
             lastMessage: lastMessage,
@@ -109,6 +111,7 @@ class VentureChatRoom extends StatelessWidget {
               final String creatorPfp = data['photo_url'];
 
               return VentureChatRoomWidget(
+                ventureRef: ventureRef,
                 creatorPfp: creatorPfp,
                 chatName: chatName,
                 lastMessage: lastMessage,
@@ -119,6 +122,7 @@ class VentureChatRoom extends StatelessWidget {
               );
             } else {
               return VentureChatRoomWidget(
+                ventureRef: ventureRef,
                 creatorPfp: null,
                 chatName: chatName,
                 lastMessage: lastMessage,

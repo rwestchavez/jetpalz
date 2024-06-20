@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:jet_palz/components/my_snack_bar.dart';
 
 class VentureChat extends StatefulWidget {
   final String chatName;
@@ -9,9 +10,11 @@ class VentureChat extends StatefulWidget {
   final String? lastMessageSentBy;
   final List<dynamic> members;
   final String chatId;
+  final DocumentReference ventureRef;
 
   const VentureChat({
     Key? key,
+    required this.ventureRef,
     required this.chatId,
     required this.chatName,
     required this.lastMessage,
@@ -33,11 +36,14 @@ class _VentureChatState extends State<VentureChat> {
   DocumentSnapshot? _lastMessageSnapshot;
   bool _isLoading = false;
   bool _hasNext = true;
+  int _memberCount = 0;
 
   @override
   void initState() {
     super.initState();
     _loadMessages();
+    _fetchMemberCount();
+
     _scrollController.addListener(_scrollListener);
   }
 
@@ -49,6 +55,15 @@ class _VentureChatState extends State<VentureChat> {
         _loadMoreMessages();
       }
     }
+  }
+
+  void _fetchMemberCount() async {
+    DocumentSnapshot chatDoc =
+        await firestore.collection('venture_chats').doc(widget.chatId).get();
+    List<dynamic> members = chatDoc['members'] ?? [];
+    setState(() {
+      _memberCount = members.length;
+    });
   }
 
   void _loadMessages() {
@@ -146,6 +161,237 @@ class _VentureChatState extends State<VentureChat> {
     );
   }
 
+  Future<void> _showVentureInfo() async {
+    DocumentSnapshot ventureSnapshot = await widget.ventureRef.get();
+    Map<String, dynamic> ventureData =
+        ventureSnapshot.data() as Map<String, dynamic>;
+    final DocumentReference creatorRef = ventureData['creator'];
+    final DocumentSnapshot creatorSnap = await creatorRef.get();
+    final creatorData = creatorSnap.data() as Map<String, dynamic>;
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text(
+            widget.chatName,
+            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+          ),
+          content: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8.0),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Country: ',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      Expanded(
+                        child: Text(
+                          ventureData['country'],
+                          style: TextStyle(color: Colors.black87),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8.0),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Leader: ',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      Expanded(
+                        child: Text(
+                          creatorData['username'],
+                          style: TextStyle(color: Colors.black87),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8.0),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Profession: ',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      Expanded(
+                        child: Text(
+                          ventureData['industry'],
+                          style: TextStyle(color: Colors.black87),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8.0),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Starting Month: ',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      Expanded(
+                        child: Text(
+                          ventureData['starting_month'].toString(),
+                          style: TextStyle(color: Colors.black87),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8.0),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Estimated Weeks: ',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      Expanded(
+                        child: Text(
+                          ventureData['estimated_weeks'].toString(),
+                          style: TextStyle(color: Colors.black87),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8.0),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Description: ',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      Expanded(
+                        child: Text(
+                          ventureData['description'],
+                          style: TextStyle(color: Colors.black87),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text('Close',
+                  style: TextStyle(color: Theme.of(context).primaryColor)),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _showLeaveConfirmation() async {
+    bool confirmLeave = await showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('Leave Chat'),
+          content: Text('Are you sure you want to leave this chat?'),
+          actions: <Widget>[
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                TextButton(
+                  child: Text('Yes',
+                      style: TextStyle(color: Theme.of(context).primaryColor)),
+                  onPressed: () {
+                    Navigator.of(context).pop(true);
+                  },
+                ),
+                TextButton(
+                  child: Text('No',
+                      style: TextStyle(color: Theme.of(context).primaryColor)),
+                  onPressed: () {
+                    Navigator.of(context).pop(false);
+                  },
+                ),
+              ],
+            ),
+          ],
+        );
+      },
+    );
+
+    if (confirmLeave) {
+      _leaveChat();
+    }
+  }
+
+  void _leaveChat() async {
+    try {
+      var userId = FirebaseAuth.instance.currentUser!.uid;
+      DocumentSnapshot ventureSnapshot = await widget.ventureRef.get();
+      Map<String, dynamic> ventureData =
+          ventureSnapshot.data() as Map<String, dynamic>;
+      final DocumentReference creatorRef = ventureData['creator'];
+
+      final DocumentReference userRef =
+          FirebaseFirestore.instance.collection('users').doc(userId);
+
+      final DocumentReference chatRef = FirebaseFirestore.instance
+          .collection('venture_chats')
+          .doc(widget.chatId);
+      DocumentSnapshot chatSnapshot = await chatRef.get();
+      Map<String, dynamic> chatData =
+          chatSnapshot.data() as Map<String, dynamic>;
+      final List members = chatData['members'];
+
+      if (creatorRef.id == userId) {
+        if (members.length > 1) {
+          DocumentReference newCreatorRef =
+              members.firstWhere((ref) => ref.id != userId);
+          await widget.ventureRef.update({
+            'creator': newCreatorRef,
+            'member_num': FieldValue.increment(-1)
+          });
+          await chatRef.update({
+            'members': FieldValue.arrayRemove([userRef]),
+          });
+        } else {
+          await widget.ventureRef.delete();
+          await chatRef.delete();
+        }
+      } else {
+        await chatRef.update({
+          'members': FieldValue.arrayRemove([userRef]),
+        });
+        await widget.ventureRef
+            .update({'member_num': FieldValue.increment(-1)});
+      }
+
+      Navigator.of(context).pop();
+      MySnackBar.show(context, content: Text("You have left the venture"));
+    } catch (e) {
+      print('Error leaving chat: $e');
+    }
+  }
+
   @override
   void dispose() {
     _messageController.dispose();
@@ -162,31 +408,40 @@ class _VentureChatState extends State<VentureChat> {
           title: Column(
             children: [
               Text(widget.chatName, style: const TextStyle(fontSize: 20)),
-              StreamBuilder<DocumentSnapshot>(
-                stream: firestore
-                    .collection('venture_chats')
-                    .doc(widget.chatId)
-                    .snapshots(),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return Container();
-                  }
-
-                  var chatData = snapshot.data!.data() as Map<String, dynamic>;
-                  List<dynamic> members = chatData['members'] ?? [];
-
-                  return Text(
-                    '${members.length} members',
-                    style: const TextStyle(fontSize: 14.0),
-                  );
-                },
+              Text(
+                '$_memberCount members',
+                style: const TextStyle(fontSize: 14.0),
               ),
             ],
           ),
           actions: [
-            TextButton(
-              onPressed: () {},
-              child: const Text("Leave"),
+            PopupMenuButton<String>(
+              offset: Offset(0, 50),
+              onSelected: (value) {
+                if (value == 'leave') {
+                  _showLeaveConfirmation();
+                } else if (value == 'info') {
+                  _showVentureInfo();
+                }
+              },
+              itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+                const PopupMenuItem<String>(
+                  value: 'info',
+                  child: ListTile(
+                    leading: Icon(Icons.info),
+                    title: Text('Info'),
+                  ),
+                ),
+                const PopupMenuItem<String>(
+                  value: 'leave',
+                  child: ListTile(
+                    leading: Icon(Icons.exit_to_app),
+                    title: Text('Leave'),
+                  ),
+                ),
+
+                // Add more menu items as needed
+              ],
             ),
           ],
           centerTitle: true,
@@ -211,6 +466,8 @@ class _VentureChatState extends State<VentureChat> {
       ),
     );
   }
+
+  // Implement methods _leaveChat and _showChatInfo as needed
 
   void markMessageSeen(String messageId) async {
     var userId = FirebaseAuth.instance.currentUser!.uid;

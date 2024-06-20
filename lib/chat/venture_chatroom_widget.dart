@@ -11,9 +11,11 @@ class VentureChatRoomWidget extends StatelessWidget {
   final List members;
   final String chatId;
   final String? creatorPfp;
+  final DocumentReference ventureRef;
 
   const VentureChatRoomWidget({
     Key? key,
+    required this.ventureRef,
     required this.chatId,
     required this.chatName,
     required this.lastMessage,
@@ -74,6 +76,7 @@ class VentureChatRoomWidget extends StatelessWidget {
               context,
               MaterialPageRoute(
                 builder: (context) => VentureChat(
+                  ventureRef: ventureRef,
                   chatName: chatName,
                   lastMessage: lastMessage,
                   lastMessageTime: lastMessageTime,
@@ -97,7 +100,10 @@ class VentureChatRoomWidget extends StatelessWidget {
             child: Row(
               children: [
                 CircleAvatar(
-                  backgroundImage: NetworkImage(creatorPfp!),
+                  backgroundImage: creatorPfp == null
+                      ? NetworkImage(
+                          "https://firebasestorage.googleapis.com/v0/b/jetpalz.appspot.com/o/assets%2Fpfp.png?alt=media&token=f13f281f-f92d-484f-8119-0ba572034891")
+                      : NetworkImage(creatorPfp!),
                   radius: 30.0, // Increased avatar size
                 ),
                 SizedBox(width: 12.0),
@@ -165,9 +171,6 @@ class VentureChatRoomWidget extends StatelessWidget {
   String getCurrentUserId() {
     FirebaseAuth auth = FirebaseAuth.instance;
     User? currentUser = auth.currentUser;
-    if (currentUser != null) {
-      return currentUser.uid;
-    }
-    throw Exception("No user logged in");
+    return currentUser!.uid;
   }
 }
