@@ -69,6 +69,11 @@ class _CreateVentureWidgetState extends State<CreateVenture> {
                               final venturesRef =
                                   firestore.collection('ventures');
 
+                              var userSnap = await userDoc.get();
+                              var userData =
+                                  userSnap.data() as Map<String, dynamic>;
+                              String creatorName = userData['username'];
+
                               // Check if the user is already a venture creator
                               QuerySnapshot venturesSnapshot = await venturesRef
                                   .where('creator', isEqualTo: userDoc)
@@ -98,6 +103,7 @@ class _CreateVentureWidgetState extends State<CreateVenture> {
                                 Map<String, dynamic> ventureData = {
                                   'country': country,
                                   'creator': userDoc,
+                                  'creator_name': creatorName,
                                   'industry': industry,
                                   'description': description,
                                   'member_num': 1,
@@ -138,7 +144,7 @@ class _CreateVentureWidgetState extends State<CreateVenture> {
                   ],
                 ),
               ),
-              SizedBox(height: 12),
+              //  SizedBox(height: 12),
               Flexible(
                 child: SingleChildScrollView(
                   child: Padding(

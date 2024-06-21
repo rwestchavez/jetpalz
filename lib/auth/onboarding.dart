@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:jet_palz/components/my_button.dart';
 import 'package:jet_palz/components/my_textField.dart';
+import 'package:jet_palz/constants.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 import '../components/my_snack_bar.dart';
@@ -192,7 +193,7 @@ class _OnboardingWidgetState extends State<Onboarding> {
                               .update({
                             'username': username,
                             'photo_url':
-                                'https://firebasestorage.googleapis.com/v0/b/jetpalz.appspot.com/o/assets%2Fpfp.png?alt=media&token=f13f281f-f92d-484f-8119-0ba572034891',
+                                DefaultPfp
                           });
                           Navigator.pushReplacementNamed(context, '/feed');
                         } else {

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:jet_palz/components/my_appbar.dart';
 import 'package:provider/provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:timeago/timeago.dart' as timeago;
@@ -7,12 +8,9 @@ import 'request_provider.dart';
 class NotificationsUI extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final requestProvider =
-        Provider.of<RequestProvider>(context, listen: false);
-
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Join Requests'),
+      appBar: MyAppBar(
+        title: "Notifications",
       ),
       body: Consumer<RequestProvider>(
         builder: (context, provider, _) {
@@ -48,7 +46,7 @@ class NotificationsUI extends StatelessWidget {
                               vertical: 8.0, horizontal: 16.0),
                           child: ListTile(
                             title: Text(
-                              'Request from ${request.requester}',
+                              '${request.requester} wants to join your venture!',
                               style: TextStyle(
                                   fontSize: 18.0, fontWeight: FontWeight.bold),
                             ),
@@ -56,10 +54,6 @@ class NotificationsUI extends StatelessWidget {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 SizedBox(height: 8.0),
-                                Text(
-                                  'Country: ${ventureData['country']}',
-                                  style: TextStyle(fontSize: 16.0),
-                                ),
                                 Text(
                                   'Requested ${timeago.format(request.timestamp)}',
                                   style: TextStyle(

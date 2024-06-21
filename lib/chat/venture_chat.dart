@@ -580,6 +580,7 @@ class MessageBubble extends StatelessWidget {
             children: [
               if (!isSentByMe) ...[
                 CircleAvatar(
+                  backgroundColor: Colors.transparent,
                   radius: 20,
                   backgroundImage: NetworkImage(pfpUrl),
                 ),
@@ -619,6 +620,7 @@ class MessageBubble extends StatelessWidget {
               SizedBox(width: 8),
               if (isSentByMe) ...[
                 CircleAvatar(
+                  backgroundColor: Colors.transparent,
                   radius: 20,
                   backgroundImage: NetworkImage(pfpUrl),
                 ),

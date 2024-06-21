@@ -196,8 +196,7 @@ class _ProfileWidgetState extends State<EditProfile> {
         print("Updated image");
       } else {
         setState(() {
-          _temporaryImageUrl =
-              "https://firebasestorage.googleapis.com/v0/b/jet-palz-backend-dcwyg2.appspot.com/o/assets%2Fpfp.png?alt=media&token=92f34e08-89ff-4de0-8076-4a2e9ec0576f";
+          _temporaryImageUrl = DefaultPfp;
         });
       }
     } catch (e) {
@@ -270,8 +269,7 @@ class _ProfileWidgetState extends State<EditProfile> {
 
   void _cancelChanges() {
     setState(() {
-      _temporaryImageUrl =
-          "https://firebasestorage.googleapis.com/v0/b/jet-palz-backend-dcwyg2.appspot.com/o/assets%2Fpfp.png?alt=media&token=92f34e08-89ff-4de0-8076-4a2e9ec0576f";
+      _temporaryImageUrl = DefaultPfp;
       // Clear image file
       _imageFile = null;
       // Mark image as not picked
@@ -309,7 +307,7 @@ class _ProfileWidgetState extends State<EditProfile> {
                             children: [
                               CircleAvatar(
                                 radius: 50,
-                                backgroundColor: Colors.lightBlue[200],
+                                backgroundColor: Colors.transparent,
                                 child: _imageFile != null
                                     ? ClipOval(
                                         child: Image.file(
@@ -464,7 +462,7 @@ class _ProfileWidgetState extends State<EditProfile> {
                               width: 300,
                               child: MyButton(
                                 onPressed: _isSavingChanges
-                                    ? null
+                                    ? () {}
                                     : _saveChanges, // Disable button during data saving process
                                 child: _isSavingChanges
                                     ? CircularProgressIndicator() // Display loading indicator when saving changes

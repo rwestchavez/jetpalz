@@ -26,6 +26,7 @@ class VentureProvider extends ChangeNotifier {
           ventureId: snap.id,
           country: doc['country'] ?? 'Unknown',
           creator: doc['creator'],
+          creatorName: doc['creator_name'],
           industry: doc['industry'] ?? 'Unknown',
           description: doc['description'] ?? 'No description',
           memberNum: doc['member_num'] ?? 0,

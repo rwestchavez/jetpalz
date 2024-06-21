@@ -72,13 +72,13 @@ class _ProfileWidgetState extends State<ProfileView> {
                               snapshot.data == null) {
                             return CircleAvatar(
                               radius: 50,
-                              backgroundColor: Colors.lightBlue[200],
+                              backgroundColor: Colors.transparent,
                               child: CircularProgressIndicator(),
                             );
                           } else if (snapshot.hasError) {
                             return CircleAvatar(
                               radius: 50,
-                              backgroundColor: Colors.lightBlue[200],
+                              backgroundColor: Colors.transparent,
                               child: Icon(
                                 Icons.error,
                                 size: 50,
@@ -89,7 +89,7 @@ class _ProfileWidgetState extends State<ProfileView> {
                               snapshot.data != null) {
                             return CircleAvatar(
                               radius: 50,
-                              backgroundColor: Colors.lightBlue[200],
+                              backgroundColor: Colors.transparent,
                               child: ClipOval(
                                 child: Image.network(
                                   snapshot.data!,
@@ -102,7 +102,7 @@ class _ProfileWidgetState extends State<ProfileView> {
                           } else {
                             return CircleAvatar(
                               radius: 50,
-                              backgroundColor: Colors.lightBlue[200],
+                              backgroundColor: Colors.transparent,
                               child: Icon(
                                 Icons.person,
                                 size: 50,

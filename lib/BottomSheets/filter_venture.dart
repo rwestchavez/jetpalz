@@ -87,7 +87,6 @@ class _FilterVentureState extends State<FilterVenture> {
               ],
             ),
           ),
-          const SizedBox(height: 12),
           Flexible(
             child: SingleChildScrollView(
               child: Padding(

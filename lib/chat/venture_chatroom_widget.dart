@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:jet_palz/constants.dart';
 import 'venture_chat.dart';
 
 class VentureChatRoomWidget extends StatelessWidget {
@@ -100,9 +101,9 @@ class VentureChatRoomWidget extends StatelessWidget {
             child: Row(
               children: [
                 CircleAvatar(
+                  backgroundColor: Colors.transparent,
                   backgroundImage: creatorPfp == null
-                      ? NetworkImage(
-                          "https://firebasestorage.googleapis.com/v0/b/jetpalz.appspot.com/o/assets%2Fpfp.png?alt=media&token=f13f281f-f92d-484f-8119-0ba572034891")
+                      ? NetworkImage(DefaultPfp)
                       : NetworkImage(creatorPfp!),
                   radius: 30.0, // Increased avatar size
                 ),

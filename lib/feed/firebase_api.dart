@@ -14,23 +14,15 @@ class FirebaseApi {
     final currentUserUid = FirebaseAuth.instance.currentUser!.uid;
     final firestore = FirebaseFirestore.instance;
 
-    // Step 1: Fetch requests made by the current user
     final QuerySnapshot requestSnapshot = await firestore
         .collection('requests')
         .where('requesterId', isEqualTo: currentUserUid)
         .where('status', isEqualTo: 'accepted') // Only get accepted requests
         .get();
 
-    // Extract the ventureIds of ventures where the user has an accepted request
-    List<String> acceptedVentureIds =
-        requestSnapshot.docs.map((doc) => doc['ventureId'] as String).toList();
-
-    // Step 2: Query ventures excluding those created by the current user or accepted ventures
     CollectionReference venturesRef = firestore.collection('ventures');
     Query query = venturesRef.orderBy('created_time').limit(limit);
-    var docRef = firestore.collection("users").doc(currentUserUid);
 
-    // Add filters based on parameters
     if (country != null) {
       query = query.where('country', isEqualTo: country);
     }

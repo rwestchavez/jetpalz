@@ -23,6 +23,7 @@ class ListViewWidget extends StatefulWidget {
 
 class _ListViewWidgetState extends State<ListViewWidget> {
   final scrollController = ScrollController();
+  bool _isButtonDisabled = false;
 
   @override
   void initState() {
@@ -47,42 +48,73 @@ class _ListViewWidgetState extends State<ListViewWidget> {
   }
 
   Future<void> sendJoinRequest(String ventureId) async {
-    final userId = FirebaseAuth.instance.currentUser!.uid;
-    final firestore = FirebaseFirestore.instance;
-    final userSnap = await firestore.collection('users').doc(userId).get();
-    final userData = userSnap.data() as Map<String, dynamic>;
-    final String requester = userData['username'];
-
-    final venture = firestore.collection('ventures').doc(ventureId);
-    final requestRef = firestore.collection('requests').doc();
-    final snap = await venture.get();
-    final data = snap.data() as Map<String, dynamic>;
-    final DocumentReference creator = data["creator"];
-    final creatorId = creator.id;
-
-    await requestRef.set({
-      'creatorId': creatorId,
-      'requestId': requestRef.id,
-      'requesterId': userId,
-      'requester': requester,
-      'ventureId': ventureId,
-      'status': 'pending',
-      'timestamp': FieldValue.serverTimestamp(),
+    setState(() {
+      _isButtonDisabled = true;
     });
+    try {
+      final userId = FirebaseAuth.instance.currentUser!.uid;
+
+      final firestore = FirebaseFirestore.instance;
+      final userRef = firestore.collection('users').doc(userId);
+      final userSnap = await userRef.get();
+      final userData = userSnap.data() as Map<String, dynamic>;
+      final venture = firestore.collection('ventures').doc(ventureId);
+
+      final requestRef = firestore.collection('requests').doc();
+      final snap = await venture.get();
+      if (snap['creator'] == userRef) {
+        MySnackBar.show(context,
+            content: Text("You can't join your own venture!"));
+        return;
+      }
+      final data = snap.data() as Map<String, dynamic>;
+      final DocumentReference creator = data["creator"];
+      final creatorId = creator.id;
+      final String requester = userData['username'];
+
+      await requestRef.set({
+        'creatorId': creatorId,
+        'requestId': requestRef.id,
+        'requesterId': userId,
+        'requester': requester,
+        'ventureId': ventureId,
+        'status': 'pending',
+        'timestamp': FieldValue.serverTimestamp(),
+      });
+
+      MySnackBar.show(context,
+          content: Text("You sent a request to join the venture"));
+    } finally {
+      setState(() {
+        _isButtonDisabled = false;
+      });
+    }
   }
 
   Future<void> cancelJoinRequest(String ventureId) async {
-    final userId = FirebaseAuth.instance.currentUser!.uid;
-    final firestore = FirebaseFirestore.instance;
+    setState(() {
+      _isButtonDisabled = true;
+    });
+    try {
+      final userId = FirebaseAuth.instance.currentUser!.uid;
+      final firestore = FirebaseFirestore.instance;
 
-    final querySnapshot = await firestore
-        .collection('requests')
-        .where('ventureId', isEqualTo: ventureId)
-        .where('requesterId', isEqualTo: userId)
-        .get();
+      final querySnapshot = await firestore
+          .collection('requests')
+          .where('ventureId', isEqualTo: ventureId)
+          .where('requesterId', isEqualTo: userId)
+          .get();
 
-    for (var doc in querySnapshot.docs) {
-      await doc.reference.delete();
+      for (var doc in querySnapshot.docs) {
+        await doc.reference.delete();
+      }
+
+      MySnackBar.show(context,
+          content: Text("You cancelled your request to join the venture"));
+    } finally {
+      setState(() {
+        _isButtonDisabled = false;
+      });
     }
   }
 
@@ -171,26 +203,9 @@ class _ListViewWidgetState extends State<ListViewWidget> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          FutureBuilder<DocumentSnapshot>(
-                            future: venture.creator!.get(),
-                            builder: (context, snapshot) {
-                              if (snapshot.connectionState ==
-                                  ConnectionState.waiting) {
-                                return CircularProgressIndicator();
-                              } else if (snapshot.hasError) {
-                                return Text('Error: ${snapshot.error}');
-                              } else if (snapshot.hasData) {
-                                var creatorData = snapshot.data?.data()
-                                    as Map<String, dynamic>?;
-                                return Text(creatorData?['username'] ?? "error",
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.w700,
-                                        fontSize: 20));
-                              } else {
-                                return Text('Unknown');
-                              }
-                            },
-                          ),
+                          Text(venture.creatorName,
+                              style: TextStyle(
+                                  fontWeight: FontWeight.w700, fontSize: 20)),
                           Row(
                             children: [
                               Text("Profession",
@@ -224,26 +239,24 @@ class _ListViewWidgetState extends State<ListViewWidget> {
                               child: StreamBuilder<QuerySnapshot>(
                                 stream: checkRequestStatus(venture.ventureId),
                                 builder: (context, snapshot) {
-                                  if (snapshot.connectionState ==
-                                      ConnectionState.waiting) {
-                                    return CircularProgressIndicator();
-                                  } else if (snapshot.hasError) {
+                                  if (snapshot.hasError) {
                                     return Text('Error: ${snapshot.error}');
                                   } else if (snapshot.hasData &&
                                       snapshot.data!.docs.isNotEmpty) {
                                     var requestStatus =
                                         snapshot.data!.docs.first['status'];
                                     return MyButton(
-                                      onPressed: () {
-                                        if (requestStatus == 'pending') {
-                                          cancelJoinRequest(venture.ventureId);
-                                          MySnackBar.show(context,
-                                              content: Text(
-                                                  "You cancelled your request to join the venture"));
-                                        } else {
-                                          sendJoinRequest(venture.ventureId);
-                                        }
-                                      },
+                                      onPressed: _isButtonDisabled
+                                          ? () {}
+                                          : () {
+                                              if (requestStatus == 'pending') {
+                                                cancelJoinRequest(
+                                                    venture.ventureId);
+                                              } else {
+                                                sendJoinRequest(
+                                                    venture.ventureId);
+                                              }
+                                            },
                                       style: ButtonStyle(
                                         backgroundColor: WidgetStateProperty
                                             .resolveWith<Color>(
@@ -255,12 +268,12 @@ class _ListViewWidgetState extends State<ListViewWidget> {
                                     );
                                   } else {
                                     return MyButton(
-                                      onPressed: () {
-                                        sendJoinRequest(venture.ventureId);
-                                        MySnackBar.show(context,
-                                            content: Text(
-                                                "You sent a request to join the venture"));
-                                      },
+                                      onPressed: _isButtonDisabled
+                                          ? () {}
+                                          : () {
+                                              sendJoinRequest(
+                                                  venture.ventureId);
+                                            },
                                       child: Text("Join"),
                                     );
                                   }
