@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:jet_palz/components/my_button.dart';
 import 'package:jet_palz/components/my_snack_bar.dart';
+import 'package:jet_palz/helpers/delete_venture.dart';
+import 'package:jet_palz/helpers/edit_venture.dart';
 import '../app_state.dart';
 import 'venture_provider.dart';
 
@@ -51,6 +53,7 @@ class _ListViewWidgetState extends State<ListViewWidget> {
     setState(() {
       _isButtonDisabled = true;
     });
+
     try {
       final userId = FirebaseAuth.instance.currentUser!.uid;
 
@@ -60,13 +63,26 @@ class _ListViewWidgetState extends State<ListViewWidget> {
       final userData = userSnap.data() as Map<String, dynamic>;
       final venture = firestore.collection('ventures').doc(ventureId);
 
-      final requestRef = firestore.collection('requests').doc();
+      final requestRef = firestore.collection("requests").doc();
+
+      final requestQuery = await firestore
+          .collection('requests')
+          .where("ventureId", isEqualTo: ventureId)
+          .get();
+
       final snap = await venture.get();
       if (snap['creator'] == userRef) {
         MySnackBar.show(context,
             content: Text("You can't join your own venture!"));
         return;
       }
+      for (QueryDocumentSnapshot doc in requestQuery.docs) {
+        // Check the status field of the document
+        if (doc['status'] == 'accepted') {
+          return;
+        }
+      }
+
       final data = snap.data() as Map<String, dynamic>;
       final DocumentReference creator = data["creator"];
       final creatorId = creator.id;
@@ -166,164 +182,205 @@ class _ListViewWidgetState extends State<ListViewWidget> {
     return ListView(
       controller: scrollController,
       children: [
-        ...widget.usersProvider.ventures
-            .map(
-              (venture) => Container(
-                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                decoration: BoxDecoration(
-                  border: Border.all(
-                      width: 1, color: Color.fromARGB(255, 214, 214, 214)),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+        ...widget.usersProvider.ventures.map((venture) {
+          final userId = FirebaseAuth.instance.currentUser!.uid;
+          final isCreator = venture.creator!.id == userId;
+
+          return Container(
+            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            decoration: BoxDecoration(
+              border: Border.all(
+                  width: 1, color: Color.fromARGB(255, 214, 214, 214)),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
+                    Text("${venture.country}",
+                        style: TextStyle(
+                            fontWeight: FontWeight.w900, fontSize: 30)),
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text("${venture.country}",
-                            style: TextStyle(
-                                fontWeight: FontWeight.w900, fontSize: 30)),
-                        Row(
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.only(right: 8),
-                              child: Text(
-                                '${venture.memberNum} / ${venture.maxPeople}',
-                                style: TextStyle(
-                                    fontWeight: FontWeight.bold, fontSize: 20),
-                              ),
-                            ),
-                            Icon(Icons.people_alt),
-                          ],
-                        ),
-                      ],
-                    ),
-                    Container(
-                      constraints: BoxConstraints(maxWidth: 300.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(venture.creatorName,
-                              style: TextStyle(
-                                  fontWeight: FontWeight.w700, fontSize: 20)),
-                          Row(
-                            children: [
-                              Text("Profession",
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 15)),
-                              Padding(
-                                padding: const EdgeInsets.only(left: 8),
-                                child: Text("${venture.industry}"),
-                              )
-                            ],
-                          )
-                        ],
-                      ),
-                    ),
-                    SizedBox(
-                      height: 8,
-                    ),
-                    Text(venture.description!),
-                    SizedBox(
-                      height: 12,
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        Expanded(
-                          child: Container(
-                            alignment: Alignment.centerLeft,
-                            child: Container(
-                              constraints: BoxConstraints(maxWidth: 150),
-                              child: StreamBuilder<QuerySnapshot>(
-                                stream: checkRequestStatus(venture.ventureId),
-                                builder: (context, snapshot) {
-                                  if (snapshot.hasError) {
-                                    return Text('Error: ${snapshot.error}');
-                                  } else if (snapshot.hasData &&
-                                      snapshot.data!.docs.isNotEmpty) {
-                                    var requestStatus =
-                                        snapshot.data!.docs.first['status'];
-                                    return MyButton(
-                                      onPressed: _isButtonDisabled
-                                          ? () {}
-                                          : () {
-                                              if (requestStatus == 'pending') {
-                                                cancelJoinRequest(
-                                                    venture.ventureId);
-                                              } else {
-                                                sendJoinRequest(
-                                                    venture.ventureId);
-                                              }
-                                            },
-                                      style: ButtonStyle(
-                                        backgroundColor: WidgetStateProperty
-                                            .resolveWith<Color>(
-                                          (states) =>
-                                              getButtonColor(requestStatus),
-                                        ),
-                                      ),
-                                      child: Text(getButtonText(requestStatus)),
-                                    );
-                                  } else {
-                                    return MyButton(
-                                      onPressed: _isButtonDisabled
-                                          ? () {}
-                                          : () {
-                                              sendJoinRequest(
-                                                  venture.ventureId);
-                                            },
-                                      child: Text("Join"),
-                                    );
-                                  }
-                                },
-                              ),
-                            ),
-                          ),
-                        ),
                         Padding(
-                          padding: EdgeInsets.only(right: 0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                children: [
-                                  Text(
-                                    'Month ',
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.w700,
-                                    ),
-                                  ),
-                                  Text(
-                                    '${venture.startingMonth}',
-                                  ),
-                                ],
-                              ),
-                              Row(
-                                children: [
-                                  Text(
-                                    'Duration ',
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.w700,
-                                    ),
-                                  ),
-                                  Text(
-                                    '${venture.estimatedWeeks}',
-                                  ),
-                                  Text(" Weeks")
-                                ],
-                              ),
-                            ],
+                          padding: const EdgeInsets.only(right: 8),
+                          child: Text(
+                            '${venture.memberNum} / ${venture.maxPeople}',
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold, fontSize: 20),
                           ),
                         ),
+                        Icon(Icons.people_alt),
                       ],
                     ),
                   ],
                 ),
-              ),
-            )
-            .toList(),
+                Container(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            venture.creatorName,
+                            style: TextStyle(
+                                fontWeight: FontWeight.w700, fontSize: 20),
+                          ),
+                          if (isCreator)
+                            PopupMenuButton<String>(
+                              onSelected: (value) async {
+                                var firestore = FirebaseFirestore.instance;
+                                final ventureId = venture.ventureId;
+                                final ventureRef = firestore
+                                    .collection("ventures")
+                                    .doc(ventureId);
+                                if (value == 'edit') {
+                                  final ventureSnap = await ventureRef.get();
+                                  final ventureData = ventureSnap.data()
+                                      as Map<String, dynamic>;
+                                  showModalBottomSheet(
+                                      isScrollControlled: true,
+                                      context: context,
+                                      builder: (BuildContext context) {
+                                        return FractionallySizedBox(
+                                            heightFactor:
+                                                0.5, // Adjust this factor to control the height
+                                            child: EditVenture(
+                                                ventureRef: ventureRef,
+                                                ventureData: ventureData));
+                                      });
+                                } else if (value == 'delete') {
+                                  deleteVenture(context, ventureRef);
+                                }
+                              },
+                              itemBuilder: (context) => [
+                                PopupMenuItem(
+                                  value: 'edit',
+                                  child: Text('Edit'),
+                                ),
+                                PopupMenuItem(
+                                  value: 'delete',
+                                  child: Text('Delete'),
+                                ),
+                              ],
+                            ),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          Text("Profession",
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold, fontSize: 15)),
+                          Padding(
+                            padding: const EdgeInsets.only(left: 8),
+                            child: Text("${venture.industry}"),
+                          )
+                        ],
+                      )
+                    ],
+                  ),
+                ),
+                SizedBox(
+                  height: 8,
+                ),
+                Text(venture.description!),
+                SizedBox(
+                  height: 12,
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: Container(
+                        alignment: Alignment.centerLeft,
+                        child: Container(
+                          constraints: BoxConstraints(maxWidth: 150),
+                          child: StreamBuilder<QuerySnapshot>(
+                            stream: checkRequestStatus(venture.ventureId),
+                            builder: (context, snapshot) {
+                              if (snapshot.hasError) {
+                                return Text('Error: ${snapshot.error}');
+                              } else if (snapshot.hasData &&
+                                  snapshot.data!.docs.isNotEmpty) {
+                                var requestStatus =
+                                    snapshot.data!.docs.first['status'];
+                                return MyButton(
+                                  onPressed: _isButtonDisabled
+                                      ? () {}
+                                      : () {
+                                          if (requestStatus == 'pending') {
+                                            cancelJoinRequest(
+                                                venture.ventureId);
+                                          } else {
+                                            sendJoinRequest(venture.ventureId);
+                                          }
+                                        },
+                                  style: ButtonStyle(
+                                    backgroundColor:
+                                        WidgetStateProperty.resolveWith<Color>(
+                                      (states) => getButtonColor(requestStatus),
+                                    ),
+                                  ),
+                                  child: Text(getButtonText(requestStatus)),
+                                );
+                              } else {
+                                return MyButton(
+                                  onPressed: _isButtonDisabled
+                                      ? () {}
+                                      : () {
+                                          sendJoinRequest(venture.ventureId);
+                                        },
+                                  child: Text("Join"),
+                                );
+                              }
+                            },
+                          ),
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.only(right: 0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Text(
+                                'Month ',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                              Text(
+                                '${venture.startingMonth}',
+                              ),
+                            ],
+                          ),
+                          Row(
+                            children: [
+                              Text(
+                                'Duration ',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                              Text(
+                                '${venture.estimatedWeeks}',
+                              ),
+                              Text(" Weeks")
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          );
+        }).toList(),
         if (widget.usersProvider.hasNext)
           Center(
             child: GestureDetector(

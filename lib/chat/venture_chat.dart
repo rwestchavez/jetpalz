@@ -1,7 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:jet_palz/chat/chat.dart';
 import 'package:jet_palz/components/my_snack_bar.dart';
+import 'package:jet_palz/helpers/edit_venture.dart';
 
 class VentureChat extends StatefulWidget {
   final String chatName;
@@ -415,33 +417,73 @@ class _VentureChatState extends State<VentureChat> {
             ],
           ),
           actions: [
-            PopupMenuButton<String>(
-              offset: Offset(0, 50),
-              onSelected: (value) {
-                if (value == 'leave') {
-                  _showLeaveConfirmation();
-                } else if (value == 'info') {
-                  _showVentureInfo();
+            FutureBuilder(
+              future: widget.ventureRef.get(),
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  final ventureData =
+                      snapshot.data!.data() as Map<String, dynamic>;
+                  return PopupMenuButton<String>(
+                    offset: Offset(0, 50),
+                    onSelected: (value) {
+                      if (value == 'leave') {
+                        _showLeaveConfirmation();
+                      } else if (value == 'info') {
+                        _showVentureInfo();
+                      } else if (value == 'edit') {
+                        showModalBottomSheet(
+                            isScrollControlled: true,
+                            context: context,
+                            builder: (BuildContext context) {
+                              return FractionallySizedBox(
+                                  heightFactor:
+                                      0.5, // Adjust this factor to control the height
+                                  child: EditVenture(
+                                      ventureRef: widget.ventureRef,
+                                      ventureData: ventureData));
+                            });
+                      }
+                    },
+                    itemBuilder: (BuildContext context) {
+                      List<PopupMenuEntry<String>> menuItems = [
+                        const PopupMenuItem<String>(
+                          value: 'info',
+                          child: ListTile(
+                            leading: Icon(Icons.info),
+                            title: Text('Info'),
+                          ),
+                        ),
+                        const PopupMenuItem<String>(
+                          value: 'leave',
+                          child: ListTile(
+                            leading: Icon(Icons.exit_to_app),
+                            title: Text('Leave'),
+                          ),
+                        ),
+                      ];
+
+                      // Check if the current user is the creator of the venture
+                      if (ventureData['creator'].id ==
+                          FirebaseAuth.instance.currentUser!.uid) {
+                        menuItems.insert(
+                          1,
+                          const PopupMenuItem<String>(
+                            value: 'edit',
+                            child: ListTile(
+                              leading: Icon(Icons.edit),
+                              title: Text('Edit'),
+                            ),
+                          ),
+                        );
+                      }
+
+                      return menuItems;
+                    },
+                  );
+                } else {
+                  return Container();
                 }
               },
-              itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
-                const PopupMenuItem<String>(
-                  value: 'info',
-                  child: ListTile(
-                    leading: Icon(Icons.info),
-                    title: Text('Info'),
-                  ),
-                ),
-                const PopupMenuItem<String>(
-                  value: 'leave',
-                  child: ListTile(
-                    leading: Icon(Icons.exit_to_app),
-                    title: Text('Leave'),
-                  ),
-                ),
-
-                // Add more menu items as needed
-              ],
             ),
           ],
           centerTitle: true,
