@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:jet_palz/chat/chat.dart';
 import 'package:jet_palz/components/my_snack_bar.dart';
+import 'package:jet_palz/helpers/delete_venture.dart';
 import 'package:jet_palz/helpers/edit_venture.dart';
 
 class VentureChat extends StatefulWidget {
@@ -442,6 +443,8 @@ class _VentureChatState extends State<VentureChat> {
                                       ventureRef: widget.ventureRef,
                                       ventureData: ventureData));
                             });
+                      } else if (value == 'delete') {
+                        deleteVenture(context, widget.ventureRef);
                       }
                     },
                     itemBuilder: (BuildContext context) {
@@ -472,6 +475,16 @@ class _VentureChatState extends State<VentureChat> {
                             child: ListTile(
                               leading: Icon(Icons.edit),
                               title: Text('Edit'),
+                            ),
+                          ),
+                        );
+                        menuItems.insert(
+                          2,
+                          const PopupMenuItem<String>(
+                            value: 'delete',
+                            child: ListTile(
+                              leading: Icon(Icons.delete),
+                              title: Text('Delete'),
                             ),
                           ),
                         );

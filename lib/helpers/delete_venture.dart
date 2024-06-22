@@ -4,6 +4,13 @@ import 'package:jet_palz/components/my_snack_bar.dart';
 
 Future<void> deleteVenture(
     BuildContext context, DocumentReference ventureRef) async {
+  final querySnapshot = await FirebaseFirestore.instance
+      .collection("venture_chats")
+      .where("venture", isEqualTo: ventureRef)
+      .limit(1)
+      .get();
+
+  final chatRef = querySnapshot.docs.first.reference;
   final shouldDelete = await showDialog<bool>(
     context: context,
     builder: (BuildContext context) {
@@ -31,6 +38,7 @@ Future<void> deleteVenture(
   if (shouldDelete == true) {
     try {
       await ventureRef.delete();
+      await chatRef.delete();
       MySnackBar.show(context, content: Text('Venture deleted successfully'));
     } catch (e) {
       MySnackBar.show(context, content: Text('Failed to delete venture: $e'));
