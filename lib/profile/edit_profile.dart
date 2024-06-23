@@ -100,9 +100,7 @@ class _ProfileWidgetState extends State<EditProfile> {
         _usernameTextController.text = _userData!['username'] ?? '';
         _descriptionTextController.text = _userData!['description'] ?? '';
       });
-    } catch (e) {
-      print('Error initializing user data: $e');
-    }
+    } catch (e) {}
   }
 
   Future<Map<String, dynamic>> _fetchUserData() async {
@@ -114,7 +112,6 @@ class _ProfileWidgetState extends State<EditProfile> {
             .get();
         return userDataSnapshot.data() as Map<String, dynamic>;
       } catch (e) {
-        print('Error fetching user data: $e');
         throw e;
       }
     }
@@ -141,9 +138,7 @@ class _ProfileWidgetState extends State<EditProfile> {
                         _temporaryImageUrl = null; // Clear temporary image URL
                         _imagePicked = true; // Mark that an image is picked
                       });
-                    } else {
-                      print('No image selected.');
-                    }
+                    } else {}
                   },
                   child: const Text("Gallery"),
                 ),
@@ -160,9 +155,7 @@ class _ProfileWidgetState extends State<EditProfile> {
                         _temporaryImageUrl = null; // Clear temporary image URL
                         _imagePicked = true; // Mark that an image is picked
                       });
-                    } else {
-                      print('No image selected.');
-                    }
+                    } else {}
                   },
                   child: const Text("Camera"),
                 ),
@@ -193,15 +186,12 @@ class _ProfileWidgetState extends State<EditProfile> {
         setState(() {
           _temporaryImageUrl = downloadUrl;
         });
-        print("Updated image");
       } else {
         setState(() {
           _temporaryImageUrl = DefaultPfp;
         });
       }
-    } catch (e) {
-      print('Error uploading image: $e');
-    }
+    } catch (e) {}
   }
 
   void _saveChanges() {
@@ -258,7 +248,6 @@ class _ProfileWidgetState extends State<EditProfile> {
 
         Navigator.pop(context, true);
       } catch (e) {
-        print('Error saving changes: $e');
         MySnackBar.show(
           context,
           content: const Text('Failed to save changes'),
@@ -411,7 +400,6 @@ class _ProfileWidgetState extends State<EditProfile> {
                               setState(() {
                                 industryController.value = selected;
                                 selectedIndustry = selected;
-                                print('changing value to: $selected');
                               });
                             },
                           ),
@@ -431,7 +419,6 @@ class _ProfileWidgetState extends State<EditProfile> {
                                 industriesController.value =
                                     selected as List<String>;
                                 selectedIndustries = selected;
-                                print('changing value to: $selected');
                               });
                             },
                           ),
@@ -451,7 +438,6 @@ class _ProfileWidgetState extends State<EditProfile> {
                                 countriesController.value =
                                     selected as List<String>;
                                 selectedCountries = selected;
-                                print('changing value to: $selected');
                               });
                             },
                           ),

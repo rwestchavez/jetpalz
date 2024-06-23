@@ -9,9 +9,9 @@ import '../components/my_snack_bar.dart';
 
 class EmailSignUp extends StatefulWidget {
   const EmailSignUp({
-    Key? key,
+    super.key,
     required this.email,
-  }) : super(key: key);
+  });
 
   final String email;
 
@@ -74,11 +74,9 @@ class _EmailSignUpWidgetState extends State<EmailSignUp> {
         'description': '', // Add description if needed
       });
       // Handle successful sign-up
-      print("User signed up: ${userCredential.user!.email}");
       Navigator.pushReplacementNamed(context, '/onboarding');
     } on FirebaseAuthException catch (e) {
       String errorMessage = "Sign-up error: $e";
-      print(errorMessage);
       String snackBarMessage;
 
       switch (e.code) {
@@ -103,7 +101,6 @@ class _EmailSignUpWidgetState extends State<EmailSignUp> {
       );
     } catch (e) {
       // Handle other errors
-      print("Error signing up: $e");
       MySnackBar.show(context,
           content: const Text("An error occurred. Please try again later."));
     } finally {

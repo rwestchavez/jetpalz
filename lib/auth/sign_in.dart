@@ -12,7 +12,6 @@ class SignIn extends StatefulWidget {
 }
 
 class _SignInWidgetState extends State<SignIn> {
-
   late FocusNode emailAddressFocusNode;
   late FocusNode passwordFocusNode;
   late TextEditingController _emailController;
@@ -49,11 +48,9 @@ class _SignInWidgetState extends State<SignIn> {
         email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
       );
-      print("User signed in: ${userCredential.user!.email}");
       // Navigate to the next screen or perform any necessary action
       Navigator.pushReplacementNamed(context, '/feed');
     } on FirebaseAuthException catch (e) {
-      String errorMessage = "Error signing in: $e";
       String snackBarMessage;
 
       switch (e.code) {
@@ -221,8 +218,8 @@ class _SignInWidgetState extends State<SignIn> {
                     ),
                     const SizedBox(height: 16.0),
                     Padding(
-                      padding:
-                          const EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 16.0),
+                      padding: const EdgeInsetsDirectional.fromSTEB(
+                          0.0, 0.0, 0.0, 16.0),
                       child: ElevatedButton.icon(
                         onPressed: _isLoading
                             ? () {}

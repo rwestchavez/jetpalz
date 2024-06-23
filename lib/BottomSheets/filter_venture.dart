@@ -166,7 +166,6 @@ class _FilterVentureState extends State<FilterVenture> {
                       items: weekNum,
                       onChanged: (selected) {
                         selectedWeeks = int.parse(selected!);
-                        print('changing week value to: $selected');
                       },
                     ),
                     const SizedBox(height: 12),

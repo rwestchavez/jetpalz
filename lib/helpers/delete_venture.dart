@@ -47,6 +47,10 @@ Future<void> deleteVenture(
         ) ??
         false;
   }
+  if (Navigator.of(context).canPop()) {
+    Navigator.pop(context);
+  }
+  ventureRef.set({'deleted': true});
 
   if (shouldDelete) {
     try {
@@ -70,7 +74,7 @@ Future<void> deleteVenture(
       MySnackBar.show(context,
           content: const Text('Venture deleted successfully'));
     } catch (e) {
-      MySnackBar.show(context, content: Text('Failed to delete venture: $e'));
+      // MySnackBar.show(context, content: Text('Failed to delete venture: $e'));
     }
   }
 }

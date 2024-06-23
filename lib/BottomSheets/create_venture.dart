@@ -6,7 +6,7 @@ import '../components/my_snack_bar.dart';
 import '../constants.dart';
 
 class CreateVenture extends StatefulWidget {
-  const CreateVenture({Key? key}) : super(key: key);
+  const CreateVenture({super.key});
 
   @override
   State<CreateVenture> createState() => _CreateVentureWidgetState();
@@ -131,7 +131,8 @@ class _CreateVentureWidgetState extends State<CreateVenture> {
                                       });
 
                                       MySnackBar.show(context,
-                                          content: const Text("Venture Created"));
+                                          content:
+                                              const Text("Venture Created"));
                                       Navigator.pop(context);
                                     } catch (e) {
                                       MySnackBar.show(context,

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -41,9 +43,24 @@ class _VentureChatState extends State<VentureChat> {
   bool _hasNext = true;
   int _memberCount = 0;
 
+  StreamSubscription<DocumentSnapshot>? _ventureRefSubscription;
+
   @override
   void initState() {
     super.initState();
+    _ventureRefSubscription = widget.ventureRef?.snapshots().listen((event) {
+      if (event.exists) {
+        var data = event.data() as Map<String, dynamic>?;
+        if (data != null && data['deleted'] == true) {
+          // Venture has been marked as deleted
+          if (Navigator.of(context).canPop()) {
+            Navigator.of(context).pop();
+          }
+          MySnackBar.show(context,
+              content: Text("This venture has been deleted"));
+        }
+      }
+    });
     _loadMessages();
     _fetchMemberCount();
 
@@ -435,15 +452,15 @@ class _VentureChatState extends State<VentureChat> {
       Navigator.of(context).pop();
       MySnackBar.show(context,
           content: const Text("You have left the venture"));
-    } catch (e) {
-      print('Error leaving chat: $e');
-    }
+    } catch (e) {}
   }
 
   @override
   void dispose() {
     _messageController.dispose();
     _scrollController.dispose();
+    _ventureRefSubscription?.cancel(); // Cancel subscription on dispose
+
     super.dispose();
   }
 

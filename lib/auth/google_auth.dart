@@ -19,8 +19,6 @@ Future<void> googleAuth(BuildContext context, bool signUp) async {
     final UserCredential userCredential =
         await _auth.signInWithCredential(credential);
 
-    print("User signed in: ${userCredential.user!.email}");
-
     // Navigate to the next screen or perform any necessary action
     if (signUp) {
       await FirebaseFirestore.instance

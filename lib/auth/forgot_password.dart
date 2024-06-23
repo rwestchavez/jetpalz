@@ -35,12 +35,12 @@ class _ForgotPasswordWidgetState extends State<ForgotPassword> {
   Future<void> _resetPassword(String email) async {
     try {
       await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
-      MySnackBar.show(context, content: const Text("Password reset email sent!"));
-    } catch (error) {
-      print('Password reset failed: $error');
       MySnackBar.show(context,
-          content:
-              const Text("Failed to send password reset email. Please try again."));
+          content: const Text("Password reset email sent!"));
+    } catch (error) {
+      MySnackBar.show(context,
+          content: const Text(
+              "Failed to send password reset email. Please try again."));
     }
   }
 
@@ -111,7 +111,8 @@ class _ForgotPasswordWidgetState extends State<ForgotPassword> {
                     Align(
                       alignment: Alignment.center,
                       child: Padding(
-                        padding: const EdgeInsets.fromLTRB(16.0, 24.0, 16.0, 0.0),
+                        padding:
+                            const EdgeInsets.fromLTRB(16.0, 24.0, 16.0, 0.0),
                         child: MyButton(
                           onPressed: () async {
                             if (_formKey.currentState!.validate())

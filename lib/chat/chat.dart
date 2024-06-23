@@ -23,7 +23,6 @@ class Chat extends StatelessWidget {
               int requestCount = requestProvider.requests.length +
                   requestProvider.acceptedRequests.length +
                   requestProvider.rejectedRequests.length;
-              print(' request count $requestCount');
 
               // Return IconButton with or without Badge based on requestCount
               if (requestCount > 0) {
@@ -71,13 +70,11 @@ class VentureChatRoom extends StatelessWidget {
     if (chatProvider.isLoading) {
       return const Center(child: CircularProgressIndicator());
     }
-    print(chatProvider.chatDocuments);
 
     // this listview builder is not showiing. Thats the problem
     return ListView.builder(
       itemCount: chatProvider.chatDocuments.length,
       itemBuilder: (context, index) {
-        print("Hello ");
 
         final chatDocument = chatProvider.chatDocuments[index];
         final String chatName = chatDocument['name'];

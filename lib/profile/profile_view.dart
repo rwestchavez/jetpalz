@@ -25,23 +25,15 @@ class _ProfileWidgetState extends State<ProfileView> {
 
   Future<void> _fetchUserData(String? userId) async {
     if (userId != null) {
-      try {
-        final userDataSnapshot = await FirebaseFirestore.instance
-            .collection('users')
-            .doc(userId)
-            .get();
-        if (userDataSnapshot.exists) {
-          setState(() {
-            _userData = userDataSnapshot.data() as Map<String, dynamic>?;
-          });
-        } else {
-          print('User data does not exist for userId: $userId');
-        }
-      } catch (e) {
-        print('Error fetching user data: $e');
+      final userDataSnapshot = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(userId)
+          .get();
+      if (userDataSnapshot.exists) {
+        setState(() {
+          _userData = userDataSnapshot.data() as Map<String, dynamic>?;
+        });
       }
-    } else {
-      print('userId is null');
     }
   }
 
@@ -239,7 +231,10 @@ class _ProfileWidgetState extends State<ProfileView> {
                                           padding: const EdgeInsets.symmetric(
                                               horizontal: 12, vertical: 6),
                                           decoration: BoxDecoration(
-                                            color: const Color.fromARGB(255, 71, 200,
+                                            color: const Color.fromARGB(
+                                                255,
+                                                71,
+                                                200,
                                                 255), // Same background color as the Chip
                                             borderRadius: BorderRadius.circular(
                                                 20), // Same border radius as the Chip

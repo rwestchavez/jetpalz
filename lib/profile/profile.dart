@@ -37,9 +37,7 @@ class _ProfileWidgetState extends State<Profile> {
         setState(() {
           _userData = userDataSnapshot.data() as Map<String, dynamic>;
         });
-      } catch (e) {
-        print('Error fetching user data: $e');
-      }
+      } catch (e) {}
     }
   }
 
@@ -263,7 +261,10 @@ class _ProfileWidgetState extends State<Profile> {
                                           padding: const EdgeInsets.symmetric(
                                               horizontal: 12, vertical: 6),
                                           decoration: BoxDecoration(
-                                            color: const Color.fromARGB(255, 71, 200,
+                                            color: const Color.fromARGB(
+                                                255,
+                                                71,
+                                                200,
                                                 255), // Same background color as the Chip
                                             borderRadius: BorderRadius.circular(
                                                 20), // Same border radius as the Chip

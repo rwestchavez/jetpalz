@@ -51,7 +51,6 @@ class RequestProvider with ChangeNotifier {
         return 'Unknown User';
       }
     } catch (e) {
-      print("Error fetching creator username: $e");
       return 'Unknown User';
     }
   }
