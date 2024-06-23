@@ -20,7 +20,8 @@ class NotificationsUI extends StatelessWidget {
           } else if (provider.requests.isEmpty &&
               provider.acceptedRequests.isEmpty &&
               provider.rejectedRequests.isEmpty) {
-            return const Center(child: Text('No pending requests or notifications'));
+            return const Center(
+                child: Text('No pending requests or notifications'));
           } else {
             return ListView.builder(
               itemCount: provider.requests.length +
@@ -40,7 +41,10 @@ class NotificationsUI extends StatelessWidget {
                         return Container();
                       } else {
                         var ventureData =
-                            snapshot.data!.data() as Map<String, dynamic>;
+                            snapshot.data!.data() as Map<String, dynamic>?;
+                        if (ventureData == null) {
+                          return Container(); // Or some fallback UI
+                        }
 
                         return Card(
                           margin: const EdgeInsets.symmetric(
@@ -68,15 +72,16 @@ class NotificationsUI extends StatelessWidget {
                                 mainAxisAlignment: MainAxisAlignment.end,
                                 children: [
                                   IconButton(
-                                    icon:
-                                        const Icon(Icons.check, color: Colors.green),
+                                    icon: const Icon(Icons.check,
+                                        color: Colors.green),
                                     onPressed: () {
                                       provider.respondToRequest(
                                           request, 'accepted');
                                     },
                                   ),
                                   IconButton(
-                                    icon: const Icon(Icons.close, color: Colors.red),
+                                    icon: const Icon(Icons.close,
+                                        color: Colors.red),
                                     onPressed: () {
                                       provider.respondToRequest(
                                           request, 'rejected');
@@ -115,17 +120,23 @@ class NotificationsUI extends StatelessWidget {
                         );
                       } else {
                         var requestData =
-                            snapshot.data!.data() as Map<String, dynamic>;
-
+                            snapshot.data!.data() as Map<String, dynamic>?;
+                        String? data = requestData?['creatorId'];
+                        if (data == null || requestData == null) {
+                          return Container(); // Or some fallback UI
+                        }
                         return FutureBuilder<String>(
-                          future: provider
-                              .getCreatorUsername(requestData['creatorId']),
+                          future: provider.getCreatorUsername(data),
                           builder: (context, usernameSnapshot) {
                             if (usernameSnapshot.hasError) {
                               return Center(
                                   child:
                                       Text('Error: ${usernameSnapshot.error}'));
+                            } else if (!usernameSnapshot.hasData) {
+                              return const Center(
+                                  child: CircularProgressIndicator());
                             } else {
+                              var creatorUsername = usernameSnapshot.data!;
                               DateTime requestTime =
                                   (requestData['timestamp'] as Timestamp)
                                       .toDate();
@@ -149,7 +160,7 @@ class NotificationsUI extends StatelessWidget {
                                       vertical: 8.0, horizontal: 16.0),
                                   child: ListTile(
                                     title: Text(
-                                      '${requestData['requester']} joined ${usernameSnapshot.data}\'s venture!',
+                                      '${requestData['requester']} joined ${creatorUsername}\'s venture!',
                                       style: const TextStyle(
                                           fontSize: 18.0,
                                           fontWeight: FontWeight.bold),
@@ -194,7 +205,10 @@ class NotificationsUI extends StatelessWidget {
                         );
                       } else {
                         var requestData =
-                            snapshot.data!.data() as Map<String, dynamic>;
+                            snapshot.data!.data() as Map<String, dynamic>?;
+                        if (requestData == null) {
+                          return Container(); // Or some fallback UI
+                        }
 
                         return FutureBuilder<String>(
                           future: provider
@@ -204,7 +218,11 @@ class NotificationsUI extends StatelessWidget {
                               return Center(
                                   child:
                                       Text('Error: ${usernameSnapshot.error}'));
+                            } else if (!usernameSnapshot.hasData) {
+                              return const Center(
+                                  child: CircularProgressIndicator());
                             } else {
+                              var creatorUsername = usernameSnapshot.data!;
                               DateTime requestTime =
                                   (requestData['timestamp'] as Timestamp)
                                       .toDate();
@@ -228,7 +246,7 @@ class NotificationsUI extends StatelessWidget {
                                       vertical: 8.0, horizontal: 16.0),
                                   child: ListTile(
                                     title: Text(
-                                      'You were rejected from ${usernameSnapshot.data}\'s venture.',
+                                      'You were rejected from ${creatorUsername}\'s venture.',
                                       style: const TextStyle(
                                           fontSize: 18.0,
                                           fontWeight: FontWeight.bold),
@@ -238,8 +256,8 @@ class NotificationsUI extends StatelessWidget {
                                       style: const TextStyle(
                                           fontSize: 14.0, color: Colors.grey),
                                     ),
-                                    trailing:
-                                        const Icon(Icons.cancel, color: Colors.red),
+                                    trailing: const Icon(Icons.cancel,
+                                        color: Colors.red),
                                   ),
                                 ),
                               );

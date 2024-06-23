@@ -46,7 +46,6 @@ class _VentureChatState extends State<VentureChat> {
     super.initState();
     _loadMessages();
     _fetchMemberCount();
-
     _scrollController.addListener(_scrollListener);
   }
 
@@ -152,7 +151,6 @@ class _VentureChatState extends State<VentureChat> {
       'last_message_time': Timestamp.now(),
       'last_message_sent_by': userRef,
     });
-
     _messageController.clear();
     _scrollToBottom();
   }
@@ -383,57 +381,91 @@ class _VentureChatState extends State<VentureChat> {
   }
 
   void _leaveChat() async {
+    if (mounted) {
+      MySnackBar.show(context, content: const Text("Leaving venture"));
+    }
+
     try {
-      var userId = FirebaseAuth.instance.currentUser!.uid;
-      DocumentSnapshot ventureSnapshot = await widget.ventureRef.get();
-      Map<String, dynamic> ventureData =
-          ventureSnapshot.data() as Map<String, dynamic>;
-      final DocumentReference creatorRef = ventureData['creator'];
+      final firestore = FirebaseFirestore.instance;
+      final userId = FirebaseAuth.instance.currentUser!.uid;
 
-      final DocumentReference userRef =
-          FirebaseFirestore.instance.collection('users').doc(userId);
+      await firestore.runTransaction((transaction) async {
+        // Retrieve the venture data
+        DocumentSnapshot ventureSnapshot =
+            await transaction.get(widget.ventureRef);
+        Map<String, dynamic> ventureData =
+            ventureSnapshot.data() as Map<String, dynamic>;
 
-      final DocumentReference chatRef = FirebaseFirestore.instance
-          .collection('venture_chats')
-          .doc(widget.chatId);
-      DocumentSnapshot chatSnapshot = await chatRef.get();
-      Map<String, dynamic> chatData =
-          chatSnapshot.data() as Map<String, dynamic>;
-      final List members = chatData['members'];
+        if (ventureData['member_num'] == 1) {
+          deleteVenture(
+            context,
+            widget.ventureRef,
+            true,
+          );
+          return;
+        }
 
-      if (creatorRef.id == userId) {
-        if (members.length > 1) {
-          DocumentReference newCreatorRef =
-              members.firstWhere((ref) => ref.id != userId);
-          await widget.ventureRef.update({
-            'creator': newCreatorRef,
-            'member_num': FieldValue.increment(-1)
-          });
-          await chatRef.update({
+        final DocumentReference creatorRef = ventureData['creator'];
+
+        // Retrieve the user reference
+        final DocumentReference userRef =
+            firestore.collection('users').doc(userId);
+
+        // Retrieve the chat data
+        final DocumentReference chatRef =
+            firestore.collection('venture_chats').doc(widget.chatId);
+        DocumentSnapshot chatSnapshot = await transaction.get(chatRef);
+        Map<String, dynamic> chatData =
+            chatSnapshot.data() as Map<String, dynamic>;
+        final List members = chatData['members'];
+
+        if (creatorRef.id == userId) {
+          if (members.length > 1) {
+            // Find a new creator
+            DocumentReference newCreatorRef =
+                members.firstWhere((ref) => ref.id != userId);
+            // Update the venture and chat documents
+            transaction.update(widget.ventureRef, {
+              'creator': newCreatorRef,
+              'member_num': FieldValue.increment(-1),
+            });
+            transaction.update(chatRef, {
+              'members': FieldValue.arrayRemove([userRef]),
+            });
+          } else {
+            // Delete the venture and chat documents
+            transaction.delete(widget.ventureRef);
+            transaction.delete(chatRef);
+          }
+        } else {
+          // Update the chat and venture documents
+          transaction.update(chatRef, {
             'members': FieldValue.arrayRemove([userRef]),
           });
-        } else {
-          await widget.ventureRef.delete();
-          await chatRef.delete();
+          transaction.update(widget.ventureRef, {
+            'member_num': FieldValue.increment(-1),
+          });
         }
-      } else {
-        await chatRef.update({
-          'members': FieldValue.arrayRemove([userRef]),
-        });
-        await widget.ventureRef
-            .update({'member_num': FieldValue.increment(-1)});
-      }
-      var requests = await FirebaseFirestore.instance
-          .collection("requests")
-          .where("requesterId", isEqualTo: userId)
-          .where("ventureId", isEqualTo: widget.ventureRef.id)
-          .limit(1)
-          .get();
-      var requestRef = requests.docs.first.reference;
-      requestRef.delete();
 
-      Navigator.of(context).pop();
-      MySnackBar.show(context, content: const Text("You have left the venture"));
+        // Delete the request
+        var requests = await firestore
+            .collection("requests")
+            .where("requesterId", isEqualTo: userId)
+            .where("ventureId", isEqualTo: widget.ventureRef.id)
+            .limit(1)
+            .get();
+        if (requests.docs.isNotEmpty) {
+          var requestRef = requests.docs.first.reference;
+          transaction.delete(requestRef);
+        }
+      });
+
+      if (mounted) {
+        Navigator.of(context).pop();
+        ScaffoldMessenger.of(context).hideCurrentSnackBar();
+        MySnackBar.show(context,
+            content: const Text("You have left the venture"));
+      }
     } catch (e) {
       print('Error leaving chat: $e');
     }
@@ -488,7 +520,7 @@ class _VentureChatState extends State<VentureChat> {
                                       ventureData: ventureData));
                             });
                       } else if (value == 'delete') {
-                        deleteVenture(context, widget.ventureRef);
+                        deleteVenture(context, widget.ventureRef, false);
                       }
                     },
                     itemBuilder: (BuildContext context) {
@@ -716,12 +748,14 @@ class MessageBubble extends StatelessWidget {
                       const SizedBox(height: 4),
                       Text(
                         content,
-                        style: const TextStyle(fontSize: 18), // Increased font size
+                        style: const TextStyle(
+                            fontSize: 18), // Increased font size
                       ),
                       const SizedBox(height: 4),
                       Text(
                         _formatTimestamp(timestamp),
-                        style: const TextStyle(fontSize: 12, color: Colors.black54),
+                        style: const TextStyle(
+                            fontSize: 12, color: Colors.black54),
                       ),
                     ],
                   ),

@@ -79,7 +79,7 @@ class _ListViewWidgetState extends State<ListViewWidget> {
       }
       for (QueryDocumentSnapshot doc in requestQuery.docs) {
         // Check the status field of the document
-        if (doc['status'] == 'accepted') {
+        if (doc['status'] == 'accepted' && doc['creatorId'] != userId) {
           return;
         }
       }
@@ -268,7 +268,7 @@ class _ListViewWidgetState extends State<ListViewWidget> {
                                                 ventureData: ventureData));
                                       });
                                 } else if (value == 'delete') {
-                                  deleteVenture(context, ventureRef);
+                                  deleteVenture(context, ventureRef, false);
                                 }
                               },
                               itemBuilder: (context) => [

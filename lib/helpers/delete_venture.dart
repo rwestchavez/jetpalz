@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:jet_palz/components/my_snack_bar.dart';
 
 Future<void> deleteVenture(
-    BuildContext context, DocumentReference ventureRef) async {
+    BuildContext context, DocumentReference ventureRef, bool bypass) async {
   DocumentReference? chatRef;
 
   final querySnapshot = await FirebaseFirestore.instance
@@ -16,31 +16,39 @@ Future<void> deleteVenture(
     chatRef = querySnapshot.docs.first.reference;
   }
 
-  final shouldDelete = await showDialog<bool>(
-    context: context,
-    builder: (BuildContext context) {
-      return AlertDialog(
-        title: const Text('Confirm Deletion'),
-        content: const Text('Are you sure you want to delete this venture?'),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop(false);
-            },
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop(true);
-            },
-            child: const Text('Delete'),
-          ),
-        ],
-      );
-    },
-  );
+  bool shouldDelete = false;
 
-  if (shouldDelete == true) {
+  if (bypass) {
+    shouldDelete = true;
+  } else {
+    shouldDelete = await showDialog<bool>(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: const Text('Confirm Deletion'),
+              content:
+                  const Text('Are you sure you want to delete this venture?'),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop(false);
+                  },
+                  child: const Text('Cancel'),
+                ),
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop(true);
+                  },
+                  child: const Text('Delete'),
+                ),
+              ],
+            );
+          },
+        ) ??
+        false;
+  }
+
+  if (shouldDelete) {
     try {
       await ventureRef.delete();
       if (chatRef != null) {

@@ -44,6 +44,12 @@ class VentureChatRoomWidget extends StatelessWidget {
     });
   }
 
+  String getCurrentUserId() {
+    FirebaseAuth auth = FirebaseAuth.instance;
+    User? currentUser = auth.currentUser;
+    return currentUser!.uid;
+  }
+
   @override
   Widget build(BuildContext context) {
     String timeAgo = '';
@@ -168,11 +174,5 @@ class VentureChatRoomWidget extends StatelessWidget {
         );
       },
     );
-  }
-
-  String getCurrentUserId() {
-    FirebaseAuth auth = FirebaseAuth.instance;
-    User? currentUser = auth.currentUser;
-    return currentUser!.uid;
   }
 }
