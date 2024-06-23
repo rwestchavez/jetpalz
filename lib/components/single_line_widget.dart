@@ -6,11 +6,11 @@ class SingleLineWidget extends StatelessWidget {
   final VoidCallback onTap;
 
   const SingleLineWidget({
-    Key? key,
+    super.key,
     required this.icon,
     required this.text,
     required this.onTap,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

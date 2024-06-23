@@ -6,11 +6,11 @@ class MyButton extends StatelessWidget {
   final ButtonStyle? style;
 
   const MyButton({
-    Key? key,
+    super.key,
     required this.onPressed,
     required this.child,
     this.style,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +24,7 @@ class MyButton extends StatelessWidget {
 
     final mergedStyle = defaultStyle.merge(style);
 
-    return Container(
+    return SizedBox(
       width: double.infinity,
       child: ElevatedButton(
         onPressed: onPressed,

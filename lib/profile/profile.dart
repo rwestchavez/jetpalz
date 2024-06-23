@@ -1,12 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:jet_palz/main.dart';
 import '../components/my_appBar.dart';
+import '../components/my_snack_bar.dart';
 import '../components/single_line_widget.dart'; // Make sure to import the new component
 
 class Profile extends StatefulWidget {
-  const Profile({Key? key}) : super(key: key);
+  const Profile({super.key});
 
   @override
   State<Profile> createState() => _ProfileWidgetState();
@@ -37,7 +37,9 @@ class _ProfileWidgetState extends State<Profile> {
         setState(() {
           _userData = userDataSnapshot.data() as Map<String, dynamic>;
         });
-      } catch (e) {}
+      } catch (e) {
+        MySnackBar.show(context, content: Text("Error $e"));
+      }
     }
   }
 
@@ -139,122 +141,55 @@ class _ProfileWidgetState extends State<Profile> {
                   ),
                   Padding(
                     padding: const EdgeInsets.fromLTRB(16.0, 0, 16.0, 0.0),
-                    child: Container(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          (_userData['description'] != null &&
-                                  _userData['description'].isNotEmpty)
-                              ? Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    const SizedBox(height: 32),
-                                    Text(
-                                      _userData['description'],
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.normal,
-                                          fontSize: 18,
-                                          color: Theme.of(context)
-                                              .textTheme
-                                              .bodyLarge
-                                              ?.color),
-                                    ),
-                                  ],
-                                )
-                              : const Text(""),
-                        ],
-                      ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        (_userData['description'] != null &&
+                                _userData['description'].isNotEmpty)
+                            ? Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const SizedBox(height: 32),
+                                  Text(
+                                    _userData['description'],
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.normal,
+                                        fontSize: 18,
+                                        color: Theme.of(context)
+                                            .textTheme
+                                            .bodyLarge
+                                            ?.color),
+                                  ),
+                                ],
+                              )
+                            : const Text(""),
+                      ],
                     ),
                   ),
                   Padding(
                     padding: const EdgeInsets.fromLTRB(16.0, 12.0, 16.0, 0.0),
-                    child: Container(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Countries I want to visit',
-                            style: TextStyle(
-                                color: Theme.of(context)
-                                    .textTheme
-                                    .bodyLarge
-                                    ?.color,
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold),
-                          ),
-                          const SizedBox(height: 8),
-                          SingleChildScrollView(
-                            scrollDirection: Axis.horizontal,
-                            child: Row(
-                              children: (_userData['countries_interest'] !=
-                                          null &&
-                                      _userData['countries_interest']
-                                          .isNotEmpty)
-                                  ? (_userData['countries_interest']
-                                          as List<dynamic>)
-                                      .map((country) {
-                                      return Padding(
-                                          padding:
-                                              const EdgeInsets.only(right: 8.0),
-                                          child: Container(
-                                            padding: const EdgeInsets.symmetric(
-                                                horizontal: 12, vertical: 6),
-                                            decoration: BoxDecoration(
-                                              color: const Color.fromARGB(
-                                                  255, 255, 198, 40),
-                                              borderRadius:
-                                                  BorderRadius.circular(20),
-                                            ),
-                                            child: Text(
-                                              country.toString(),
-                                              style: TextStyle(
-                                                  fontSize: 18,
-                                                  color: Theme.of(context)
-                                                      .colorScheme
-                                                      .surface),
-                                            ),
-                                          ));
-                                    }).toList()
-                                  : [
-                                      const Text(
-                                        'Add countries by editing your profile...',
-                                        style: TextStyle(fontSize: 16),
-                                      ),
-                                    ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(16.0, 12.0, 16.0, 0.0),
-                    child: Container(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Professions I am interested in',
-                            style: TextStyle(
-                                color: Theme.of(context)
-                                    .textTheme
-                                    .bodyLarge
-                                    ?.color,
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold),
-                          ),
-                          const SizedBox(height: 8),
-                          SingleChildScrollView(
-                            scrollDirection: Axis.horizontal,
-                            child: Row(
-                              children: (_userData['professions_interest'] !=
-                                          null &&
-                                      _userData['professions_interest']
-                                          .isNotEmpty)
-                                  ? (_userData['professions_interest']
-                                          as List<dynamic>)
-                                      .map((profession) {
-                                      return Padding(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Countries I want to visit',
+                          style: TextStyle(
+                              color:
+                                  Theme.of(context).textTheme.bodyLarge?.color,
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold),
+                        ),
+                        const SizedBox(height: 8),
+                        SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: Row(
+                            children: (_userData['countries_interest'] !=
+                                        null &&
+                                    _userData['countries_interest'].isNotEmpty)
+                                ? (_userData['countries_interest']
+                                        as List<dynamic>)
+                                    .map((country) {
+                                    return Padding(
                                         padding:
                                             const EdgeInsets.only(right: 8.0),
                                         child: Container(
@@ -262,36 +197,92 @@ class _ProfileWidgetState extends State<Profile> {
                                               horizontal: 12, vertical: 6),
                                           decoration: BoxDecoration(
                                             color: const Color.fromARGB(
-                                                255,
-                                                71,
-                                                200,
-                                                255), // Same background color as the Chip
-                                            borderRadius: BorderRadius.circular(
-                                                20), // Same border radius as the Chip
+                                                255, 255, 198, 40),
+                                            borderRadius:
+                                                BorderRadius.circular(20),
                                           ),
                                           child: Text(
-                                            profession.toString(),
+                                            country.toString(),
                                             style: TextStyle(
                                                 fontSize: 18,
                                                 color: Theme.of(context)
                                                     .colorScheme
-                                                    .surface
-                                                // Adjust text color as needed
-                                                ),
+                                                    .surface),
                                           ),
-                                        ),
-                                      );
-                                    }).toList()
-                                  : [
-                                      const Text(
-                                        'Add professions by editing your profile...',
-                                        style: TextStyle(fontSize: 16),
-                                      ),
-                                    ],
-                            ),
+                                        ));
+                                  }).toList()
+                                : [
+                                    const Text(
+                                      'Add countries by editing your profile...',
+                                      style: TextStyle(fontSize: 16),
+                                    ),
+                                  ],
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(16.0, 12.0, 16.0, 0.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Professions I am interested in',
+                          style: TextStyle(
+                              color:
+                                  Theme.of(context).textTheme.bodyLarge?.color,
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold),
+                        ),
+                        const SizedBox(height: 8),
+                        SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: Row(
+                            children:
+                                (_userData['professions_interest'] != null &&
+                                        _userData['professions_interest']
+                                            .isNotEmpty)
+                                    ? (_userData['professions_interest']
+                                            as List<dynamic>)
+                                        .map((profession) {
+                                        return Padding(
+                                          padding:
+                                              const EdgeInsets.only(right: 8.0),
+                                          child: Container(
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 12, vertical: 6),
+                                            decoration: BoxDecoration(
+                                              color: const Color.fromARGB(
+                                                  255,
+                                                  71,
+                                                  200,
+                                                  255), // Same background color as the Chip
+                                              borderRadius: BorderRadius.circular(
+                                                  20), // Same border radius as the Chip
+                                            ),
+                                            child: Text(
+                                              profession.toString(),
+                                              style: TextStyle(
+                                                  fontSize: 18,
+                                                  color: Theme.of(context)
+                                                      .colorScheme
+                                                      .surface
+                                                  // Adjust text color as needed
+                                                  ),
+                                            ),
+                                          ),
+                                        );
+                                      }).toList()
+                                    : [
+                                        const Text(
+                                          'Add professions by editing your profile...',
+                                          style: TextStyle(fontSize: 16),
+                                        ),
+                                      ],
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                   const Divider(

@@ -4,7 +4,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:jet_palz/components/my_button.dart';
 import 'package:jet_palz/components/my_textField.dart';
@@ -100,7 +99,9 @@ class _ProfileWidgetState extends State<EditProfile> {
         _usernameTextController.text = _userData!['username'] ?? '';
         _descriptionTextController.text = _userData!['description'] ?? '';
       });
-    } catch (e) {}
+    } catch (e) {
+      MySnackBar.show(context, content: Text("Error $e"));
+    }
   }
 
   Future<Map<String, dynamic>> _fetchUserData() async {
@@ -112,7 +113,7 @@ class _ProfileWidgetState extends State<EditProfile> {
             .get();
         return userDataSnapshot.data() as Map<String, dynamic>;
       } catch (e) {
-        throw e;
+        MySnackBar.show(context, content: Text("Error $e"));
       }
     }
     throw Exception('User is null');
@@ -191,7 +192,9 @@ class _ProfileWidgetState extends State<EditProfile> {
           _temporaryImageUrl = DefaultPfp;
         });
       }
-    } catch (e) {}
+    } catch (e) {
+      MySnackBar.show(context, content: Text("Error $e"));
+    }
   }
 
   void _saveChanges() {

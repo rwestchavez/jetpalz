@@ -53,7 +53,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'JetPalz',
       routes: {
-        '/signIn': (context) => SignIn(),
+        '/signIn': (context) => const SignIn(),
         '/forgotPassword': (context) => const ForgotPassword(),
         '/feed': (context) => const Main(),
         '/onboarding': (context) => const Onboarding(),
@@ -62,7 +62,7 @@ class MyApp extends StatelessWidget {
         '/settings': (context) => Settings(),
         '/changeEmail': (context) => const ChangeEmail(),
         '/changePassword': (context) => const ChangePassword(),
-        '/notifications': (context) => NotificationsUI(),
+        '/notifications': (context) => const NotificationsUI(),
       },
       home: user != null ? const Main() : const SignUp(),
       theme: lightModeTheme.themeData,

@@ -65,7 +65,7 @@ class Feed extends StatelessWidget {
 }
 
 class VentureFeed extends StatefulWidget {
-  const VentureFeed({Key? key}) : super(key: key);
+  const VentureFeed({super.key});
 
   @override
   _Page2State createState() => _Page2State();

@@ -6,7 +6,7 @@ import '../components/my_appBar.dart';
 class ProfileView extends StatefulWidget {
   final String? userId; // Add this to accept another user's ID
 
-  const ProfileView({Key? key, this.userId}) : super(key: key);
+  const ProfileView({super.key, this.userId});
 
   @override
   State<ProfileView> createState() => _ProfileWidgetState();
@@ -106,125 +106,56 @@ class _ProfileWidgetState extends State<ProfileView> {
                   ),
                   Padding(
                     padding: const EdgeInsets.fromLTRB(16.0, 0, 16.0, 0.0),
-                    child: Container(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          (_userData != null &&
-                                  _userData!['description'] != null &&
-                                  _userData!['description'].isNotEmpty)
-                              ? Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    const SizedBox(height: 32),
-                                    Text(
-                                      _userData!['description'] ?? "",
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.normal,
-                                          fontSize: 18,
-                                          color: Theme.of(context)
-                                              .textTheme
-                                              .bodyLarge
-                                              ?.color),
-                                    ),
-                                  ],
-                                )
-                              : const Text(""),
-                        ],
-                      ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        (_userData != null &&
+                                _userData!['description'] != null &&
+                                _userData!['description'].isNotEmpty)
+                            ? Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const SizedBox(height: 32),
+                                  Text(
+                                    _userData!['description'] ?? "",
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.normal,
+                                        fontSize: 18,
+                                        color: Theme.of(context)
+                                            .textTheme
+                                            .bodyLarge
+                                            ?.color),
+                                  ),
+                                ],
+                              )
+                            : const Text(""),
+                      ],
                     ),
                   ),
                   Padding(
                     padding: const EdgeInsets.fromLTRB(16.0, 12.0, 16.0, 0.0),
-                    child: Container(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Countries I want to visit',
-                            style: TextStyle(
-                                color: Theme.of(context)
-                                    .textTheme
-                                    .bodyLarge
-                                    ?.color,
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold),
-                          ),
-                          const SizedBox(height: 8),
-                          SingleChildScrollView(
-                            scrollDirection: Axis.horizontal,
-                            child: Row(
-                              children: (_userData != null &&
-                                      _userData!['countries_interest'] !=
-                                          null &&
-                                      _userData!['countries_interest']
-                                          .isNotEmpty)
-                                  ? (_userData!['countries_interest']
-                                          as List<dynamic>)
-                                      .map((country) {
-                                      return Padding(
-                                          padding:
-                                              const EdgeInsets.only(right: 8.0),
-                                          child: Container(
-                                            padding: const EdgeInsets.symmetric(
-                                                horizontal: 12, vertical: 6),
-                                            decoration: BoxDecoration(
-                                              color: const Color.fromARGB(
-                                                  255, 255, 198, 40),
-                                              borderRadius:
-                                                  BorderRadius.circular(20),
-                                            ),
-                                            child: Text(
-                                              country.toString(),
-                                              style: TextStyle(
-                                                  fontSize: 18,
-                                                  color: Theme.of(context)
-                                                      .colorScheme
-                                                      .surface),
-                                            ),
-                                          ));
-                                    }).toList()
-                                  : [
-                                      const Text(
-                                        "This user hasn't added any countries",
-                                        style: TextStyle(fontSize: 16),
-                                      ),
-                                    ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(16.0, 12.0, 16.0, 0.0),
-                    child: Container(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Professions I am interested in',
-                            style: TextStyle(
-                                color: Theme.of(context)
-                                    .textTheme
-                                    .bodyLarge
-                                    ?.color,
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold),
-                          ),
-                          const SizedBox(height: 8),
-                          SingleChildScrollView(
-                            scrollDirection: Axis.horizontal,
-                            child: Row(
-                              children: (_userData != null &&
-                                      _userData!['professions_interest'] !=
-                                          null &&
-                                      _userData!['professions_interest']
-                                          .isNotEmpty)
-                                  ? (_userData!['professions_interest']
-                                          as List<dynamic>)
-                                      .map((profession) {
-                                      return Padding(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Countries I want to visit',
+                          style: TextStyle(
+                              color:
+                                  Theme.of(context).textTheme.bodyLarge?.color,
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold),
+                        ),
+                        const SizedBox(height: 8),
+                        SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: Row(
+                            children: (_userData != null &&
+                                    _userData!['countries_interest'] != null &&
+                                    _userData!['countries_interest'].isNotEmpty)
+                                ? (_userData!['countries_interest']
+                                        as List<dynamic>)
+                                    .map((country) {
+                                    return Padding(
                                         padding:
                                             const EdgeInsets.only(right: 8.0),
                                         child: Container(
@@ -232,35 +163,92 @@ class _ProfileWidgetState extends State<ProfileView> {
                                               horizontal: 12, vertical: 6),
                                           decoration: BoxDecoration(
                                             color: const Color.fromARGB(
-                                                255,
-                                                71,
-                                                200,
-                                                255), // Same background color as the Chip
-                                            borderRadius: BorderRadius.circular(
-                                                20), // Same border radius as the Chip
+                                                255, 255, 198, 40),
+                                            borderRadius:
+                                                BorderRadius.circular(20),
                                           ),
                                           child: Text(
-                                            profession.toString(),
+                                            country.toString(),
                                             style: TextStyle(
                                                 fontSize: 18,
                                                 color: Theme.of(context)
                                                     .colorScheme
-                                                    .surface // Adjust text color as needed
-                                                ),
+                                                    .surface),
                                           ),
-                                        ),
-                                      );
-                                    }).toList()
-                                  : [
-                                      const Text(
-                                        "This user hasn't added any professions",
-                                        style: TextStyle(fontSize: 16),
-                                      ),
-                                    ],
-                            ),
+                                        ));
+                                  }).toList()
+                                : [
+                                    const Text(
+                                      "This user hasn't added any countries",
+                                      style: TextStyle(fontSize: 16),
+                                    ),
+                                  ],
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(16.0, 12.0, 16.0, 0.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Professions I am interested in',
+                          style: TextStyle(
+                              color:
+                                  Theme.of(context).textTheme.bodyLarge?.color,
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold),
+                        ),
+                        const SizedBox(height: 8),
+                        SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: Row(
+                            children: (_userData != null &&
+                                    _userData!['professions_interest'] !=
+                                        null &&
+                                    _userData!['professions_interest']
+                                        .isNotEmpty)
+                                ? (_userData!['professions_interest']
+                                        as List<dynamic>)
+                                    .map((profession) {
+                                    return Padding(
+                                      padding:
+                                          const EdgeInsets.only(right: 8.0),
+                                      child: Container(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 12, vertical: 6),
+                                        decoration: BoxDecoration(
+                                          color: const Color.fromARGB(
+                                              255,
+                                              71,
+                                              200,
+                                              255), // Same background color as the Chip
+                                          borderRadius: BorderRadius.circular(
+                                              20), // Same border radius as the Chip
+                                        ),
+                                        child: Text(
+                                          profession.toString(),
+                                          style: TextStyle(
+                                              fontSize: 18,
+                                              color: Theme.of(context)
+                                                  .colorScheme
+                                                  .surface // Adjust text color as needed
+                                              ),
+                                        ),
+                                      ),
+                                    );
+                                  }).toList()
+                                : [
+                                    const Text(
+                                      "This user hasn't added any professions",
+                                      style: TextStyle(fontSize: 16),
+                                    ),
+                                  ],
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ],

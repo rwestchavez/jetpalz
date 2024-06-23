@@ -128,6 +128,7 @@ class _SignUpState extends State<SignUp> {
                                             .hasMatch(value)) {
                                           return 'Please enter a valid email';
                                         }
+                                        return null;
                                       }),
                                 ),
                               ),
@@ -164,7 +165,7 @@ class _SignUpState extends State<SignUp> {
                                   0.0,
                                   24.0,
                                 ),
-                                child: Container(
+                                child: SizedBox(
                                   width: double.infinity,
                                   child: Stack(
                                     alignment:

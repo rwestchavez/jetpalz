@@ -168,13 +168,6 @@ class _EmailSignUpWidgetState extends State<EmailSignUp> {
                     ),
                     const SizedBox(height: 24),
                     MyButton(
-                      child: _isLoading
-                          ? const CircularProgressIndicator(
-                              valueColor:
-                                  AlwaysStoppedAnimation<Color>(Colors.white),
-                            )
-                          : const Text("Create Account",
-                              style: TextStyle(fontWeight: FontWeight.bold)),
                       onPressed: _isLoading
                           ? () {}
                           : () async {
@@ -182,6 +175,13 @@ class _EmailSignUpWidgetState extends State<EmailSignUp> {
                                 await _signUp();
                               }
                             },
+                      child: _isLoading
+                          ? const CircularProgressIndicator(
+                              valueColor:
+                                  AlwaysStoppedAnimation<Color>(Colors.white),
+                            )
+                          : const Text("Create Account",
+                              style: TextStyle(fontWeight: FontWeight.bold)),
                     ),
                     const SizedBox(height: 16),
                   ],

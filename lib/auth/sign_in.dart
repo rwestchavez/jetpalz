@@ -7,6 +7,8 @@ import '../components/my_snack_bar.dart';
 import 'google_auth.dart';
 
 class SignIn extends StatefulWidget {
+  const SignIn({super.key});
+
   @override
   _SignInWidgetState createState() => _SignInWidgetState();
 }

@@ -57,12 +57,14 @@ class Chat extends StatelessWidget {
           const SizedBox(width: 16),
         ],
       ),
-      body: VentureChatRoom(),
+      body: const VentureChatRoom(),
     );
   }
 }
 
 class VentureChatRoom extends StatelessWidget {
+  const VentureChatRoom({super.key});
+
   @override
   Widget build(BuildContext context) {
     final chatProvider = Provider.of<ChatProvider>(context);
@@ -75,7 +77,6 @@ class VentureChatRoom extends StatelessWidget {
     return ListView.builder(
       itemCount: chatProvider.chatDocuments.length,
       itemBuilder: (context, index) {
-
         final chatDocument = chatProvider.chatDocuments[index];
         final String chatName = chatDocument['name'];
         final List members = chatDocument['members'];

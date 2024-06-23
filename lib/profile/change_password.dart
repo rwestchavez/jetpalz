@@ -7,7 +7,7 @@ import '../components/my_appBar.dart';
 import '../components/my_snack_bar.dart'; // Import the MySnackBar class
 
 class ChangePassword extends StatefulWidget {
-  const ChangePassword({Key? key}) : super(key: key);
+  const ChangePassword({super.key});
 
   @override
   State<ChangePassword> createState() => _ChangePasswordWidgetState();

@@ -18,7 +18,7 @@ class VentureChat extends StatefulWidget {
   final DocumentReference? ventureRef;
 
   const VentureChat({
-    Key? key,
+    super.key,
     required this.ventureRef,
     required this.chatId,
     required this.chatName,
@@ -26,7 +26,7 @@ class VentureChat extends StatefulWidget {
     required this.lastMessageTime,
     required this.lastMessageSentBy,
     required this.members,
-  }) : super(key: key);
+  });
 
   @override
   _VentureChatState createState() => _VentureChatState();
@@ -58,7 +58,7 @@ class _VentureChatState extends State<VentureChat> {
             Navigator.of(context).pop();
           }
           MySnackBar.show(context,
-              content: Text("This venture has been deleted"));
+              content: const Text("This venture has been deleted"));
         }
       }
     });
@@ -453,7 +453,9 @@ class _VentureChatState extends State<VentureChat> {
       Navigator.of(context).pop();
       MySnackBar.show(context,
           content: const Text("You have left the venture"));
-    } catch (e) {}
+    } catch (e) {
+      MySnackBar.show(context, content: Text("Error $e"));
+    }
   }
 
   @override
@@ -618,6 +620,7 @@ class MessagesList extends StatelessWidget {
   final Function(String) markMessageSeen;
 
   const MessagesList({
+    super.key,
     required this.chatId,
     required this.messages,
     required this.scrollController,
@@ -673,7 +676,8 @@ class MessageBubble extends StatelessWidget {
   final String senderId;
 
   const MessageBubble(
-      {required this.content,
+      {super.key,
+      required this.content,
       required this.timestamp,
       required this.isSentByMe,
       required this.pfpUrl,
@@ -776,6 +780,7 @@ class SendMessageBar extends StatelessWidget {
   final void Function() onSend;
 
   const SendMessageBar({
+    super.key,
     required this.messageController,
     required this.onSend,
   });

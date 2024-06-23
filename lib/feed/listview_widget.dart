@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:jet_palz/components/my_button.dart';
 import 'package:jet_palz/components/my_snack_bar.dart';
 import 'package:jet_palz/helpers/delete_venture.dart';
@@ -17,8 +16,8 @@ class ListViewWidget extends StatefulWidget {
   const ListViewWidget({
     required this.appState,
     required this.usersProvider,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   _ListViewWidgetState createState() => _ListViewWidgetState();
@@ -223,80 +222,78 @@ class _ListViewWidgetState extends State<ListViewWidget> {
                     ),
                   ],
                 ),
-                Container(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          GestureDetector(
-                            onTap: () {
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => ProfileView(
-                                          userId: venture.creator!.id)));
-                            },
-                            child: Text(
-                              venture.creatorName,
-                              style: const TextStyle(
-                                  fontWeight: FontWeight.w700, fontSize: 20),
-                            ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => ProfileView(
+                                        userId: venture.creator!.id)));
+                          },
+                          child: Text(
+                            venture.creatorName,
+                            style: const TextStyle(
+                                fontWeight: FontWeight.w700, fontSize: 20),
                           ),
-                          if (isCreator)
-                            PopupMenuButton<String>(
-                              onSelected: (value) async {
-                                var firestore = FirebaseFirestore.instance;
-                                final ventureId = venture.ventureId;
-                                final ventureRef = firestore
-                                    .collection("ventures")
-                                    .doc(ventureId);
-                                if (value == 'edit') {
-                                  final ventureSnap = await ventureRef.get();
-                                  final ventureData = ventureSnap.data()
-                                      as Map<String, dynamic>;
-                                  showModalBottomSheet(
-                                      isScrollControlled: true,
-                                      context: context,
-                                      builder: (BuildContext context) {
-                                        return FractionallySizedBox(
-                                            heightFactor:
-                                                0.5, // Adjust this factor to control the height
-                                            child: EditVenture(
-                                                ventureRef: ventureRef,
-                                                ventureData: ventureData));
-                                      });
-                                } else if (value == 'delete') {
-                                  deleteVenture(context, ventureRef, false);
-                                }
-                              },
-                              itemBuilder: (context) => [
-                                const PopupMenuItem(
-                                  value: 'edit',
-                                  child: Text('Edit'),
-                                ),
-                                const PopupMenuItem(
-                                  value: 'delete',
-                                  child: Text('Delete'),
-                                ),
-                              ],
-                            ),
-                        ],
-                      ),
-                      Row(
-                        children: [
-                          const Text("Profession",
-                              style: TextStyle(
-                                  fontWeight: FontWeight.bold, fontSize: 15)),
-                          Padding(
-                            padding: const EdgeInsets.only(left: 8),
-                            child: Text("${venture.industry}"),
-                          )
-                        ],
-                      )
-                    ],
-                  ),
+                        ),
+                        if (isCreator)
+                          PopupMenuButton<String>(
+                            onSelected: (value) async {
+                              var firestore = FirebaseFirestore.instance;
+                              final ventureId = venture.ventureId;
+                              final ventureRef = firestore
+                                  .collection("ventures")
+                                  .doc(ventureId);
+                              if (value == 'edit') {
+                                final ventureSnap = await ventureRef.get();
+                                final ventureData =
+                                    ventureSnap.data() as Map<String, dynamic>;
+                                showModalBottomSheet(
+                                    isScrollControlled: true,
+                                    context: context,
+                                    builder: (BuildContext context) {
+                                      return FractionallySizedBox(
+                                          heightFactor:
+                                              0.5, // Adjust this factor to control the height
+                                          child: EditVenture(
+                                              ventureRef: ventureRef,
+                                              ventureData: ventureData));
+                                    });
+                              } else if (value == 'delete') {
+                                deleteVenture(context, ventureRef, false);
+                              }
+                            },
+                            itemBuilder: (context) => [
+                              const PopupMenuItem(
+                                value: 'edit',
+                                child: Text('Edit'),
+                              ),
+                              const PopupMenuItem(
+                                value: 'delete',
+                                child: Text('Delete'),
+                              ),
+                            ],
+                          ),
+                      ],
+                    ),
+                    Row(
+                      children: [
+                        const Text("Profession",
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold, fontSize: 15)),
+                        Padding(
+                          padding: const EdgeInsets.only(left: 8),
+                          child: Text("${venture.industry}"),
+                        )
+                      ],
+                    )
+                  ],
                 ),
                 const SizedBox(
                   height: 8,
@@ -401,10 +398,10 @@ class _ListViewWidgetState extends State<ListViewWidget> {
           Center(
             child: GestureDetector(
               onTap: () {},
-              child: Container(
+              child: const SizedBox(
                 height: 25,
                 width: 25,
-                child: const CircularProgressIndicator(),
+                child: CircularProgressIndicator(),
               ),
             ),
           ),

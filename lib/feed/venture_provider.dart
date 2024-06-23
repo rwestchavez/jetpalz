@@ -38,8 +38,9 @@ class VentureProvider extends ChangeNotifier {
       }).toList();
 
   Future fetchNextUsers({bool reset = false}) async {
-    if (_isFetchingVentures)
+    if (_isFetchingVentures) {
       return; // quits early if already fetching users. Return stops function
+    }
 
     _errorMessage = '';
     _isFetchingVentures = true;
@@ -68,9 +69,10 @@ class VentureProvider extends ChangeNotifier {
 
       // this is where the client side filtering will happen. You edit the user snapshot here
 
-      if (snap.docs.length < documentLimit)
+      if (snap.docs.length < documentLimit) {
         _hasNext =
             false; // so if it fetches 3 documents since there are 3 documents at the end, then it will know it has run out, this happens after the fetch
+      }
       notifyListeners();
     } catch (error) {
       _errorMessage = error.toString();

@@ -15,7 +15,7 @@ class VentureChatRoomWidget extends StatelessWidget {
   final DocumentReference ventureRef;
 
   const VentureChatRoomWidget({
-    Key? key,
+    super.key,
     required this.ventureRef,
     required this.chatId,
     required this.chatName,
@@ -24,7 +24,7 @@ class VentureChatRoomWidget extends StatelessWidget {
     required this.lastMessageSentBy,
     required this.members,
     required this.creatorPfp,
-  }) : super(key: key);
+  });
 
   Stream<int> fetchUnreadMessagesCount(String chatId, String userId) {
     var messagesQuery = FirebaseFirestore.instance

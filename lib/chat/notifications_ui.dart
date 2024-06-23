@@ -7,6 +7,8 @@ import 'package:timeago/timeago.dart' as timeago;
 import 'request_provider.dart';
 
 class NotificationsUI extends StatelessWidget {
+  const NotificationsUI({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

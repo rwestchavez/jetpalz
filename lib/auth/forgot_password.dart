@@ -7,7 +7,7 @@ import 'package:jet_palz/components/my_textField.dart';
 import '../components/my_snack_bar.dart';
 
 class ForgotPassword extends StatefulWidget {
-  const ForgotPassword({Key? key}) : super(key: key);
+  const ForgotPassword({super.key});
 
   @override
   State<ForgotPassword> createState() => _ForgotPasswordWidgetState();
@@ -86,13 +86,13 @@ class _ForgotPasswordWidgetState extends State<ForgotPassword> {
                     ),
                     Padding(
                       padding: const EdgeInsets.fromLTRB(16.0, 12.0, 16.0, 0.0),
-                      child: Container(
+                      child: SizedBox(
                         width: double.infinity,
                         child: MyTextField(
                           hintText: "Enter your email",
                           controller: _emailAddressTextController,
                           focusNode: _emailAddressFocusNode,
-                          autofillHints: [AutofillHints.email],
+                          autofillHints: const [AutofillHints.email],
                           obscureText: false,
                           keyboardType: TextInputType.emailAddress,
                           validator: (value) {
@@ -115,10 +115,10 @@ class _ForgotPasswordWidgetState extends State<ForgotPassword> {
                             const EdgeInsets.fromLTRB(16.0, 24.0, 16.0, 0.0),
                         child: MyButton(
                           onPressed: () async {
-                            if (_formKey.currentState!.validate())
+                            if (_formKey.currentState!.validate()) {
                               await _resetPassword(
                                   _emailAddressTextController.text);
-                            ;
+                            }
                             // Call your reset password function here
                           },
                           child: const Text('Send Link'),

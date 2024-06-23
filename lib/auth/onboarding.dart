@@ -9,7 +9,7 @@ import '../components/my_snack_bar.dart';
 import '../helpers/is_username_available.dart';
 
 class Onboarding extends StatefulWidget {
-  const Onboarding({Key? key}) : super(key: key);
+  const Onboarding({super.key});
 
   @override
   State<Onboarding> createState() => _OnboardingWidgetState();
@@ -59,7 +59,7 @@ class _OnboardingWidgetState extends State<Onboarding> {
               ),
               const SizedBox(height: 20),
               Expanded(
-                child: Container(
+                child: SizedBox(
                   width: double.infinity,
                   height: 500,
                   child: Stack(
@@ -235,10 +235,10 @@ class OnboardTextWidget extends StatelessWidget {
   final String description;
 
   const OnboardTextWidget({
-    Key? key,
+    super.key,
     required this.title,
     required this.description,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

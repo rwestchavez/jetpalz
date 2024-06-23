@@ -7,7 +7,7 @@ import '../components/my_appBar.dart';
 import '../components/my_snack_bar.dart'; // Import the MySnackBar class
 
 class ChangeEmail extends StatefulWidget {
-  const ChangeEmail({Key? key}) : super(key: key);
+  const ChangeEmail({super.key});
 
   @override
   State<ChangeEmail> createState() => _ChangeEmailWidgetState();

@@ -4,6 +4,8 @@ import '../auth/sign_up.dart';
 import '../components/single_line_widget.dart'; // Import the SingleLineWidget
 
 class Settings extends StatelessWidget {
+  const Settings({super.key});
+
   void _logout(BuildContext context) async {
     await FirebaseAuth.instance.signOut();
     Navigator.of(context).pushReplacement(
@@ -59,7 +61,8 @@ class Settings extends StatelessWidget {
                 Navigator.pushNamed(context, '/changeEmail');
               },
             ),
-            const SizedBox(height: 8), // Add some vertical space between widgets
+            const SizedBox(
+                height: 8), // Add some vertical space between widgets
             SingleLineWidget(
               icon: Icons.lock,
               text: 'Change Password',
@@ -68,7 +71,8 @@ class Settings extends StatelessWidget {
                 Navigator.pushNamed(context, '/changePassword');
               },
             ),
-            const SizedBox(height: 8), // Add some vertical space between widgets
+            const SizedBox(
+                height: 8), // Add some vertical space between widgets
             SingleLineWidget(
               icon: Icons.exit_to_app,
               text: 'Logout',

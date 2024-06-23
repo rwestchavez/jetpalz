@@ -8,7 +8,7 @@ import '../models/request_model.dart';
 import '../models/venture_model.dart';
 
 class MyVenturesListView extends StatefulWidget {
-  const MyVenturesListView({Key? key}) : super(key: key);
+  const MyVenturesListView({super.key});
 
   @override
   _MyVenturesListViewState createState() => _MyVenturesListViewState();
@@ -230,7 +230,7 @@ class _MyVenturesListViewState extends State<MyVenturesListView> {
                                                   },
                                             style: ButtonStyle(
                                               backgroundColor:
-                                                  MaterialStateProperty
+                                                  WidgetStateProperty
                                                       .resolveWith<Color>(
                                                 (states) => getButtonColor(
                                                     requestStatus),

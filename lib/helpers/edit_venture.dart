@@ -1,6 +1,5 @@
 import 'package:animated_custom_dropdown/custom_dropdown.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import '../components/my_snack_bar.dart';
 import '../constants.dart';
@@ -12,8 +11,8 @@ class EditVenture extends StatefulWidget {
   const EditVenture({
     required this.ventureRef,
     required this.ventureData,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   State<EditVenture> createState() => _EditVentureWidgetState();
@@ -78,8 +77,7 @@ class _EditVentureWidgetState extends State<EditVenture> {
                         child: TextButton(
                           onPressed: () async {
                             if (_formKey.currentState!.validate()) {
-                              FirebaseFirestore firestore =
-                                  FirebaseFirestore.instance;
+
 
                               await widget.ventureRef.update({
                                 'description': description,

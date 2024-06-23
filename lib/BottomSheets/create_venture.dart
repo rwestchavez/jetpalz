@@ -89,24 +89,25 @@ class _CreateVentureWidgetState extends State<CreateVenture> {
                                                   isEqualTo: userDoc)
                                               .get();
 
-                                      /* if (venturesSnapshot.docs.isNotEmpty) {
+                                      if (venturesSnapshot.docs.isNotEmpty) {
                                         // Show a message or handle the situation when the user already has a venture
                                         showDialog(
                                           context: context,
                                           builder: (context) => AlertDialog(
-                                            title: Text('Error'),
-                                            content: Text(
+                                            title: const Text('Error'),
+                                            content: const Text(
                                                 'You can only be the creator of one venture at a time.'),
                                             actions: [
                                               TextButton(
-                                                onPressed: () => Navigator.pop(context),
-                                                child: Text('OK'),
+                                                onPressed: () =>
+                                                    Navigator.pop(context),
+                                                child: const Text('OK'),
                                               ),
                                             ],
                                           ),
                                         );
                                         return;
-                                      } */
+                                      }
 
                                       await firestore
                                           .runTransaction((transaction) async {
