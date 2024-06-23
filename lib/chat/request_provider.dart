@@ -7,16 +7,21 @@ import '../models/request_model.dart';
 class RequestProvider with ChangeNotifier {
   List<JoinRequest> _requests = [];
   List<JoinRequest> _acceptedRequests = [];
+  List<JoinRequest> _rejectedRequests = [];
+
   bool _isLoading = true;
   final String _userId = FirebaseAuth.instance.currentUser!.uid;
 
   List<JoinRequest> get requests => _requests;
   List<JoinRequest> get acceptedRequests => _acceptedRequests;
+  List<JoinRequest> get rejectedRequests => _rejectedRequests;
+
   bool get isLoading => _isLoading;
 
   RequestProvider() {
     _fetchRequests();
     _fetchAcceptedRequests();
+    _fetchRejectedRequests();
   }
 
   Future<void> _fetchRequests() async {
@@ -58,8 +63,39 @@ class RequestProvider with ChangeNotifier {
         .where('status', isEqualTo: 'accepted')
         .snapshots()
         .listen((snapshot) {
+      // Filter requests where the current user's ID is not in the seenBy array
+      final filteredRequests = snapshot.docs.where((doc) {
+        List<dynamic> seenBy = doc['seenBy'] ?? [];
+        return !seenBy.contains(_userId);
+      }).toList();
+
+      // Map the filtered requests to JoinRequest objects
       _acceptedRequests =
-          snapshot.docs.map((doc) => JoinRequest.fromDocument(doc)).toList();
+          filteredRequests.map((doc) => JoinRequest.fromDocument(doc)).toList();
+
+      // Notify listeners of the change
+      notifyListeners();
+    });
+  }
+
+  Future<void> _fetchRejectedRequests() async {
+    FirebaseFirestore.instance
+        .collection('requests')
+        .where('requesterId', isEqualTo: _userId)
+        .where('status', isEqualTo: 'rejected')
+        .snapshots()
+        .listen((snapshot) {
+      // Filter requests where the current user's ID is not in the seenBy array
+      final filteredRequests = snapshot.docs.where((doc) {
+        List<dynamic> seenBy = doc['seenBy'] ?? [];
+        return !seenBy.contains(_userId);
+      }).toList();
+
+      // Map the filtered requests to JoinRequest objects
+      _rejectedRequests =
+          filteredRequests.map((doc) => JoinRequest.fromDocument(doc)).toList();
+
+      // Notify listeners of the change
       notifyListeners();
     });
   }
@@ -112,5 +148,6 @@ class RequestProvider with ChangeNotifier {
     }
     _fetchRequests();
     _fetchAcceptedRequests();
+    _fetchRejectedRequests();
   }
 }

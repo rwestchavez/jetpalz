@@ -27,6 +27,7 @@ class _EmailSignUpWidgetState extends State<EmailSignUp> {
   bool _passwordVisible = false;
   bool _confirmPasswordVisible = false;
   final _formKey = GlobalKey<FormState>();
+  bool _isLoading = false;
 
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
@@ -49,6 +50,10 @@ class _EmailSignUpWidgetState extends State<EmailSignUp> {
   }
 
   Future<void> _signUp() async {
+    setState(() {
+      _isLoading = true; // Set loading state to true
+    });
+
     try {
       UserCredential userCredential =
           await _auth.createUserWithEmailAndPassword(
@@ -67,10 +72,10 @@ class _EmailSignUpWidgetState extends State<EmailSignUp> {
         'countries_interest': [], // Add countries interest if needed
         'professions_interest': [], // Add professions interest if needed
         'description': '', // Add description if needed
-        'current_ventures': [], // Add current ventures if needed
       });
       // Handle successful sign-up
       print("User signed up: ${userCredential.user!.email}");
+      Navigator.pushReplacementNamed(context, '/onboarding');
     } on FirebaseAuthException catch (e) {
       String errorMessage = "Sign-up error: $e";
       print(errorMessage);
@@ -101,6 +106,10 @@ class _EmailSignUpWidgetState extends State<EmailSignUp> {
       print("Error signing up: $e");
       MySnackBar.show(context,
           content: Text("An error occurred. Please try again later."));
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
     }
   }
 
@@ -163,15 +172,20 @@ class _EmailSignUpWidgetState extends State<EmailSignUp> {
                     ),
                     SizedBox(height: 24),
                     MyButton(
-                      child: Text("Create Account",
-                          style: TextStyle(fontWeight: FontWeight.bold)),
-                      onPressed: () async {
-                        if (_formKey.currentState!.validate()) {
-                          await _signUp();
-                          Navigator.pushReplacementNamed(
-                              context, '/onboarding');
-                        } // Call the sign-up method
-                      },
+                      child: _isLoading
+                          ? CircularProgressIndicator(
+                              valueColor:
+                                  AlwaysStoppedAnimation<Color>(Colors.white),
+                            )
+                          : Text("Create Account",
+                              style: TextStyle(fontWeight: FontWeight.bold)),
+                      onPressed: _isLoading
+                          ? () {}
+                          : () async {
+                              if (_formKey.currentState!.validate()) {
+                                await _signUp();
+                              }
+                            },
                     ),
                     SizedBox(height: 16),
                   ],

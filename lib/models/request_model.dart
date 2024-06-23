@@ -7,6 +7,7 @@ class JoinRequest {
   final String status;
   final DateTime timestamp;
   final String requester;
+  final List<String> seenBy;
 
   JoinRequest({
     required this.requester,
@@ -15,6 +16,7 @@ class JoinRequest {
     required this.ventureId,
     required this.status,
     required this.timestamp,
+    required this.seenBy,
   });
 
   factory JoinRequest.fromDocument(DocumentSnapshot doc) {
@@ -25,6 +27,7 @@ class JoinRequest {
       ventureId: doc['ventureId'],
       status: doc['status'],
       timestamp: (doc['timestamp'] as Timestamp).toDate(),
+      seenBy: List<String>.from(doc['seenBy'] ?? []),
     );
   }
 }

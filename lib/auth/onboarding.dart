@@ -5,7 +5,6 @@ import 'package:jet_palz/components/my_button.dart';
 import 'package:jet_palz/components/my_textField.dart';
 import 'package:jet_palz/constants.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
-
 import '../components/my_snack_bar.dart';
 import '../helpers/is_username_available.dart';
 
@@ -20,10 +19,9 @@ class _OnboardingWidgetState extends State<Onboarding> {
   final scaffoldKey = GlobalKey<ScaffoldState>();
   late PageController _pageController;
   late TextEditingController _usernameTextController;
-
-  GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   String? userId = FirebaseAuth.instance.currentUser?.uid;
+  bool _isLoading = false; // Loading state variable
 
   @override
   void initState() {
@@ -50,18 +48,15 @@ class _OnboardingWidgetState extends State<Onboarding> {
         child: Scaffold(
             body: SafeArea(
           child: Column(
-            //  mainAxisSize: MainAxisSize.max,
             children: [
               SizedBox(
                 height: 24,
               ),
               Image.asset(
                 'assets/logo.png',
-                width: double.infinity, // Adjust width as needed
+                width: double.infinity,
                 height: 200,
-                // fit: BoxFit.contain, // Adjust image fit
               ),
-              // LogoWidget
               SizedBox(height: 20),
               Expanded(
                 child: Container(
@@ -123,8 +118,8 @@ class _OnboardingWidgetState extends State<Onboarding> {
                                           if (value.length < 3) {
                                             return 'Username must be at least 3 characters long';
                                           }
-                                          if (value.length > 30) {
-                                            return 'Username must be below 30 characters long';
+                                          if (value.length > 18) {
+                                            return 'Username must be below 18 characters long';
                                           }
                                           if (!RegExp(r'^[a-zA-Z0-9_]+$')
                                               .hasMatch(value)) {
@@ -179,39 +174,55 @@ class _OnboardingWidgetState extends State<Onboarding> {
                 child: Container(
                   constraints: BoxConstraints(maxWidth: 200),
                   child: MyButton(
-                    onPressed: () async {
-                      if (_pageController.page == 3 &&
-                          _formKey.currentState!.validate()) {
-                        final username = _usernameTextController.text;
-                        final isAvailable = await isUsernameAvailable(username);
+                    onPressed: _isLoading
+                        ? () {}
+                        : () async {
+                            if (_pageController.page == 3 &&
+                                _formKey.currentState!.validate()) {
+                              setState(() {
+                                _isLoading = true; // Start loading
+                              });
 
-                        if (isAvailable) {
-                          // Username is available, proceed with registration
-                          await FirebaseFirestore.instance
-                              .collection('users')
-                              .doc(userId)
-                              .update({
-                            'username': username,
-                            'photo_url':
-                                DefaultPfp
-                          });
-                          Navigator.pushReplacementNamed(context, '/feed');
-                        } else {
-                          // Username is not available, inform the user
-                          MySnackBar.show(
-                            context,
-                            content: Text(
-                                'Username is not available. Please choose a different one.'),
-                          );
-                        }
-                      } else {
-                        _pageController.nextPage(
-                          duration: Duration(milliseconds: 300),
-                          curve: Curves.ease,
-                        );
-                      }
-                    },
-                    child: Text('Next'),
+                              final username = _usernameTextController.text;
+                              final isAvailable =
+                                  await isUsernameAvailable(username);
+
+                              if (isAvailable) {
+                                // Username is available, proceed with registration
+                                await FirebaseFirestore.instance
+                                    .collection('users')
+                                    .doc(userId)
+                                    .update({
+                                  'username': username,
+                                  'photo_url': DefaultPfp,
+                                });
+                                Navigator.pushReplacementNamed(
+                                    context, '/feed');
+                              } else {
+                                // Username is not available, inform the user
+                                MySnackBar.show(
+                                  context,
+                                  content: Text(
+                                      'Username is not available. Please choose a different one.'),
+                                );
+                              }
+
+                              setState(() {
+                                _isLoading = false; // Stop loading
+                              });
+                            } else {
+                              _pageController.nextPage(
+                                duration: Duration(milliseconds: 300),
+                                curve: Curves.ease,
+                              );
+                            }
+                          },
+                    child: _isLoading
+                        ? CircularProgressIndicator(
+                            valueColor:
+                                AlwaysStoppedAnimation<Color>(Colors.white),
+                          )
+                        : Text('Next'),
                   ),
                 ),
               ),

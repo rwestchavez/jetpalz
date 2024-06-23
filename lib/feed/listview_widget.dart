@@ -96,6 +96,7 @@ class _ListViewWidgetState extends State<ListViewWidget> {
         'ventureId': ventureId,
         'status': 'pending',
         'timestamp': FieldValue.serverTimestamp(),
+        'seenBy': [],
       });
 
       MySnackBar.show(context,

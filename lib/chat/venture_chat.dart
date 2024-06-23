@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:jet_palz/chat/chat.dart';
 import 'package:jet_palz/components/my_snack_bar.dart';
 import 'package:jet_palz/helpers/delete_venture.dart';
 import 'package:jet_palz/helpers/edit_venture.dart';
@@ -387,6 +386,14 @@ class _VentureChatState extends State<VentureChat> {
         await widget.ventureRef
             .update({'member_num': FieldValue.increment(-1)});
       }
+      var requests = await FirebaseFirestore.instance
+          .collection("requests")
+          .where("requesterId", isEqualTo: userId)
+          .where("ventureId", isEqualTo: widget.ventureRef.id)
+          .limit(1)
+          .get();
+      var requestRef = requests.docs.first.reference;
+      requestRef.delete();
 
       Navigator.of(context).pop();
       MySnackBar.show(context, content: Text("You have left the venture"));

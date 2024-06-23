@@ -373,8 +373,8 @@ class _ProfileWidgetState extends State<EditProfile> {
                               if (value.length < 3) {
                                 return 'Username must be at least 3 characters long';
                               }
-                              if (value.length > 30) {
-                                return 'Username must be less than 30 characters';
+                              if (value.length > 18) {
+                                return 'Username must be less than 18 characters';
                               }
                               if (!RegExp(r'^[a-zA-Z0-9_]+$').hasMatch(value)) {
                                 return 'Username can only contain letters, numbers, and underscores';
@@ -465,7 +465,11 @@ class _ProfileWidgetState extends State<EditProfile> {
                                     ? () {}
                                     : _saveChanges, // Disable button during data saving process
                                 child: _isSavingChanges
-                                    ? CircularProgressIndicator() // Display loading indicator when saving changes
+                                    ? CircularProgressIndicator(
+                                        valueColor:
+                                            AlwaysStoppedAnimation<Color>(
+                                                Colors.white),
+                                      ) // Display loading indicator when saving changes
                                     : Text(
                                         "Save changes",
                                         style: TextStyle(

@@ -21,6 +21,7 @@ class _CreateVentureWidgetState extends State<CreateVenture> {
   int? people = 0;
   String? month;
   int? weeks = 0;
+  bool isLoading = false;
 
   @override
   Widget build(BuildContext context) {
@@ -57,94 +58,107 @@ class _CreateVentureWidgetState extends State<CreateVenture> {
                       child: Align(
                         alignment: Alignment.centerRight,
                         child: TextButton(
-                          onPressed: () async {
-                            if (_formKey.currentState!.validate()) {
-                              FirebaseFirestore firestore =
-                                  FirebaseFirestore.instance;
-                              final currentUser =
-                                  FirebaseAuth.instance.currentUser;
-                              final userDoc = firestore
-                                  .collection('users')
-                                  .doc(currentUser!.uid);
-                              final venturesRef =
-                                  firestore.collection('ventures');
+                          onPressed: isLoading
+                              ? () {}
+                              : () async {
+                                  if (_formKey.currentState!.validate()) {
+                                    setState(() {
+                                      isLoading = true;
+                                    });
 
-                              var userSnap = await userDoc.get();
-                              var userData =
-                                  userSnap.data() as Map<String, dynamic>;
-                              String creatorName = userData['username'];
+                                    try {
+                                      FirebaseFirestore firestore =
+                                          FirebaseFirestore.instance;
+                                      final currentUser =
+                                          FirebaseAuth.instance.currentUser;
+                                      final userDoc = firestore
+                                          .collection('users')
+                                          .doc(currentUser!.uid);
+                                      final venturesRef =
+                                          firestore.collection('ventures');
 
-                              // Check if the user is already a venture creator
-                              QuerySnapshot venturesSnapshot = await venturesRef
-                                  .where('creator', isEqualTo: userDoc)
-                                  .get();
+                                      var userSnap = await userDoc.get();
+                                      var userData = userSnap.data()
+                                          as Map<String, dynamic>;
+                                      String creatorName = userData['username'];
 
-                              /* if (venturesSnapshot.docs.isNotEmpty) {
-                                // Show a message or handle the situation when the user already has a venture
-                                showDialog(
-                                  context: context,
-                                  builder: (context) => AlertDialog(
-                                    title: Text('Error'),
-                                    content: Text(
-                                        'You can only be the creator of one venture at a time.'),
-                                    actions: [
-                                      TextButton(
-                                        onPressed: () => Navigator.pop(context),
-                                        child: Text('OK'),
-                                      ),
-                                    ],
+                                      // Check if the user is already a venture creator
+                                      QuerySnapshot venturesSnapshot =
+                                          await venturesRef
+                                              .where('creator',
+                                                  isEqualTo: userDoc)
+                                              .get();
+
+                                      /* if (venturesSnapshot.docs.isNotEmpty) {
+                                        // Show a message or handle the situation when the user already has a venture
+                                        showDialog(
+                                          context: context,
+                                          builder: (context) => AlertDialog(
+                                            title: Text('Error'),
+                                            content: Text(
+                                                'You can only be the creator of one venture at a time.'),
+                                            actions: [
+                                              TextButton(
+                                                onPressed: () => Navigator.pop(context),
+                                                child: Text('OK'),
+                                              ),
+                                            ],
+                                          ),
+                                        );
+                                        return;
+                                      } */
+
+                                      await firestore
+                                          .runTransaction((transaction) async {
+                                        Map<String, dynamic> ventureData = {
+                                          'country': country,
+                                          'creator': userDoc,
+                                          'creator_name': creatorName,
+                                          'industry': industry,
+                                          'description': description,
+                                          'member_num': 1,
+                                          'starting_month': month,
+                                          'estimated_weeks': weeks,
+                                          'created_time': DateTime.now(),
+                                          'max_people': people,
+                                          'chat': null,
+                                        };
+
+                                        DocumentReference newVentureRef =
+                                            venturesRef.doc();
+                                        transaction.set(
+                                            newVentureRef, ventureData);
+                                      });
+
+                                      MySnackBar.show(context,
+                                          content: Text("Venture Created"));
+                                      Navigator.pop(context);
+                                    } catch (e) {
+                                      MySnackBar.show(context,
+                                          content: Text(
+                                              "Error creating venture: $e"));
+                                    } finally {
+                                      setState(() {
+                                        isLoading = false;
+                                      });
+                                    }
+                                  }
+                                },
+                          child: isLoading
+                              ? CircularProgressIndicator()
+                              : Text(
+                                  'Post',
+                                  style: TextStyle(
+                                    fontSize: 18.0,
+                                    color: Colors.blue,
                                   ),
-                                );
-                                return;
-                              } */
-
-                              await firestore
-                                  .runTransaction((transaction) async {
-                                Map<String, dynamic> ventureData = {
-                                  'country': country,
-                                  'creator': userDoc,
-                                  'creator_name': creatorName,
-                                  'industry': industry,
-                                  'description': description,
-                                  'member_num': 1,
-                                  'starting_month': month,
-                                  'estimated_weeks': weeks,
-                                  'created_time': DateTime.now(),
-                                  'max_people': people,
-                                  'chat': null,
-                                };
-                                DocumentSnapshot userSnapshot =
-                                    await transaction.get(userDoc);
-                                List<dynamic> currentVentures =
-                                    userSnapshot.get('current_ventures') ?? [];
-                                DocumentReference newVentureRef =
-                                    venturesRef.doc();
-                                transaction.set(newVentureRef, ventureData);
-
-                                currentVentures.add(newVentureRef);
-                                transaction.update(userDoc,
-                                    {'current_ventures': currentVentures});
-                              });
-                              print("Transaction complete");
-                              MySnackBar.show(context,
-                                  content: Text("Venture Created"));
-                              Navigator.pop(context);
-                            }
-                          },
-                          child: Text(
-                            'Post',
-                            style: TextStyle(
-                              fontSize: 18.0,
-                              color: Colors.blue,
-                            ),
-                          ),
+                                ),
                         ),
                       ),
                     ),
                   ],
                 ),
               ),
-              //  SizedBox(height: 12),
               Flexible(
                 child: SingleChildScrollView(
                   child: Padding(
@@ -152,7 +166,14 @@ class _CreateVentureWidgetState extends State<CreateVenture> {
                     child: Column(
                       mainAxisSize: MainAxisSize.max,
                       children: [
-                        TextField(
+                        TextFormField(
+                          validator: (value) {
+                            if (value!.length > 400) {
+                              // Adjust the maximum character limit as needed
+                              return 'Description must be less than 400 characters';
+                            }
+                            return null;
+                          },
                           onChanged: (value) => description = value,
                           controller: textController,
                           minLines: 1,
@@ -270,7 +291,6 @@ class _CreateVentureWidgetState extends State<CreateVenture> {
                               ? "Required"
                               : null,
                         ),
-                        // Add more text here for description
                       ],
                     ),
                   ),

@@ -23,6 +23,7 @@ import 'profile/profile.dart';
 import 'theme/dark_mode_theme.dart';
 import 'theme/light_mode_theme.dart';
 import 'app_state.dart';
+import 'package:badges/badges.dart' as badges;
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -41,25 +42,23 @@ Future<void> main() async {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
-      systemNavigationBarColor: Colors
-          .transparent, // Change this to the desired color// Optional: Set this to transparent if you don't want a status bar color
+      systemNavigationBarColor: Colors.transparent,
     ));
     User? user = FirebaseAuth.instance.currentUser;
 
     return MaterialApp(
-      title: 'JetPalz', // Add a title for your app
+      title: 'JetPalz',
       routes: {
         '/signIn': (context) => SignIn(),
         '/forgotPassword': (context) => const ForgotPassword(),
         '/feed': (context) => const Main(),
         '/onboarding': (context) => const Onboarding(),
         '/editProfile': (context) => const EditProfile(),
-        '/myVentures': (context) => MyVenturesListView(),
+        '/myVentures': (context) => const MyVenturesListView(),
         '/settings': (context) => Settings(),
         '/changeEmail': (context) => const ChangeEmail(),
         '/changePassword': (context) => const ChangePassword(),
@@ -67,7 +66,7 @@ class MyApp extends StatelessWidget {
       },
       home: user != null ? const Main() : const SignUp(),
       theme: lightModeTheme.themeData,
-      darkTheme: darkModeTheme.themeData, // disable dark theme
+      darkTheme: darkModeTheme.themeData,
       debugShowCheckedModeBanner: false,
     );
   }
@@ -96,14 +95,29 @@ class MainState extends State<Main> {
 
   @override
   Widget build(BuildContext context) {
+    final hasRequests = context.watch<RequestProvider>().requests.isNotEmpty;
+
+    final hasJoins =
+        context.watch<RequestProvider>().acceptedRequests.isNotEmpty;
+
+    final hasRejects =
+        context.watch<RequestProvider>().rejectedRequests.isNotEmpty;
+
+    final hasNotifications = hasRequests || hasJoins || hasRejects;
+
     return Scaffold(
       body: IndexedStack(index: _index, children: screens),
       bottomNavigationBar: NavigationBar(
         backgroundColor: Theme.of(context).colorScheme.surface,
         labelBehavior: NavigationDestinationLabelBehavior.onlyShowSelected,
-        destinations: const [
+        destinations: [
           NavigationDestination(
-            icon: Icon(Icons.chat_bubble_outline),
+            icon: badges.Badge(
+              showBadge: hasNotifications,
+              position: badges.BadgePosition.topEnd(top: -5, end: -5),
+              badgeContent: Container(),
+              child: Icon(Icons.chat_bubble_outline),
+            ),
             label: "Chat",
             selectedIcon: Icon(Icons.chat_bubble),
           ),
@@ -119,11 +133,9 @@ class MainState extends State<Main> {
           )
         ],
         onDestinationSelected: (value) {
-          setState(
-            () {
-              _index = value;
-            },
-          );
+          setState(() {
+            _index = value;
+          });
         },
         selectedIndex: _index,
       ),

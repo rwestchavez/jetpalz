@@ -116,7 +116,13 @@ class _EditVentureWidgetState extends State<EditVenture> {
                     child: Column(
                       mainAxisSize: MainAxisSize.max,
                       children: [
-                        TextField(
+                        TextFormField(
+                          validator: (value) {
+                            if (value != null && value.length > 400) {
+                              return 'Description must be less than 400 characters';
+                            }
+                            return null;
+                          },
                           onChanged: (value) => description = value,
                           controller: textController,
                           minLines: 1,

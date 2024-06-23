@@ -220,7 +220,7 @@ class _SignUpState extends State<SignUp> {
                                 ),
                                 child: FilledButton.icon(
                                   onPressed: () async {
-                                    await googleAuth(context);
+                                    await googleAuth(context, true);
                                   },
                                   icon: FaIcon(
                                     FontAwesomeIcons.google,

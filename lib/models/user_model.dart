@@ -10,7 +10,6 @@ class UserModel {
   final List<String> countriesInterest;
   final List<String> professionsInterest;
   final String description;
-  final List<DocumentReference> currentVentures;
 
   UserModel({
     required this.email,
@@ -22,7 +21,6 @@ class UserModel {
     required this.countriesInterest,
     required this.professionsInterest,
     required this.description,
-    required this.currentVentures,
   });
 
   // Factory method to create a UserModel from a Firestore document
@@ -37,7 +35,6 @@ class UserModel {
       countriesInterest: List<String>.from(doc['countries_interest']),
       professionsInterest: List<String>.from(doc['professions_interest']),
       description: doc['description'],
-      currentVentures: List<DocumentReference>.from(doc['current_ventures']),
     );
   }
 
@@ -53,7 +50,6 @@ class UserModel {
       'countries_interest': countriesInterest,
       'professions_interest': professionsInterest,
       'description': description,
-      'current_ventures': currentVentures,
     };
   }
 }

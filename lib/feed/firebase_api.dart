@@ -1,5 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 
 class FirebaseApi {
   static Future<QuerySnapshot> getVentures(
@@ -11,14 +10,7 @@ class FirebaseApi {
     String? month,
     int? weeks,
   }) async {
-    final currentUserUid = FirebaseAuth.instance.currentUser!.uid;
     final firestore = FirebaseFirestore.instance;
-
-    final QuerySnapshot requestSnapshot = await firestore
-        .collection('requests')
-        .where('requesterId', isEqualTo: currentUserUid)
-        .where('status', isEqualTo: 'accepted') // Only get accepted requests
-        .get();
 
     CollectionReference venturesRef = firestore.collection('ventures');
     Query query = venturesRef.orderBy('created_time').limit(limit);

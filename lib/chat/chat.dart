@@ -20,7 +20,9 @@ class Chat extends StatelessWidget {
         actions: [
           Consumer<RequestProvider>(
             builder: (context, requestProvider, child) {
-              int requestCount = requestProvider.requests.length;
+              int requestCount = requestProvider.requests.length +
+                  requestProvider.acceptedRequests.length +
+                  requestProvider.rejectedRequests.length;
               print(' request count $requestCount');
 
               // Return IconButton with or without Badge based on requestCount

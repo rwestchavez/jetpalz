@@ -21,6 +21,8 @@ class _SignInWidgetState extends State<SignIn> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final _formKey = GlobalKey<FormState>();
 
+  bool _isLoading = false; // Loading state variable
+
   @override
   void initState() {
     super.initState();
@@ -40,6 +42,9 @@ class _SignInWidgetState extends State<SignIn> {
   }
 
   Future<void> _signIn() async {
+    setState(() {
+      _isLoading = true; // Start loading
+    });
     try {
       UserCredential userCredential = await _auth.signInWithEmailAndPassword(
         email: _emailController.text.trim(),
@@ -47,6 +52,7 @@ class _SignInWidgetState extends State<SignIn> {
       );
       print("User signed in: ${userCredential.user!.email}");
       // Navigate to the next screen or perform any necessary action
+      Navigator.pushReplacementNamed(context, '/feed');
     } on FirebaseAuthException catch (e) {
       String errorMessage = "Error signing in: $e";
       print(errorMessage);
@@ -79,6 +85,10 @@ class _SignInWidgetState extends State<SignIn> {
         context,
         content: Text("An error occurred. Please try again later."),
       );
+    } finally {
+      setState(() {
+        _isLoading = false; // Stop loading
+      });
     }
   }
 
@@ -162,15 +172,20 @@ class _SignInWidgetState extends State<SignIn> {
                     ),
                     SizedBox(height: 16.0),
                     MyButton(
-                      onPressed: () async {
-                        if (_formKey.currentState!.validate()) {
-                          await _signIn();
-                          Navigator.pushReplacementNamed(
-                              context, '/onboarding');
-                        }
-                      },
-                      child: Text('Sign in',
-                          style: TextStyle(fontWeight: FontWeight.bold)),
+                      onPressed: _isLoading
+                          ? () {}
+                          : () async {
+                              if (_formKey.currentState!.validate()) {
+                                await _signIn();
+                              }
+                            },
+                      child: _isLoading
+                          ? CircularProgressIndicator(
+                              valueColor:
+                                  AlwaysStoppedAnimation<Color>(Colors.white),
+                            )
+                          : Text('Sign in',
+                              style: TextStyle(fontWeight: FontWeight.bold)),
                     ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.end,
@@ -178,7 +193,6 @@ class _SignInWidgetState extends State<SignIn> {
                         TextButton(
                           onPressed: () {
                             Navigator.pushNamed(context, '/forgotPassword');
-                            // Implement logic for "Forgot password?"
                           },
                           child: Text('Forgot password?'),
                         ),
@@ -215,9 +229,11 @@ class _SignInWidgetState extends State<SignIn> {
                       padding:
                           EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 16.0),
                       child: ElevatedButton.icon(
-                        onPressed: () async {
-                          await googleAuth(context);
-                        },
+                        onPressed: _isLoading
+                            ? () {}
+                            : () async {
+                                await googleAuth(context, false);
+                              },
                         icon: FaIcon(
                           FontAwesomeIcons.google,
                           size: 20.0,
