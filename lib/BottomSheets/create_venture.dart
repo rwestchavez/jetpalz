@@ -94,9 +94,10 @@ class _CreateVentureWidgetState extends State<CreateVenture> {
                                         showDialog(
                                           context: context,
                                           builder: (context) => AlertDialog(
-                                            title: const Text('Error'),
-                                            content: const Text(
-                                                'You can only be the creator of one venture at a time.'),
+                                            title: const Text(
+                                              'You can only be the creator of one venture at a time.',
+                                              textAlign: TextAlign.center,
+                                            ),
                                             actions: [
                                               TextButton(
                                                 onPressed: () =>

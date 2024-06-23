@@ -56,6 +56,9 @@ class _VentureChatState extends State<VentureChat> {
             widget.members[0].id != FirebaseAuth.instance.currentUser!.uid) {
           if (Navigator.of(context).canPop()) {
             Navigator.of(context).pop();
+            if (Navigator.canPop(context)) {
+              Navigator.of(context).pop();
+            }
           }
           MySnackBar.show(context,
               content: const Text("This venture has been deleted"));
@@ -401,61 +404,80 @@ class _VentureChatState extends State<VentureChat> {
   }
 
   void _leaveChat() async {
-    try {
-      var userId = FirebaseAuth.instance.currentUser!.uid;
-      DocumentSnapshot ventureSnapshot = await widget.ventureRef!.get();
-      Map<String, dynamic> ventureData =
-          ventureSnapshot.data() as Map<String, dynamic>;
-      final DocumentReference creatorRef = ventureData['creator'];
+    var userId = FirebaseAuth.instance.currentUser!.uid;
+    DocumentSnapshot ventureSnapshot = await widget.ventureRef!.get();
+    Map<String, dynamic> ventureData =
+        ventureSnapshot.data() as Map<String, dynamic>;
+    final DocumentReference creatorRef = ventureData['creator'];
 
-      final DocumentReference userRef =
-          FirebaseFirestore.instance.collection('users').doc(userId);
+    final DocumentReference userRef =
+        FirebaseFirestore.instance.collection('users').doc(userId);
 
-      final DocumentReference chatRef = FirebaseFirestore.instance
-          .collection('venture_chats')
-          .doc(widget.chatId);
-      DocumentSnapshot chatSnapshot = await chatRef.get();
-      Map<String, dynamic> chatData =
-          chatSnapshot.data() as Map<String, dynamic>;
-      final List members = chatData['members'];
+    final DocumentReference chatRef = FirebaseFirestore.instance
+        .collection('venture_chats')
+        .doc(widget.chatId);
+    DocumentSnapshot chatSnapshot = await chatRef.get();
+    Map<String, dynamic> chatData = chatSnapshot.data() as Map<String, dynamic>;
+    final List members = chatData['members'];
 
-      if (creatorRef.id == userId) {
-        if (members.length > 1) {
-          DocumentReference newCreatorRef =
-              members.firstWhere((ref) => ref.id != userId);
+    if (creatorRef.id == userId) {
+      if (members.length > 1) {
+        // Attempt to find a new creator in members list
+        DocumentReference? newCreatorRef;
+        try {
+          newCreatorRef = members.firstWhere((ref) => ref.id != userId);
+        } catch (e) {
+          // Handle case where no matching element is found
+          print('No valid creator found in members list');
+        }
+
+        if (newCreatorRef != null) {
           await widget.ventureRef!.update({
             'creator': newCreatorRef,
-            'member_num': FieldValue.increment(-1)
+            'member_num': FieldValue.increment(-1),
           });
+
           await chatRef.update({
             'members': FieldValue.arrayRemove([userRef]),
           });
         } else {
-          await widget.ventureRef!.delete();
-          await chatRef.delete();
+          // Handle scenario where no valid creator reference is found
+          deleteVenture(context, widget.ventureRef!, true);
+          //   await widget.ventureRef!.delete();
+          //   await chatRef.delete();
         }
       } else {
-        await chatRef.update({
-          'members': FieldValue.arrayRemove([userRef]),
-        });
-        await widget.ventureRef!
-            .update({'member_num': FieldValue.increment(-1)});
+        deleteVenture(context, widget.ventureRef!, true);
+        //   await widget.ventureRef!.delete();
+        //   await chatRef.delete();
       }
-      var requests = await FirebaseFirestore.instance
-          .collection("requests")
-          .where("requesterId", isEqualTo: userId)
-          .where("ventureId", isEqualTo: widget.ventureRef!.id)
-          .limit(1)
-          .get();
+    } else {
+      await chatRef.update({
+        'members': FieldValue.arrayRemove([userRef]),
+      });
+      await widget.ventureRef!.update({
+        'member_num': FieldValue.increment(-1),
+      });
+    }
+
+    var requests = await FirebaseFirestore.instance
+        .collection("requests")
+        .where("requesterId", isEqualTo: userId)
+        .where("ventureId", isEqualTo: widget.ventureRef!.id)
+        .limit(1)
+        .get();
+
+    if (requests.docs.isNotEmpty) {
       var requestRef = requests.docs.first.reference;
       requestRef.delete();
-
-      Navigator.of(context).pop();
-      MySnackBar.show(context,
-          content: const Text("You have left the venture"));
-    } catch (e) {
-      MySnackBar.show(context, content: Text("Error $e"));
     }
+    if (Navigator.of(context).canPop()) {
+      Navigator.of(context).pop();
+      if (Navigator.canPop(context)) {
+        Navigator.of(context).pop();
+      }
+    }
+    MySnackBar.show(context, content: const Text("You have left the venture"));
   }
 
   @override

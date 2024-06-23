@@ -47,14 +47,15 @@ Future<void> deleteVenture(
         ) ??
         false;
   }
-  if (Navigator.of(context).canPop()) {
-    Navigator.pop(context);
-  }
-  ventureRef.set({'deleted': true});
-
-
   if (shouldDelete) {
     try {
+      ventureRef.set({'deleted': true});
+
+      if (Navigator.of(context).canPop()) {
+        Navigator.pop(context);
+      }
+      await Future.delayed(Duration(milliseconds: 500));
+
       final requestsQuerySnapshot = await FirebaseFirestore.instance
           .collection("requests")
           .where("ventureId", isEqualTo: ventureRef.id)
