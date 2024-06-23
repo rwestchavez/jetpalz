@@ -24,8 +24,8 @@ class _EmailSignUpWidgetState extends State<EmailSignUp> {
   late TextEditingController _confirmPasswordController;
   late FocusNode _passwordFocusNode;
   late FocusNode _confirmPasswordFocusNode;
-  bool _passwordVisible = false;
-  bool _confirmPasswordVisible = false;
+  final bool _passwordVisible = false;
+  final bool _confirmPasswordVisible = false;
   final _formKey = GlobalKey<FormState>();
   bool _isLoading = false;
 
@@ -76,7 +76,6 @@ class _EmailSignUpWidgetState extends State<EmailSignUp> {
       // Handle successful sign-up
       Navigator.pushReplacementNamed(context, '/onboarding');
     } on FirebaseAuthException catch (e) {
-      String errorMessage = "Sign-up error: $e";
       String snackBarMessage;
 
       switch (e.code) {

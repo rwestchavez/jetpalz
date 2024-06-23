@@ -52,20 +52,22 @@ Future<void> deleteVenture(
   }
   ventureRef.set({'deleted': true});
 
+
   if (shouldDelete) {
     try {
-      await ventureRef.delete();
-      if (chatRef != null) {
-        await chatRef.delete();
-      }
       final requestsQuerySnapshot = await FirebaseFirestore.instance
           .collection("requests")
           .where("ventureId", isEqualTo: ventureRef.id)
           .get();
 
+      final batch = FirebaseFirestore.instance.batch();
+
+      if (chatRef != null) {
+        batch.delete(chatRef);
+      }
+      batch.delete(ventureRef);
       // If there are any requests, delete them in a batch
       if (requestsQuerySnapshot.docs.isNotEmpty) {
-        final batch = FirebaseFirestore.instance.batch();
         for (final requestDoc in requestsQuerySnapshot.docs) {
           batch.delete(requestDoc.reference);
         }

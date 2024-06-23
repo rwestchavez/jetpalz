@@ -15,7 +15,7 @@ class VentureChat extends StatefulWidget {
   final String? lastMessageSentBy;
   final List<dynamic> members;
   final String chatId;
-  final DocumentReference ventureRef;
+  final DocumentReference? ventureRef;
 
   const VentureChat({
     Key? key,
@@ -51,8 +51,9 @@ class _VentureChatState extends State<VentureChat> {
     _ventureRefSubscription = widget.ventureRef?.snapshots().listen((event) {
       if (event.exists) {
         var data = event.data() as Map<String, dynamic>?;
-        if (data != null && data['deleted'] == true) {
-          // Venture has been marked as deleted
+        if (data != null &&
+            data['deleted'] == true &&
+            widget.members[0].id != FirebaseAuth.instance.currentUser!.uid) {
           if (Navigator.of(context).canPop()) {
             Navigator.of(context).pop();
           }
@@ -183,7 +184,7 @@ class _VentureChatState extends State<VentureChat> {
   }
 
   Future<void> _showVentureInfo() async {
-    DocumentSnapshot ventureSnapshot = await widget.ventureRef.get();
+    DocumentSnapshot ventureSnapshot = await widget.ventureRef!.get();
     Map<String, dynamic> ventureData =
         ventureSnapshot.data() as Map<String, dynamic>;
     final DocumentReference creatorRef = ventureData['creator'];
@@ -402,7 +403,7 @@ class _VentureChatState extends State<VentureChat> {
   void _leaveChat() async {
     try {
       var userId = FirebaseAuth.instance.currentUser!.uid;
-      DocumentSnapshot ventureSnapshot = await widget.ventureRef.get();
+      DocumentSnapshot ventureSnapshot = await widget.ventureRef!.get();
       Map<String, dynamic> ventureData =
           ventureSnapshot.data() as Map<String, dynamic>;
       final DocumentReference creatorRef = ventureData['creator'];
@@ -422,7 +423,7 @@ class _VentureChatState extends State<VentureChat> {
         if (members.length > 1) {
           DocumentReference newCreatorRef =
               members.firstWhere((ref) => ref.id != userId);
-          await widget.ventureRef.update({
+          await widget.ventureRef!.update({
             'creator': newCreatorRef,
             'member_num': FieldValue.increment(-1)
           });
@@ -430,20 +431,20 @@ class _VentureChatState extends State<VentureChat> {
             'members': FieldValue.arrayRemove([userRef]),
           });
         } else {
-          await widget.ventureRef.delete();
+          await widget.ventureRef!.delete();
           await chatRef.delete();
         }
       } else {
         await chatRef.update({
           'members': FieldValue.arrayRemove([userRef]),
         });
-        await widget.ventureRef
+        await widget.ventureRef!
             .update({'member_num': FieldValue.increment(-1)});
       }
       var requests = await FirebaseFirestore.instance
           .collection("requests")
           .where("requesterId", isEqualTo: userId)
-          .where("ventureId", isEqualTo: widget.ventureRef.id)
+          .where("ventureId", isEqualTo: widget.ventureRef!.id)
           .limit(1)
           .get();
       var requestRef = requests.docs.first.reference;
@@ -481,7 +482,7 @@ class _VentureChatState extends State<VentureChat> {
           ),
           actions: [
             FutureBuilder(
-              future: widget.ventureRef.get(),
+              future: widget.ventureRef!.get(),
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
                   final ventureData =
@@ -502,11 +503,11 @@ class _VentureChatState extends State<VentureChat> {
                                   heightFactor:
                                       0.5, // Adjust this factor to control the height
                                   child: EditVenture(
-                                      ventureRef: widget.ventureRef,
+                                      ventureRef: widget.ventureRef!,
                                       ventureData: ventureData));
                             });
                       } else if (value == 'delete') {
-                        deleteVenture(context, widget.ventureRef, false);
+                        deleteVenture(context, widget.ventureRef!, false);
                       }
                     },
                     itemBuilder: (BuildContext context) {
