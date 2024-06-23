@@ -89,7 +89,8 @@ class VentureChatRoomWidget extends StatelessWidget {
             );
           },
           child: Container(
-            padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 10.0),
+            padding:
+                const EdgeInsets.symmetric(vertical: 8.0, horizontal: 10.0),
             decoration: BoxDecoration(
               border: Border(
                 bottom: BorderSide(
@@ -103,11 +104,11 @@ class VentureChatRoomWidget extends StatelessWidget {
                 CircleAvatar(
                   backgroundColor: Colors.transparent,
                   backgroundImage: creatorPfp == null
-                      ? NetworkImage(DefaultPfp)
+                      ? const NetworkImage(DefaultPfp)
                       : NetworkImage(creatorPfp!),
                   radius: 30.0, // Increased avatar size
                 ),
-                SizedBox(width: 12.0),
+                const SizedBox(width: 12.0),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -122,7 +123,7 @@ class VentureChatRoomWidget extends StatelessWidget {
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
-                      SizedBox(height: 4.0),
+                      const SizedBox(height: 4.0),
                       Text(
                         lastMessage.isNotEmpty
                             ? '${lastMessageSentBy ?? ''}: $lastMessage'
@@ -134,7 +135,7 @@ class VentureChatRoomWidget extends StatelessWidget {
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
-                      SizedBox(height: 4.0),
+                      const SizedBox(height: 4.0),
                       Text(
                         timeAgo,
                         style: TextStyle(
@@ -147,14 +148,14 @@ class VentureChatRoomWidget extends StatelessWidget {
                 ),
                 if (hasUnreadMessages)
                   Container(
-                    padding: EdgeInsets.all(6.0),
-                    decoration: BoxDecoration(
+                    padding: const EdgeInsets.all(6.0),
+                    decoration: const BoxDecoration(
                       color: Colors.red,
                       shape: BoxShape.circle,
                     ),
                     child: Text(
                       '$unreadCount',
-                      style: TextStyle(
+                      style: const TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
                         fontSize: 12.0,

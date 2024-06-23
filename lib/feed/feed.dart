@@ -14,7 +14,7 @@ class Feed extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: VentureFeed(),
+      body: const VentureFeed(),
       appBar: MyAppBar(
         title: "Feed",
         automaticallyImplyLeading: false,
@@ -27,13 +27,13 @@ class Feed extends StatelessWidget {
                     isScrollControlled: true,
                     context: context,
                     builder: (BuildContext context) {
-                      return FractionallySizedBox(
+                      return const FractionallySizedBox(
                           heightFactor:
                               0.5, // Adjust this factor to control the height
                           child: CreateVenture());
                     },
                   ),
-              icon: Icon(Icons.airplanemode_active, size: 40)),
+              icon: const Icon(Icons.airplanemode_active, size: 40)),
         ),
         actions: [
           Padding(
@@ -46,7 +46,7 @@ class Feed extends StatelessWidget {
                     isScrollControlled: true,
                     context: context,
                     builder: (BuildContext context) {
-                      return FractionallySizedBox(
+                      return const FractionallySizedBox(
                           heightFactor:
                               0.5, // Adjust this factor to control the height
                           child: FilterVenture());

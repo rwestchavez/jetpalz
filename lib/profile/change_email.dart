@@ -54,7 +54,7 @@ class _ChangeEmailWidgetState extends State<ChangeEmail> {
           await user.verifyBeforeUpdateEmail(_emailAddressController.text);
           MySnackBar.show(
             context,
-            content: Text('Verification sent to your email'),
+            content: const Text('Verification sent to your email'),
           );
         } on FirebaseAuthException catch (e) {
           MySnackBar.show(
@@ -84,46 +84,49 @@ class _ChangeEmailWidgetState extends State<ChangeEmail> {
           future: _getCurrentUserEmail(),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return Center(child: CircularProgressIndicator());
+              return const Center(child: CircularProgressIndicator());
             } else if (snapshot.hasError) {
               return Center(child: Text('Error: ${snapshot.error}'));
             } else {
-              return Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Form(
-                  key: _formKey,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Current Email: ${snapshot.data}',
-                        style: TextStyle(fontSize: 16),
-                      ),
-                      SizedBox(height: 8),
-                      MyTextField(
-                        hintText: "Enter your new email",
-                        controller: _emailAddressController,
-                        focusNode: _focusNode,
-                        keyboardType: TextInputType.emailAddress,
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please enter your email';
-                          }
-                          if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
-                            return 'Please enter a valid email';
-                          }
-                          return null; // Validation passed
-                        },
-                      ),
-                      SizedBox(height: 16),
-                      MyButton(
-                        onPressed: _changeEmail,
-                        child: Text(
-                          'Change Email',
-                          style: TextStyle(fontWeight: FontWeight.bold),
+              return SingleChildScrollView(
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Form(
+                    key: _formKey,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Current Email: ${snapshot.data}',
+                          style: const TextStyle(fontSize: 16),
                         ),
-                      ),
-                    ],
+                        const SizedBox(height: 8),
+                        MyTextField(
+                          hintText: "Enter your new email",
+                          controller: _emailAddressController,
+                          focusNode: _focusNode,
+                          keyboardType: TextInputType.emailAddress,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Please enter your email';
+                            }
+                            if (!RegExp(r'^[^@]+@[^@]+\.[^@]+')
+                                .hasMatch(value)) {
+                              return 'Please enter a valid email';
+                            }
+                            return null; // Validation passed
+                          },
+                        ),
+                        const SizedBox(height: 16),
+                        MyButton(
+                          onPressed: _changeEmail,
+                          child: const Text(
+                            'Change Email',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               );

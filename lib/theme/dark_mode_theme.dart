@@ -20,7 +20,7 @@ class darkModeTheme {
     return ThemeData(
       useMaterial3: true,
       brightness: Brightness.dark,
-      colorScheme: ColorScheme(
+      colorScheme: const ColorScheme(
         brightness: Brightness.dark,
         primary: primary,
         onPrimary: onPrimary,
@@ -31,7 +31,7 @@ class darkModeTheme {
         error: error,
         onError: onError,
       ),
-      textTheme: TextTheme(
+      textTheme: const TextTheme(
         bodyLarge: TextStyle(color: primaryText),
         bodyMedium: TextStyle(color: secondaryText),
       ),

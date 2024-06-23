@@ -15,7 +15,7 @@ class SingleLineWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsetsDirectional.fromSTEB(
+      padding: const EdgeInsetsDirectional.fromSTEB(
           4, 12, 12, 4), // Increase top and bottom padding
       child: InkWell(
         splashColor: Colors.transparent,
@@ -42,13 +42,13 @@ class SingleLineWidget extends StatelessWidget {
               ),
             ),
             child: Padding(
-              padding: EdgeInsetsDirectional.fromSTEB(16.0, 16.0, 16.0,
+              padding: const EdgeInsetsDirectional.fromSTEB(16.0, 16.0, 16.0,
                   16.0), // Increase padding inside the container
               child: Row(
                 mainAxisSize: MainAxisSize.max,
                 children: [
                   Padding(
-                    padding: EdgeInsetsDirectional.only(
+                    padding: const EdgeInsetsDirectional.only(
                         start: 8.0), // Adjust padding
                     child: Icon(
                       icon,
@@ -57,7 +57,7 @@ class SingleLineWidget extends StatelessWidget {
                     ),
                   ),
                   Padding(
-                    padding: EdgeInsetsDirectional.only(
+                    padding: const EdgeInsetsDirectional.only(
                         start: 16.0), // Increase space between icon and text
                     child: Text(
                       text,
@@ -71,10 +71,10 @@ class SingleLineWidget extends StatelessWidget {
                       ),
                     ),
                   ),
-                  Spacer(), // This will push the arrow icon to the right edge
+                  const Spacer(), // This will push the arrow icon to the right edge
                   Padding(
-                    padding:
-                        EdgeInsetsDirectional.only(end: 8.0), // Adjust padding
+                    padding: const EdgeInsetsDirectional.only(
+                        end: 8.0), // Adjust padding
                     child: Icon(
                       Icons.arrow_forward_ios,
                       color: Theme.of(context).colorScheme.onSurface,

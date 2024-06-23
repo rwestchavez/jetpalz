@@ -44,7 +44,8 @@ class _MyVenturesListViewState extends State<MyVenturesListView> {
       }
 
       MySnackBar.show(context,
-          content: Text("You cancelled your request to join the venture"));
+          content:
+              const Text("You cancelled your request to join the venture"));
     } finally {
       setState(() {
         _isButtonDisabled = false;
@@ -119,9 +120,9 @@ class _MyVenturesListViewState extends State<MyVenturesListView> {
         title: "Requests",
       ),
       body: _isLoading
-          ? Center(child: CircularProgressIndicator())
+          ? const Center(child: CircularProgressIndicator())
           : ventures.isEmpty
-              ? Center(
+              ? const Center(
                   child: Text(
                     "You haven't requested to join any ventures",
                     style: TextStyle(fontSize: 18),
@@ -133,12 +134,12 @@ class _MyVenturesListViewState extends State<MyVenturesListView> {
                   itemBuilder: (context, index) {
                     final venture = ventures[index];
                     return Container(
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 8),
                       decoration: BoxDecoration(
                         border: Border.all(
                             width: 1,
-                            color: Color.fromARGB(255, 214, 214, 214)),
+                            color: const Color.fromARGB(255, 214, 214, 214)),
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -147,7 +148,7 @@ class _MyVenturesListViewState extends State<MyVenturesListView> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text("${venture.country}",
-                                  style: TextStyle(
+                                  style: const TextStyle(
                                       fontWeight: FontWeight.w900,
                                       fontSize: 30)),
                               Row(
@@ -156,28 +157,28 @@ class _MyVenturesListViewState extends State<MyVenturesListView> {
                                     padding: const EdgeInsets.only(right: 8),
                                     child: Text(
                                       '${venture.memberNum} / ${venture.maxPeople}',
-                                      style: TextStyle(
+                                      style: const TextStyle(
                                           fontWeight: FontWeight.bold,
                                           fontSize: 20),
                                     ),
                                   ),
-                                  Icon(Icons.people_alt),
+                                  const Icon(Icons.people_alt),
                                 ],
                               ),
                             ],
                           ),
                           Container(
-                            constraints: BoxConstraints(maxWidth: 300.0),
+                            constraints: const BoxConstraints(maxWidth: 300.0),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(venture.creatorName,
-                                    style: TextStyle(
+                                    style: const TextStyle(
                                         fontWeight: FontWeight.w700,
                                         fontSize: 20)),
                                 Row(
                                   children: [
-                                    Text("Profession",
+                                    const Text("Profession",
                                         style: TextStyle(
                                             fontWeight: FontWeight.bold,
                                             fontSize: 15)),
@@ -190,11 +191,11 @@ class _MyVenturesListViewState extends State<MyVenturesListView> {
                               ],
                             ),
                           ),
-                          SizedBox(
+                          const SizedBox(
                             height: 8,
                           ),
                           Text(venture.description ?? ''),
-                          SizedBox(
+                          const SizedBox(
                             height: 12,
                           ),
                           Row(
@@ -204,7 +205,8 @@ class _MyVenturesListViewState extends State<MyVenturesListView> {
                                 child: Container(
                                   alignment: Alignment.centerLeft,
                                   child: Container(
-                                    constraints: BoxConstraints(maxWidth: 150),
+                                    constraints:
+                                        const BoxConstraints(maxWidth: 150),
                                     child: StreamBuilder<QuerySnapshot>(
                                       stream:
                                           checkRequestStatus(venture.ventureId),
@@ -242,7 +244,7 @@ class _MyVenturesListViewState extends State<MyVenturesListView> {
                                             onPressed: _isButtonDisabled
                                                 ? () {}
                                                 : () {},
-                                            child: Text("Join"),
+                                            child: const Text("Join"),
                                           );
                                         }
                                       },
@@ -251,13 +253,13 @@ class _MyVenturesListViewState extends State<MyVenturesListView> {
                                 ),
                               ),
                               Padding(
-                                padding: EdgeInsets.only(right: 0),
+                                padding: const EdgeInsets.only(right: 0),
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Row(
                                       children: [
-                                        Text(
+                                        const Text(
                                           'Month ',
                                           style: TextStyle(
                                             fontWeight: FontWeight.w700,
@@ -270,7 +272,7 @@ class _MyVenturesListViewState extends State<MyVenturesListView> {
                                     ),
                                     Row(
                                       children: [
-                                        Text(
+                                        const Text(
                                           'Duration ',
                                           style: TextStyle(
                                             fontWeight: FontWeight.w700,
@@ -279,7 +281,7 @@ class _MyVenturesListViewState extends State<MyVenturesListView> {
                                         Text(
                                           '${venture.estimatedWeeks}',
                                         ),
-                                        Text(" Weeks")
+                                        const Text(" Weeks")
                                       ],
                                     ),
                                   ],

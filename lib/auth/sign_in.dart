@@ -12,7 +12,6 @@ class SignIn extends StatefulWidget {
 }
 
 class _SignInWidgetState extends State<SignIn> {
-  final scaffoldKey = GlobalKey<ScaffoldState>();
 
   late FocusNode emailAddressFocusNode;
   late FocusNode passwordFocusNode;
@@ -55,7 +54,6 @@ class _SignInWidgetState extends State<SignIn> {
       Navigator.pushReplacementNamed(context, '/feed');
     } on FirebaseAuthException catch (e) {
       String errorMessage = "Error signing in: $e";
-      print(errorMessage);
       String snackBarMessage;
 
       switch (e.code) {
@@ -80,10 +78,9 @@ class _SignInWidgetState extends State<SignIn> {
         content: Text(snackBarMessage),
       );
     } catch (e) {
-      print("Error signing in: $e");
       MySnackBar.show(
         context,
-        content: Text("An error occurred. Please try again later."),
+        content: const Text("An error occurred. Please try again later."),
       );
     } finally {
       setState(() {
@@ -103,13 +100,11 @@ class _SignInWidgetState extends State<SignIn> {
         }
       },
       child: Scaffold(
-        key: scaffoldKey,
-        backgroundColor: Colors.white,
         body: SafeArea(
           top: true,
           child: SingleChildScrollView(
             child: Padding(
-              padding: EdgeInsets.all(24.0),
+              padding: const EdgeInsets.all(24.0),
               child: Form(
                 key: _formKey,
                 child: Column(
@@ -122,23 +117,23 @@ class _SignInWidgetState extends State<SignIn> {
                       height: 200,
                       fit: BoxFit.contain, // Adjust image fit
                     ),
-                    SizedBox(height: 24.0),
-                    Text(
+                    const SizedBox(height: 24.0),
+                    const Text(
                       'Welcome Back',
                       style: TextStyle(
                         fontSize: 32.0,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    SizedBox(height: 12.0),
-                    Text(
+                    const SizedBox(height: 12.0),
+                    const Text(
                       'Sign in to pick up where you left off',
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 16.0,
                       ),
                     ),
-                    SizedBox(height: 24.0),
+                    const SizedBox(height: 24.0),
                     MyTextField(
                       hintText: "Email",
                       focusNode: emailAddressFocusNode,
@@ -154,7 +149,7 @@ class _SignInWidgetState extends State<SignIn> {
                         return null;
                       },
                     ),
-                    SizedBox(height: 16.0),
+                    const SizedBox(height: 16.0),
                     MyTextField(
                       hintText: "Password",
                       focusNode: passwordFocusNode,
@@ -170,7 +165,7 @@ class _SignInWidgetState extends State<SignIn> {
                         return null;
                       },
                     ),
-                    SizedBox(height: 16.0),
+                    const SizedBox(height: 16.0),
                     MyButton(
                       onPressed: _isLoading
                           ? () {}
@@ -180,11 +175,11 @@ class _SignInWidgetState extends State<SignIn> {
                               }
                             },
                       child: _isLoading
-                          ? CircularProgressIndicator(
+                          ? const CircularProgressIndicator(
                               valueColor:
                                   AlwaysStoppedAnimation<Color>(Colors.white),
                             )
-                          : Text('Sign in',
+                          : const Text('Sign in',
                               style: TextStyle(fontWeight: FontWeight.bold)),
                     ),
                     Row(
@@ -194,11 +189,11 @@ class _SignInWidgetState extends State<SignIn> {
                           onPressed: () {
                             Navigator.pushNamed(context, '/forgotPassword');
                           },
-                          child: Text('Forgot password?'),
+                          child: const Text('Forgot password?'),
                         ),
                       ],
                     ),
-                    SizedBox(height: 4.0),
+                    const SizedBox(height: 4.0),
                     Container(
                       width: double.infinity,
                       child: Stack(
@@ -214,7 +209,7 @@ class _SignInWidgetState extends State<SignIn> {
                             height: 32.0,
                             color: Colors.white, // Or your desired color
                             alignment: Alignment.center,
-                            child: Text(
+                            child: const Text(
                               'OR',
                               style: TextStyle(
                                 fontSize: 16.0,
@@ -224,30 +219,30 @@ class _SignInWidgetState extends State<SignIn> {
                         ],
                       ),
                     ),
-                    SizedBox(height: 16.0),
+                    const SizedBox(height: 16.0),
                     Padding(
                       padding:
-                          EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 16.0),
+                          const EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 16.0),
                       child: ElevatedButton.icon(
                         onPressed: _isLoading
                             ? () {}
                             : () async {
                                 await googleAuth(context, false);
                               },
-                        icon: FaIcon(
+                        icon: const FaIcon(
                           FontAwesomeIcons.google,
                           size: 20.0,
                         ),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.white,
                           foregroundColor: Colors.black,
-                          minimumSize: Size(double.infinity, 44.0),
-                          side: BorderSide(color: Colors.grey, width: 1),
+                          minimumSize: const Size(double.infinity, 44.0),
+                          side: const BorderSide(color: Colors.grey, width: 1),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(16.0),
                           ),
                         ),
-                        label: Text(
+                        label: const Text(
                           'Sign in with Google',
                           style: TextStyle(
                             fontSize: 16.0,
@@ -258,7 +253,7 @@ class _SignInWidgetState extends State<SignIn> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text(
+                        const Text(
                           "Don't have an account?",
                           style: TextStyle(),
                         ),
@@ -268,13 +263,13 @@ class _SignInWidgetState extends State<SignIn> {
                           },
                           style: ButtonStyle(
                             textStyle: WidgetStateProperty.all<TextStyle>(
-                              TextStyle(
+                              const TextStyle(
                                 color: Colors.blue,
                                 fontWeight: FontWeight.w600,
                               ),
                             ),
                           ),
-                          child: Text('Sign Up here'),
+                          child: const Text('Sign Up here'),
                         ),
                       ],
                     ),

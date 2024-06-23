@@ -28,18 +28,19 @@ class Chat extends StatelessWidget {
               // Return IconButton with or without Badge based on requestCount
               if (requestCount > 0) {
                 return badges.Badge(
-                  badgeStyle: badges.BadgeStyle(padding: EdgeInsets.all(8)),
+                  badgeStyle:
+                      const badges.BadgeStyle(padding: EdgeInsets.all(8)),
                   position: badges.BadgePosition.topEnd(top: 0, end: 4),
                   badgeContent: Text(
                     requestCount.toString(),
-                    style: TextStyle(color: Colors.white),
+                    style: const TextStyle(color: Colors.white),
                   ),
                   child: IconButton(
                     iconSize: 40,
                     onPressed: () {
                       Navigator.pushNamed(context, '/notifications');
                     },
-                    icon: Icon(Icons.notifications),
+                    icon: const Icon(Icons.notifications),
                   ),
                 );
               } else {
@@ -49,12 +50,12 @@ class Chat extends StatelessWidget {
                     Navigator.pushNamed(context, '/notifications');
                   },
                   iconSize: 40,
-                  icon: Icon(Icons.notifications),
+                  icon: const Icon(Icons.notifications),
                 );
               }
             },
           ),
-          SizedBox(width: 16),
+          const SizedBox(width: 16),
         ],
       ),
       body: VentureChatRoom(),
@@ -68,7 +69,7 @@ class VentureChatRoom extends StatelessWidget {
     final chatProvider = Provider.of<ChatProvider>(context);
 
     if (chatProvider.isLoading) {
-      return Center(child: CircularProgressIndicator());
+      return const Center(child: CircularProgressIndicator());
     }
     print(chatProvider.chatDocuments);
 
@@ -104,7 +105,7 @@ class VentureChatRoom extends StatelessWidget {
           builder: (BuildContext context,
               AsyncSnapshot<DocumentSnapshot> userSnapshot) {
             if (userSnapshot.connectionState == ConnectionState.waiting) {
-              return Center(child: CircularProgressIndicator());
+              return const Center(child: CircularProgressIndicator());
             } else if (userSnapshot.hasError) {
               return Center(child: Text('Error: ${userSnapshot.error}'));
             } else if (userSnapshot.hasData && userSnapshot.data!.exists) {

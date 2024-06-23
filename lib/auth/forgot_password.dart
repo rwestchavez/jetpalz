@@ -14,7 +14,6 @@ class ForgotPassword extends StatefulWidget {
 }
 
 class _ForgotPasswordWidgetState extends State<ForgotPassword> {
-  final scaffoldKey = GlobalKey<ScaffoldState>();
   late TextEditingController _emailAddressTextController;
   late FocusNode _emailAddressFocusNode;
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
@@ -36,12 +35,12 @@ class _ForgotPasswordWidgetState extends State<ForgotPassword> {
   Future<void> _resetPassword(String email) async {
     try {
       await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
-      MySnackBar.show(context, content: Text("Password reset email sent!"));
+      MySnackBar.show(context, content: const Text("Password reset email sent!"));
     } catch (error) {
       print('Password reset failed: $error');
       MySnackBar.show(context,
           content:
-              Text("Failed to send password reset email. Please try again."));
+              const Text("Failed to send password reset email. Please try again."));
     }
   }
 
@@ -50,81 +49,83 @@ class _ForgotPasswordWidgetState extends State<ForgotPassword> {
     return GestureDetector(
       onTap: () => FocusScope.of(context).unfocus(),
       child: Scaffold(
-        key: scaffoldKey,
         appBar: MyAppBar(
           title: "",
         ),
-        body: Form(
-          key: _formKey,
-          child: Align(
-            alignment: Alignment.topCenter,
-            child: Container(
-              width: double.infinity,
-              constraints: BoxConstraints(
-                maxWidth: 570.0,
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Padding(
-                    padding: EdgeInsets.fromLTRB(16.0, 0.0, 0.0, 0.0),
-                    child: Text(
-                      'Forgot Password',
-                      style: TextStyle(
-                        fontSize: 24.0,
-                        fontWeight: FontWeight.w500,
+        body: SingleChildScrollView(
+          child: Form(
+            key: _formKey,
+            child: Align(
+              alignment: Alignment.topCenter,
+              child: Container(
+                width: double.infinity,
+                constraints: const BoxConstraints(
+                  maxWidth: 570.0,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Padding(
+                      padding: EdgeInsets.fromLTRB(16.0, 0.0, 0.0, 0.0),
+                      child: Text(
+                        'Forgot Password',
+                        style: TextStyle(
+                          fontSize: 24.0,
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
                     ),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.fromLTRB(16.0, 8.0, 16.0, 16.0),
-                    child: Text(
-                      'We will send you an email with a link to reset your password, please enter the email associated with your account below.',
-                      style: TextStyle(
-                        fontSize: 16.0,
+                    const Padding(
+                      padding: EdgeInsets.fromLTRB(16.0, 8.0, 16.0, 16.0),
+                      child: Text(
+                        'We will send you an email with a link to reset your password, please enter the email associated with your account below.',
+                        style: TextStyle(
+                          fontSize: 16.0,
+                        ),
                       ),
                     ),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.fromLTRB(16.0, 12.0, 16.0, 0.0),
-                    child: Container(
-                      width: double.infinity,
-                      child: MyTextField(
-                        hintText: "Enter your email",
-                        controller: _emailAddressTextController,
-                        focusNode: _emailAddressFocusNode,
-                        autofillHints: [AutofillHints.email],
-                        obscureText: false,
-                        keyboardType: TextInputType.emailAddress,
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please enter your email';
-                          }
-                          if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
-                            return 'Please enter a valid email';
-                          }
-                          return null;
-                        },
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(16.0, 12.0, 16.0, 0.0),
+                      child: Container(
+                        width: double.infinity,
+                        child: MyTextField(
+                          hintText: "Enter your email",
+                          controller: _emailAddressTextController,
+                          focusNode: _emailAddressFocusNode,
+                          autofillHints: [AutofillHints.email],
+                          obscureText: false,
+                          keyboardType: TextInputType.emailAddress,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Please enter your email';
+                            }
+                            if (!RegExp(r'^[^@]+@[^@]+\.[^@]+')
+                                .hasMatch(value)) {
+                              return 'Please enter a valid email';
+                            }
+                            return null;
+                          },
+                        ),
                       ),
                     ),
-                  ),
-                  Align(
-                    alignment: Alignment.center,
-                    child: Padding(
-                      padding: EdgeInsets.fromLTRB(16.0, 24.0, 16.0, 0.0),
-                      child: MyButton(
-                        onPressed: () async {
-                          if (_formKey.currentState!.validate())
-                            await _resetPassword(
-                                _emailAddressTextController.text);
-                          ;
-                          // Call your reset password function here
-                        },
-                        child: Text('Send Link'),
+                    Align(
+                      alignment: Alignment.center,
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(16.0, 24.0, 16.0, 0.0),
+                        child: MyButton(
+                          onPressed: () async {
+                            if (_formKey.currentState!.validate())
+                              await _resetPassword(
+                                  _emailAddressTextController.text);
+                            ;
+                            // Call your reset password function here
+                          },
+                          child: const Text('Send Link'),
+                        ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),

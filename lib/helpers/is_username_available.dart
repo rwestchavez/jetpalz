@@ -10,7 +10,7 @@ Future<bool> isUsernameAvailable(String username) async {
         .collection('users')
         .doc(currentUser.uid)
         .get();
-    var userData = await userDoc.data() as Map<String, dynamic>;
+    var userData = userDoc.data() as Map<String, dynamic>;
     String oldName = userData['username'];
     if (oldName.toLowerCase() == lowercaseNewUsername) {
       return true;
@@ -24,6 +24,5 @@ Future<bool> isUsernameAvailable(String username) async {
       .map((doc) =>
           (doc.data() as Map<String, dynamic>)['username'].toLowerCase())
       .toList();
-  print(usernames);
   return !usernames.contains(lowercaseNewUsername);
 }

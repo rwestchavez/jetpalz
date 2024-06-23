@@ -60,12 +60,12 @@ class _EditVentureWidgetState extends State<EditVenture> {
                 child: Row(
                   children: [
                     IconButton(
-                      icon: Icon(
+                      icon: const Icon(
                         Icons.close,
                       ),
                       onPressed: () => Navigator.pop(context),
                     ),
-                    Text(
+                    const Text(
                       'Edit Venture',
                       style: TextStyle(
                         fontSize: 20.0,
@@ -91,11 +91,11 @@ class _EditVentureWidgetState extends State<EditVenture> {
                               });
 
                               MySnackBar.show(context,
-                                  content: Text("Venture Updated"));
+                                  content: const Text("Venture Updated"));
                               Navigator.pop(context);
                             }
                           },
-                          child: Text(
+                          child: const Text(
                             'Save',
                             style: TextStyle(
                               fontSize: 18.0,
@@ -112,7 +112,7 @@ class _EditVentureWidgetState extends State<EditVenture> {
               Flexible(
                 child: SingleChildScrollView(
                   child: Padding(
-                    padding: EdgeInsets.all(16.0),
+                    padding: const EdgeInsets.all(16.0),
                     child: Column(
                       mainAxisSize: MainAxisSize.max,
                       children: [
@@ -135,10 +135,10 @@ class _EditVentureWidgetState extends State<EditVenture> {
                               borderRadius: BorderRadius.circular(8.0),
                             ),
                             hintText: "Description",
-                            hintStyle: TextStyle(
+                            hintStyle: const TextStyle(
                               color: Colors.grey,
                             ), // Set the color of the hint text
-                            contentPadding: EdgeInsets.symmetric(
+                            contentPadding: const EdgeInsets.symmetric(
                               vertical: 12.0,
                               horizontal: 16.0,
                             ),
@@ -150,7 +150,7 @@ class _EditVentureWidgetState extends State<EditVenture> {
                             ),
                           ),
                         ),
-                        SizedBox(height: 12),
+                        const SizedBox(height: 12),
                         CustomDropdown<String>(
                           initialItem: country,
                           decoration: CustomDropdownDecoration(
@@ -169,7 +169,7 @@ class _EditVentureWidgetState extends State<EditVenture> {
                               ? "Required"
                               : null,
                         ),
-                        SizedBox(height: 12),
+                        const SizedBox(height: 12),
                         CustomDropdown<String>(
                           initialItem: industry,
                           decoration: CustomDropdownDecoration(
@@ -188,7 +188,7 @@ class _EditVentureWidgetState extends State<EditVenture> {
                               ? "Required"
                               : null,
                         ),
-                        SizedBox(height: 12),
+                        const SizedBox(height: 12),
                         CustomDropdown<String>(
                           initialItem: people?.toString(),
                           decoration: CustomDropdownDecoration(
@@ -207,7 +207,7 @@ class _EditVentureWidgetState extends State<EditVenture> {
                               ? "Required"
                               : null,
                         ),
-                        SizedBox(height: 12),
+                        const SizedBox(height: 12),
                         CustomDropdown<String>(
                           initialItem: month,
                           decoration: CustomDropdownDecoration(
@@ -226,7 +226,7 @@ class _EditVentureWidgetState extends State<EditVenture> {
                               ? "Required"
                               : null,
                         ),
-                        SizedBox(height: 12),
+                        const SizedBox(height: 12),
                         CustomDropdown<String>(
                           initialItem: weeks?.toString(),
                           decoration: CustomDropdownDecoration(

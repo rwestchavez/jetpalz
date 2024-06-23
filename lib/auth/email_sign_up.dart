@@ -105,7 +105,7 @@ class _EmailSignUpWidgetState extends State<EmailSignUp> {
       // Handle other errors
       print("Error signing up: $e");
       MySnackBar.show(context,
-          content: Text("An error occurred. Please try again later."));
+          content: const Text("An error occurred. Please try again later."));
     } finally {
       setState(() {
         _isLoading = false;
@@ -123,20 +123,20 @@ class _EmailSignUpWidgetState extends State<EmailSignUp> {
           top: true,
           child: SingleChildScrollView(
             child: Padding(
-              padding: EdgeInsets.all(24.0),
+              padding: const EdgeInsets.all(24.0),
               child: Form(
                 key: _formKey,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
+                    const Text(
                       'Enter your password',
                       style: TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    SizedBox(height: 24),
+                    const SizedBox(height: 24),
                     MyTextField(
                       hintText: "Password",
                       controller: _passwordController,
@@ -153,7 +153,7 @@ class _EmailSignUpWidgetState extends State<EmailSignUp> {
                         return null;
                       },
                     ),
-                    SizedBox(height: 16),
+                    const SizedBox(height: 16),
                     MyTextField(
                       hintText: "Confirm Password",
                       controller: _confirmPasswordController,
@@ -170,14 +170,14 @@ class _EmailSignUpWidgetState extends State<EmailSignUp> {
                         return null;
                       },
                     ),
-                    SizedBox(height: 24),
+                    const SizedBox(height: 24),
                     MyButton(
                       child: _isLoading
-                          ? CircularProgressIndicator(
+                          ? const CircularProgressIndicator(
                               valueColor:
                                   AlwaysStoppedAnimation<Color>(Colors.white),
                             )
-                          : Text("Create Account",
+                          : const Text("Create Account",
                               style: TextStyle(fontWeight: FontWeight.bold)),
                       onPressed: _isLoading
                           ? () {}
@@ -187,7 +187,7 @@ class _EmailSignUpWidgetState extends State<EmailSignUp> {
                               }
                             },
                     ),
-                    SizedBox(height: 16),
+                    const SizedBox(height: 16),
                   ],
                 ),
               ),

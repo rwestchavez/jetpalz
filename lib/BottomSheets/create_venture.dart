@@ -42,12 +42,12 @@ class _CreateVentureWidgetState extends State<CreateVenture> {
                 child: Row(
                   children: [
                     IconButton(
-                      icon: Icon(
+                      icon: const Icon(
                         Icons.close,
                       ),
                       onPressed: () => Navigator.pop(context),
                     ),
-                    Text(
+                    const Text(
                       'Create Venture',
                       style: TextStyle(
                         fontSize: 20.0,
@@ -131,7 +131,7 @@ class _CreateVentureWidgetState extends State<CreateVenture> {
                                       });
 
                                       MySnackBar.show(context,
-                                          content: Text("Venture Created"));
+                                          content: const Text("Venture Created"));
                                       Navigator.pop(context);
                                     } catch (e) {
                                       MySnackBar.show(context,
@@ -145,8 +145,8 @@ class _CreateVentureWidgetState extends State<CreateVenture> {
                                   }
                                 },
                           child: isLoading
-                              ? CircularProgressIndicator()
-                              : Text(
+                              ? const CircularProgressIndicator()
+                              : const Text(
                                   'Post',
                                   style: TextStyle(
                                     fontSize: 18.0,
@@ -162,7 +162,7 @@ class _CreateVentureWidgetState extends State<CreateVenture> {
               Flexible(
                 child: SingleChildScrollView(
                   child: Padding(
-                    padding: EdgeInsets.all(16.0),
+                    padding: const EdgeInsets.all(16.0),
                     child: Column(
                       mainAxisSize: MainAxisSize.max,
                       children: [
@@ -186,10 +186,10 @@ class _CreateVentureWidgetState extends State<CreateVenture> {
                               borderRadius: BorderRadius.circular(8.0),
                             ),
                             hintText: "Description",
-                            hintStyle: TextStyle(
+                            hintStyle: const TextStyle(
                               color: Colors.grey,
                             ), // Set the color of the hint text
-                            contentPadding: EdgeInsets.symmetric(
+                            contentPadding: const EdgeInsets.symmetric(
                               vertical: 12.0,
                               horizontal: 16.0,
                             ),
@@ -201,7 +201,7 @@ class _CreateVentureWidgetState extends State<CreateVenture> {
                             ),
                           ),
                         ),
-                        SizedBox(height: 12),
+                        const SizedBox(height: 12),
                         CustomDropdown<String>(
                           decoration: CustomDropdownDecoration(
                             closedBorder: Border.all(
@@ -219,7 +219,7 @@ class _CreateVentureWidgetState extends State<CreateVenture> {
                               ? "Required"
                               : null,
                         ),
-                        SizedBox(height: 12),
+                        const SizedBox(height: 12),
                         CustomDropdown<String>(
                           decoration: CustomDropdownDecoration(
                             closedBorder: Border.all(
@@ -237,7 +237,7 @@ class _CreateVentureWidgetState extends State<CreateVenture> {
                               ? "Required"
                               : null,
                         ),
-                        SizedBox(height: 12),
+                        const SizedBox(height: 12),
                         CustomDropdown<String>(
                           decoration: CustomDropdownDecoration(
                             closedBorder: Border.all(
@@ -255,7 +255,7 @@ class _CreateVentureWidgetState extends State<CreateVenture> {
                               ? "Required"
                               : null,
                         ),
-                        SizedBox(height: 12),
+                        const SizedBox(height: 12),
                         CustomDropdown<String>(
                           decoration: CustomDropdownDecoration(
                             closedBorder: Border.all(
@@ -273,7 +273,7 @@ class _CreateVentureWidgetState extends State<CreateVenture> {
                               ? "Required"
                               : null,
                         ),
-                        SizedBox(height: 12),
+                        const SizedBox(height: 12),
                         CustomDropdown<String>(
                           decoration: CustomDropdownDecoration(
                             closedBorder: Border.all(

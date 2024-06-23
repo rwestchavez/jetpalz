@@ -41,10 +41,9 @@ Future<void> googleAuth(BuildContext context, bool signUp) async {
       Navigator.pushReplacementNamed(context, '/feed');
     }
   } catch (e) {
-    print('Google sign in failed: $e');
     MySnackBar.show(
       context,
-      content: Text('Google sign in failed. Please try again later.'),
+      content: const Text('Google sign in failed. Please try again later.'),
     );
   }
 }

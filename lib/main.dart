@@ -35,7 +35,7 @@ Future<void> main() async {
       ChangeNotifierProvider(create: (_) => RequestProvider()),
       ChangeNotifierProvider(create: (_) => ChatProvider()),
     ],
-    child: MyApp(),
+    child: const MyApp(),
   ));
 }
 
@@ -44,7 +44,7 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+    SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
       systemNavigationBarColor: Colors.transparent,
     ));
@@ -116,17 +116,17 @@ class MainState extends State<Main> {
               showBadge: hasNotifications,
               position: badges.BadgePosition.topEnd(top: -5, end: -5),
               badgeContent: Container(),
-              child: Icon(Icons.chat_bubble_outline),
+              child: const Icon(Icons.chat_bubble_outline),
             ),
             label: "Chat",
-            selectedIcon: Icon(Icons.chat_bubble),
+            selectedIcon: const Icon(Icons.chat_bubble),
           ),
-          NavigationDestination(
+          const NavigationDestination(
             icon: Icon(Icons.home_outlined),
             label: "Feed",
             selectedIcon: Icon(Icons.home),
           ),
-          NavigationDestination(
+          const NavigationDestination(
             icon: Icon(Icons.person_outline),
             label: "Profile",
             selectedIcon: Icon(Icons.person),

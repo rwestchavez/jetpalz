@@ -39,7 +39,7 @@ class _ChangePasswordWidgetState extends State<ChangePassword> {
             .sendPasswordResetEmail(email: _emailAddressController.text.trim());
         MySnackBar.show(
           context,
-          content: Text('Password reset email sent'),
+          content: const Text('Password reset email sent'),
         );
       } on FirebaseAuthException catch (e) {
         String errorMessage;
@@ -75,42 +75,44 @@ class _ChangePasswordWidgetState extends State<ChangePassword> {
         appBar: MyAppBar(
           title: "Change password",
         ),
-        body: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'We will send you an email with a link to reset your password. Please enter the email associated with your account below:',
-                  style: TextStyle(fontSize: 16),
-                ),
-                SizedBox(height: 8),
-                MyTextField(
-                  hintText: "Enter your email",
-                  keyboardType: TextInputType.emailAddress,
-                  controller: _emailAddressController,
-                  focusNode: _focusNode,
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter your email';
-                    }
-                    if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
-                      return 'Please enter a valid email';
-                    }
-                    return null; // Validation passed
-                  },
-                ),
-                SizedBox(height: 16),
-                MyButton(
-                  onPressed: _sendPasswordResetEmail,
-                  child: Text(
-                    'Reset Password',
-                    style: TextStyle(fontWeight: FontWeight.bold),
+        body: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Form(
+              key: _formKey,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'We will send you an email with a link to reset your password. Please enter the email associated with your account below:',
+                    style: TextStyle(fontSize: 16),
                   ),
-                ),
-              ],
+                  const SizedBox(height: 8),
+                  MyTextField(
+                    hintText: "Enter your email",
+                    keyboardType: TextInputType.emailAddress,
+                    controller: _emailAddressController,
+                    focusNode: _focusNode,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter your email';
+                      }
+                      if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
+                        return 'Please enter a valid email';
+                      }
+                      return null; // Validation passed
+                    },
+                  ),
+                  const SizedBox(height: 16),
+                  MyButton(
+                    onPressed: _sendPasswordResetEmail,
+                    child: const Text(
+                      'Reset Password',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),

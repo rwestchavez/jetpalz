@@ -106,7 +106,6 @@ class _FilterVentureState extends State<FilterVenture> {
                       items: countries,
                       onChanged: (selected) {
                         selectedCountry = selected;
-                        print('changing value to: $selected');
                       },
                     ),
                     const SizedBox(height: 12),
@@ -122,7 +121,6 @@ class _FilterVentureState extends State<FilterVenture> {
                       items: industries,
                       onChanged: (selected) {
                         selectedIndustry = selected;
-                        print('changing value to: $selected');
                       },
                     ),
                     const SizedBox(height: 12),
@@ -138,7 +136,6 @@ class _FilterVentureState extends State<FilterVenture> {
                       items: peopleNum,
                       onChanged: (selected) {
                         selectedPeople = int.parse(selected!);
-                        print('changing people value to: $selected');
                       },
                     ),
                     const SizedBox(height: 12),
@@ -154,7 +151,6 @@ class _FilterVentureState extends State<FilterVenture> {
                       items: months,
                       onChanged: (selected) {
                         selectedMonth = selected;
-                        print('changing month value to: $selected');
                       },
                     ),
                     const SizedBox(height: 12),

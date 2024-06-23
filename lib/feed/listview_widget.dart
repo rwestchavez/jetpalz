@@ -7,6 +7,7 @@ import 'package:jet_palz/components/my_snack_bar.dart';
 import 'package:jet_palz/helpers/delete_venture.dart';
 import 'package:jet_palz/helpers/edit_venture.dart';
 import '../app_state.dart';
+import '../profile/profile_view.dart';
 import 'venture_provider.dart';
 
 class ListViewWidget extends StatefulWidget {
@@ -61,7 +62,7 @@ class _ListViewWidgetState extends State<ListViewWidget> {
       final userRef = firestore.collection('users').doc(userId);
       final userSnap = await userRef.get();
       final userData = userSnap.data() as Map<String, dynamic>;
-      final venture = firestore.collection('ventures').doc(ventureId);
+      final ventureRef = firestore.collection('ventures').doc(ventureId);
 
       final requestRef = firestore.collection("requests").doc();
 
@@ -70,10 +71,10 @@ class _ListViewWidgetState extends State<ListViewWidget> {
           .where("ventureId", isEqualTo: ventureId)
           .get();
 
-      final snap = await venture.get();
+      final snap = await ventureRef.get();
       if (snap['creator'] == userRef) {
         MySnackBar.show(context,
-            content: Text("You can't join your own venture!"));
+            content: const Text("You can't join your own venture!"));
         return;
       }
       for (QueryDocumentSnapshot doc in requestQuery.docs) {
@@ -82,7 +83,11 @@ class _ListViewWidgetState extends State<ListViewWidget> {
           return;
         }
       }
-
+      final ventureSnap = await ventureRef.get();
+      if (ventureSnap['member_num'] >= ventureSnap['max_people']) {
+        MySnackBar.show(context, content: const Text("This venture is full"));
+        return;
+      }
       final data = snap.data() as Map<String, dynamic>;
       final DocumentReference creator = data["creator"];
       final creatorId = creator.id;
@@ -100,7 +105,7 @@ class _ListViewWidgetState extends State<ListViewWidget> {
       });
 
       MySnackBar.show(context,
-          content: Text("You sent a request to join the venture"));
+          content: const Text("You sent a request to join the venture"));
     } finally {
       setState(() {
         _isButtonDisabled = false;
@@ -127,7 +132,8 @@ class _ListViewWidgetState extends State<ListViewWidget> {
       }
 
       MySnackBar.show(context,
-          content: Text("You cancelled your request to join the venture"));
+          content:
+              const Text("You cancelled your request to join the venture"));
     } finally {
       setState(() {
         _isButtonDisabled = false;
@@ -172,7 +178,7 @@ class _ListViewWidgetState extends State<ListViewWidget> {
   Widget build(BuildContext context) {
     if (widget.usersProvider.ventures.isEmpty &&
         !widget.usersProvider.hasNext) {
-      return Center(
+      return const Center(
         child: Text(
           'No Ventures found  \n\nTry using a different filter!',
           style: TextStyle(fontSize: 18),
@@ -188,10 +194,10 @@ class _ListViewWidgetState extends State<ListViewWidget> {
           final isCreator = venture.creator!.id == userId;
 
           return Container(
-            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             decoration: BoxDecoration(
               border: Border.all(
-                  width: 1, color: Color.fromARGB(255, 214, 214, 214)),
+                  width: 1, color: const Color.fromARGB(255, 214, 214, 214)),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -200,7 +206,7 @@ class _ListViewWidgetState extends State<ListViewWidget> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text("${venture.country}",
-                        style: TextStyle(
+                        style: const TextStyle(
                             fontWeight: FontWeight.w900, fontSize: 30)),
                     Row(
                       children: [
@@ -208,11 +214,11 @@ class _ListViewWidgetState extends State<ListViewWidget> {
                           padding: const EdgeInsets.only(right: 8),
                           child: Text(
                             '${venture.memberNum} / ${venture.maxPeople}',
-                            style: TextStyle(
+                            style: const TextStyle(
                                 fontWeight: FontWeight.bold, fontSize: 20),
                           ),
                         ),
-                        Icon(Icons.people_alt),
+                        const Icon(Icons.people_alt),
                       ],
                     ),
                   ],
@@ -224,10 +230,19 @@ class _ListViewWidgetState extends State<ListViewWidget> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text(
-                            venture.creatorName,
-                            style: TextStyle(
-                                fontWeight: FontWeight.w700, fontSize: 20),
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => ProfileView(
+                                          userId: venture.creator!.id)));
+                            },
+                            child: Text(
+                              venture.creatorName,
+                              style: const TextStyle(
+                                  fontWeight: FontWeight.w700, fontSize: 20),
+                            ),
                           ),
                           if (isCreator)
                             PopupMenuButton<String>(
@@ -257,11 +272,11 @@ class _ListViewWidgetState extends State<ListViewWidget> {
                                 }
                               },
                               itemBuilder: (context) => [
-                                PopupMenuItem(
+                                const PopupMenuItem(
                                   value: 'edit',
                                   child: Text('Edit'),
                                 ),
-                                PopupMenuItem(
+                                const PopupMenuItem(
                                   value: 'delete',
                                   child: Text('Delete'),
                                 ),
@@ -271,7 +286,7 @@ class _ListViewWidgetState extends State<ListViewWidget> {
                       ),
                       Row(
                         children: [
-                          Text("Profession",
+                          const Text("Profession",
                               style: TextStyle(
                                   fontWeight: FontWeight.bold, fontSize: 15)),
                           Padding(
@@ -283,11 +298,11 @@ class _ListViewWidgetState extends State<ListViewWidget> {
                     ],
                   ),
                 ),
-                SizedBox(
+                const SizedBox(
                   height: 8,
                 ),
                 Text(venture.description!),
-                SizedBox(
+                const SizedBox(
                   height: 12,
                 ),
                 Row(
@@ -297,7 +312,7 @@ class _ListViewWidgetState extends State<ListViewWidget> {
                       child: Container(
                         alignment: Alignment.centerLeft,
                         child: Container(
-                          constraints: BoxConstraints(maxWidth: 150),
+                          constraints: const BoxConstraints(maxWidth: 150),
                           child: StreamBuilder<QuerySnapshot>(
                             stream: checkRequestStatus(venture.ventureId),
                             builder: (context, snapshot) {
@@ -333,7 +348,7 @@ class _ListViewWidgetState extends State<ListViewWidget> {
                                       : () {
                                           sendJoinRequest(venture.ventureId);
                                         },
-                                  child: Text("Join"),
+                                  child: const Text("Join"),
                                 );
                               }
                             },
@@ -342,13 +357,13 @@ class _ListViewWidgetState extends State<ListViewWidget> {
                       ),
                     ),
                     Padding(
-                      padding: EdgeInsets.only(right: 0),
+                      padding: const EdgeInsets.only(right: 0),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Row(
                             children: [
-                              Text(
+                              const Text(
                                 'Month ',
                                 style: TextStyle(
                                   fontWeight: FontWeight.w700,
@@ -361,7 +376,7 @@ class _ListViewWidgetState extends State<ListViewWidget> {
                           ),
                           Row(
                             children: [
-                              Text(
+                              const Text(
                                 'Duration ',
                                 style: TextStyle(
                                   fontWeight: FontWeight.w700,
@@ -370,7 +385,7 @@ class _ListViewWidgetState extends State<ListViewWidget> {
                               Text(
                                 '${venture.estimatedWeeks}',
                               ),
-                              Text(" Weeks")
+                              const Text(" Weeks")
                             ],
                           ),
                         ],
@@ -389,7 +404,7 @@ class _ListViewWidgetState extends State<ListViewWidget> {
               child: Container(
                 height: 25,
                 width: 25,
-                child: CircularProgressIndicator(),
+                child: const CircularProgressIndicator(),
               ),
             ),
           ),

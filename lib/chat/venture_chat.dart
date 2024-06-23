@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:jet_palz/components/my_snack_bar.dart';
 import 'package:jet_palz/helpers/delete_venture.dart';
 import 'package:jet_palz/helpers/edit_venture.dart';
+import 'package:jet_palz/profile/profile_view.dart';
 
 class VentureChat extends StatefulWidget {
   final String chatName;
@@ -143,6 +144,7 @@ class _VentureChatState extends State<VentureChat> {
       'pfpUrl': pfpUrl,
       'senderName': username,
       'seenBy': [userId],
+      'senderId': userId,
     });
 
     await firestore.collection('venture_chats').doc(widget.chatId).update({
@@ -170,6 +172,35 @@ class _VentureChatState extends State<VentureChat> {
     final DocumentReference creatorRef = ventureData['creator'];
     final DocumentSnapshot creatorSnap = await creatorRef.get();
     final creatorData = creatorSnap.data() as Map<String, dynamic>;
+    final DocumentReference chatRef = ventureData['chat'];
+    final chatSnap = await chatRef.get();
+
+    // Fetch member data
+    List<Widget> memberAvatars = [];
+    for (var memberRef in chatSnap['members']) {
+      DocumentSnapshot memberSnap = await memberRef.get();
+      var memberData = memberSnap.data() as Map<String, dynamic>;
+      memberAvatars.add(
+        GestureDetector(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => ProfileView(userId: memberRef.id),
+              ),
+            );
+          },
+          child: Padding(
+            padding: const EdgeInsets.all(4.0),
+            child: CircleAvatar(
+              backgroundColor: Colors.transparent,
+              radius: 20,
+              backgroundImage: NetworkImage(memberData['photo_url']),
+            ),
+          ),
+        ),
+      );
+    }
 
     showDialog(
       context: context,
@@ -177,25 +208,31 @@ class _VentureChatState extends State<VentureChat> {
         return AlertDialog(
           title: Text(
             widget.chatName,
-            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
           ),
           content: SingleChildScrollView(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
+                // Row of member profile pictures
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(children: memberAvatars),
+                ),
+                const SizedBox(height: 16),
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 8.0),
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
+                      const Text(
                         'Country: ',
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
                       Expanded(
                         child: Text(
                           ventureData['country'],
-                          style: TextStyle(color: Colors.black87),
+                          style: const TextStyle(color: Colors.black87),
                         ),
                       ),
                     ],
@@ -206,14 +243,14 @@ class _VentureChatState extends State<VentureChat> {
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
+                      const Text(
                         'Leader: ',
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
                       Expanded(
                         child: Text(
                           creatorData['username'],
-                          style: TextStyle(color: Colors.black87),
+                          style: const TextStyle(color: Colors.black87),
                         ),
                       ),
                     ],
@@ -224,14 +261,14 @@ class _VentureChatState extends State<VentureChat> {
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
+                      const Text(
                         'Profession: ',
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
                       Expanded(
                         child: Text(
                           ventureData['industry'],
-                          style: TextStyle(color: Colors.black87),
+                          style: const TextStyle(color: Colors.black87),
                         ),
                       ),
                     ],
@@ -242,14 +279,14 @@ class _VentureChatState extends State<VentureChat> {
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
+                      const Text(
                         'Starting Month: ',
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
                       Expanded(
                         child: Text(
                           ventureData['starting_month'].toString(),
-                          style: TextStyle(color: Colors.black87),
+                          style: const TextStyle(color: Colors.black87),
                         ),
                       ),
                     ],
@@ -260,14 +297,14 @@ class _VentureChatState extends State<VentureChat> {
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
+                      const Text(
                         'Estimated Weeks: ',
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
                       Expanded(
                         child: Text(
                           ventureData['estimated_weeks'].toString(),
-                          style: TextStyle(color: Colors.black87),
+                          style: const TextStyle(color: Colors.black87),
                         ),
                       ),
                     ],
@@ -278,14 +315,14 @@ class _VentureChatState extends State<VentureChat> {
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
+                      const Text(
                         'Description: ',
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
                       Expanded(
                         child: Text(
                           ventureData['description'],
-                          style: TextStyle(color: Colors.black87),
+                          style: const TextStyle(color: Colors.black87),
                         ),
                       ),
                     ],
@@ -313,8 +350,8 @@ class _VentureChatState extends State<VentureChat> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Text('Leave Chat'),
-          content: Text('Are you sure you want to leave this chat?'),
+          title: const Text('Leave Chat'),
+          content: const Text('Are you sure you want to leave this chat?'),
           actions: <Widget>[
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -396,7 +433,7 @@ class _VentureChatState extends State<VentureChat> {
       requestRef.delete();
 
       Navigator.of(context).pop();
-      MySnackBar.show(context, content: Text("You have left the venture"));
+      MySnackBar.show(context, content: const Text("You have left the venture"));
     } catch (e) {
       print('Error leaving chat: $e');
     }
@@ -432,7 +469,7 @@ class _VentureChatState extends State<VentureChat> {
                   final ventureData =
                       snapshot.data!.data() as Map<String, dynamic>;
                   return PopupMenuButton<String>(
-                    offset: Offset(0, 50),
+                    offset: const Offset(0, 50),
                     onSelected: (value) {
                       if (value == 'leave') {
                         _showLeaveConfirmation();
@@ -574,8 +611,8 @@ class MessagesList extends StatelessWidget {
     return Column(
       children: [
         if (isLoading)
-          Padding(
-            padding: const EdgeInsets.all(8.0),
+          const Padding(
+            padding: EdgeInsets.all(8.0),
             child: CircularProgressIndicator(),
           ),
         Expanded(
@@ -598,6 +635,7 @@ class MessagesList extends StatelessWidget {
                 isSentByMe: isSentByMe,
                 pfpUrl: message['pfpUrl'],
                 username: message['senderName'],
+                senderId: message['senderId'],
               );
             },
           ),
@@ -613,14 +651,15 @@ class MessageBubble extends StatelessWidget {
   final bool isSentByMe;
   final String pfpUrl;
   final String username;
+  final String senderId;
 
-  const MessageBubble({
-    required this.content,
-    required this.timestamp,
-    required this.isSentByMe,
-    required this.pfpUrl,
-    required this.username,
-  });
+  const MessageBubble(
+      {required this.content,
+      required this.timestamp,
+      required this.isSentByMe,
+      required this.pfpUrl,
+      required this.username,
+      required this.senderId});
 
   @override
   Widget build(BuildContext context) {
@@ -629,7 +668,7 @@ class MessageBubble extends StatelessWidget {
     var backgroundColor = isSentByMe ? Colors.blue[200] : Colors.grey[300];
     var bubbleAlignment =
         isSentByMe ? MainAxisAlignment.end : MainAxisAlignment.start;
-    var radius = BorderRadius.all(Radius.circular(12));
+    var radius = const BorderRadius.all(Radius.circular(12));
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
@@ -641,16 +680,25 @@ class MessageBubble extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               if (!isSentByMe) ...[
-                CircleAvatar(
-                  backgroundColor: Colors.transparent,
-                  radius: 20,
-                  backgroundImage: NetworkImage(pfpUrl),
+                GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) =>
+                                ProfileView(userId: senderId)));
+                  },
+                  child: CircleAvatar(
+                    backgroundColor: Colors.transparent,
+                    radius: 20,
+                    backgroundImage: NetworkImage(pfpUrl),
+                  ),
                 ),
-                SizedBox(width: 8),
+                const SizedBox(width: 8),
               ],
               Flexible(
                 child: Container(
-                  padding: EdgeInsets.all(8),
+                  padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
                     color: backgroundColor,
                     borderRadius: radius,
@@ -660,26 +708,26 @@ class MessageBubble extends StatelessWidget {
                     children: [
                       Text(
                         username,
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 18, // Increased font size
                         ),
                       ),
-                      SizedBox(height: 4),
+                      const SizedBox(height: 4),
                       Text(
                         content,
-                        style: TextStyle(fontSize: 18), // Increased font size
+                        style: const TextStyle(fontSize: 18), // Increased font size
                       ),
-                      SizedBox(height: 4),
+                      const SizedBox(height: 4),
                       Text(
                         _formatTimestamp(timestamp),
-                        style: TextStyle(fontSize: 12, color: Colors.black54),
+                        style: const TextStyle(fontSize: 12, color: Colors.black54),
                       ),
                     ],
                   ),
                 ),
               ),
-              SizedBox(width: 8),
+              const SizedBox(width: 8),
               if (isSentByMe) ...[
                 CircleAvatar(
                   backgroundColor: Colors.transparent,
@@ -727,7 +775,7 @@ class SendMessageBar extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
                 child: TextField(
                   controller: messageController,
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     hintText: 'Type a message...',
                     border: InputBorder.none,
                   ),
@@ -738,9 +786,9 @@ class SendMessageBar extends StatelessWidget {
               ),
             ),
           ),
-          SizedBox(width: 8),
+          const SizedBox(width: 8),
           IconButton(
-            icon: Icon(Icons.send),
+            icon: const Icon(Icons.send),
             color: Theme.of(context).primaryColor,
             onPressed: onSend,
           ),

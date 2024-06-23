@@ -276,5 +276,5 @@ final List<String> peopleNum = [
   '12'
 ];
 
-final String DefaultPfp =
+const String DefaultPfp =
     "https://firebasestorage.googleapis.com/v0/b/jetpalz.appspot.com/o/assets%2Fpfp.png?alt=media&token=d7177f98-c4f0-46cc-a629-2860562852b0";

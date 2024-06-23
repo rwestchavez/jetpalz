@@ -52,7 +52,7 @@ class _ProfileWidgetState extends State<Profile> {
       ),
       body: SafeArea(
         child: Padding(
-          padding: EdgeInsets.fromLTRB(8, 0, 8, 0.0),
+          padding: const EdgeInsets.fromLTRB(8, 0, 8, 0.0),
           child: SingleChildScrollView(
             child: Padding(
               padding: const EdgeInsets.only(top: 20),
@@ -70,13 +70,13 @@ class _ProfileWidgetState extends State<Profile> {
                           if (snapshot.connectionState ==
                                   ConnectionState.waiting ||
                               snapshot.data == null) {
-                            return CircleAvatar(
+                            return const CircleAvatar(
                               radius: 50,
                               backgroundColor: Colors.transparent,
                               child: CircularProgressIndicator(),
                             );
                           } else if (snapshot.hasError) {
-                            return CircleAvatar(
+                            return const CircleAvatar(
                               radius: 50,
                               backgroundColor: Colors.transparent,
                               child: Icon(
@@ -100,7 +100,7 @@ class _ProfileWidgetState extends State<Profile> {
                               ),
                             );
                           } else {
-                            return CircleAvatar(
+                            return const CircleAvatar(
                               radius: 50,
                               backgroundColor: Colors.transparent,
                               child: Icon(
@@ -140,7 +140,7 @@ class _ProfileWidgetState extends State<Profile> {
                     ],
                   ),
                   Padding(
-                    padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0.0),
+                    padding: const EdgeInsets.fromLTRB(16.0, 0, 16.0, 0.0),
                     child: Container(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -150,7 +150,7 @@ class _ProfileWidgetState extends State<Profile> {
                               ? Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    SizedBox(height: 32),
+                                    const SizedBox(height: 32),
                                     Text(
                                       _userData['description'],
                                       style: TextStyle(
@@ -163,13 +163,13 @@ class _ProfileWidgetState extends State<Profile> {
                                     ),
                                   ],
                                 )
-                              : Text(""),
+                              : const Text(""),
                         ],
                       ),
                     ),
                   ),
                   Padding(
-                    padding: EdgeInsets.fromLTRB(16.0, 12.0, 16.0, 0.0),
+                    padding: const EdgeInsets.fromLTRB(16.0, 12.0, 16.0, 0.0),
                     child: Container(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -184,7 +184,7 @@ class _ProfileWidgetState extends State<Profile> {
                                 fontSize: 20,
                                 fontWeight: FontWeight.bold),
                           ),
-                          SizedBox(height: 8),
+                          const SizedBox(height: 8),
                           SingleChildScrollView(
                             scrollDirection: Axis.horizontal,
                             child: Row(
@@ -199,10 +199,10 @@ class _ProfileWidgetState extends State<Profile> {
                                           padding:
                                               const EdgeInsets.only(right: 8.0),
                                           child: Container(
-                                            padding: EdgeInsets.symmetric(
+                                            padding: const EdgeInsets.symmetric(
                                                 horizontal: 12, vertical: 6),
                                             decoration: BoxDecoration(
-                                              color: Color.fromARGB(
+                                              color: const Color.fromARGB(
                                                   255, 255, 198, 40),
                                               borderRadius:
                                                   BorderRadius.circular(20),
@@ -218,7 +218,7 @@ class _ProfileWidgetState extends State<Profile> {
                                           ));
                                     }).toList()
                                   : [
-                                      Text(
+                                      const Text(
                                         'Add countries by editing your profile...',
                                         style: TextStyle(fontSize: 16),
                                       ),
@@ -230,7 +230,7 @@ class _ProfileWidgetState extends State<Profile> {
                     ),
                   ),
                   Padding(
-                    padding: EdgeInsets.fromLTRB(16.0, 12.0, 16.0, 0.0),
+                    padding: const EdgeInsets.fromLTRB(16.0, 12.0, 16.0, 0.0),
                     child: Container(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -245,7 +245,7 @@ class _ProfileWidgetState extends State<Profile> {
                                 fontSize: 20,
                                 fontWeight: FontWeight.bold),
                           ),
-                          SizedBox(height: 8),
+                          const SizedBox(height: 8),
                           SingleChildScrollView(
                             scrollDirection: Axis.horizontal,
                             child: Row(
@@ -260,10 +260,10 @@ class _ProfileWidgetState extends State<Profile> {
                                         padding:
                                             const EdgeInsets.only(right: 8.0),
                                         child: Container(
-                                          padding: EdgeInsets.symmetric(
+                                          padding: const EdgeInsets.symmetric(
                                               horizontal: 12, vertical: 6),
                                           decoration: BoxDecoration(
-                                            color: Color.fromARGB(255, 71, 200,
+                                            color: const Color.fromARGB(255, 71, 200,
                                                 255), // Same background color as the Chip
                                             borderRadius: BorderRadius.circular(
                                                 20), // Same border radius as the Chip
@@ -282,7 +282,7 @@ class _ProfileWidgetState extends State<Profile> {
                                       );
                                     }).toList()
                                   : [
-                                      Text(
+                                      const Text(
                                         'Add professions by editing your profile...',
                                         style: TextStyle(fontSize: 16),
                                       ),
@@ -293,7 +293,7 @@ class _ProfileWidgetState extends State<Profile> {
                       ),
                     ),
                   ),
-                  Divider(
+                  const Divider(
                     height: 44.0,
                     thickness: 1.0,
                     indent: 24.0,

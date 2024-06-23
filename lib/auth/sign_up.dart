@@ -44,7 +44,7 @@ class _SignUpState extends State<SignUp> {
           top: true,
           child: SingleChildScrollView(
             child: Padding(
-              padding: EdgeInsets.all(0),
+              padding: const EdgeInsets.all(0),
               child: Column(
                 mainAxisSize: MainAxisSize.max,
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -64,7 +64,7 @@ class _SignUpState extends State<SignUp> {
                     child: Align(
                       alignment: const AlignmentDirectional(0.0, 0.0),
                       child: Padding(
-                        padding: EdgeInsets.all(24.0),
+                        padding: const EdgeInsets.all(24.0),
                         child: Form(
                           key: _formKey,
                           child: Column(
@@ -132,7 +132,7 @@ class _SignUpState extends State<SignUp> {
                                 ),
                               ),
                               Padding(
-                                padding: EdgeInsetsDirectional.fromSTEB(
+                                padding: const EdgeInsetsDirectional.fromSTEB(
                                   0.0,
                                   0.0,
                                   0.0,
@@ -152,13 +152,13 @@ class _SignUpState extends State<SignUp> {
                                       );
                                     }
                                   },
-                                  child: Text('Continue with email',
+                                  child: const Text('Continue with email',
                                       style: TextStyle(
                                           fontWeight: FontWeight.bold)),
                                 ),
                               ),
                               Padding(
-                                padding: EdgeInsetsDirectional.fromSTEB(
+                                padding: const EdgeInsetsDirectional.fromSTEB(
                                   0.0,
                                   0.0,
                                   0.0,
@@ -167,14 +167,15 @@ class _SignUpState extends State<SignUp> {
                                 child: Container(
                                   width: double.infinity,
                                   child: Stack(
-                                    alignment: AlignmentDirectional(0.0, 0.0),
+                                    alignment:
+                                        const AlignmentDirectional(0.0, 0.0),
                                     children: [
                                       Align(
-                                        alignment:
-                                            AlignmentDirectional(0.0, 0.0),
+                                        alignment: const AlignmentDirectional(
+                                            0.0, 0.0),
                                         child: Padding(
-                                          padding:
-                                              EdgeInsetsDirectional.fromSTEB(
+                                          padding: const EdgeInsetsDirectional
+                                              .fromSTEB(
                                             0.0,
                                             12.0,
                                             0.0,
@@ -189,17 +190,17 @@ class _SignUpState extends State<SignUp> {
                                         ),
                                       ),
                                       Align(
-                                        alignment:
-                                            AlignmentDirectional(0.0, 0.0),
+                                        alignment: const AlignmentDirectional(
+                                            0.0, 0.0),
                                         child: Container(
                                           width: 70.0,
                                           height: 32.0,
-                                          decoration: BoxDecoration(
+                                          decoration: const BoxDecoration(
                                             color: Colors.white,
                                           ),
-                                          alignment:
-                                              AlignmentDirectional(0.0, 0.0),
-                                          child: Text(
+                                          alignment: const AlignmentDirectional(
+                                              0.0, 0.0),
+                                          child: const Text(
                                             'OR',
                                             style: TextStyle(
                                               fontSize: 16.0,
@@ -212,7 +213,7 @@ class _SignUpState extends State<SignUp> {
                                 ),
                               ),
                               Padding(
-                                padding: EdgeInsetsDirectional.fromSTEB(
+                                padding: const EdgeInsetsDirectional.fromSTEB(
                                   0.0,
                                   0.0,
                                   0.0,
@@ -222,15 +223,16 @@ class _SignUpState extends State<SignUp> {
                                   onPressed: () async {
                                     await googleAuth(context, true);
                                   },
-                                  icon: FaIcon(
+                                  icon: const FaIcon(
                                     FontAwesomeIcons.google,
                                     size: 20.0,
                                   ),
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: Colors.white,
                                     foregroundColor: Colors.black,
-                                    minimumSize: Size(double.infinity, 44.0),
-                                    side: BorderSide(
+                                    minimumSize:
+                                        const Size(double.infinity, 44.0),
+                                    side: const BorderSide(
                                       color: Colors.grey,
                                       width: 1,
                                     ),
@@ -238,7 +240,7 @@ class _SignUpState extends State<SignUp> {
                                       borderRadius: BorderRadius.circular(16.0),
                                     ),
                                   ),
-                                  label: Text(
+                                  label: const Text(
                                     'Continue with Google',
                                     style: TextStyle(
                                       fontSize: 16.0,
@@ -247,9 +249,9 @@ class _SignUpState extends State<SignUp> {
                                 ),
                               ),
                               Align(
-                                alignment: AlignmentDirectional(0.0, 0.0),
+                                alignment: const AlignmentDirectional(0.0, 0.0),
                                 child: Padding(
-                                  padding: EdgeInsetsDirectional.fromSTEB(
+                                  padding: const EdgeInsetsDirectional.fromSTEB(
                                     0.0,
                                     12.0,
                                     0.0,
@@ -258,7 +260,7 @@ class _SignUpState extends State<SignUp> {
                                   child: Row(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
-                                      Text(
+                                      const Text(
                                         'Already have an account? ',
                                         style: TextStyle(color: Colors.black),
                                       ),
@@ -270,13 +272,13 @@ class _SignUpState extends State<SignUp> {
                                         style: ButtonStyle(
                                           textStyle: WidgetStateProperty.all<
                                               TextStyle>(
-                                            TextStyle(
+                                            const TextStyle(
                                               color: Colors.blue,
                                               fontWeight: FontWeight.w600,
                                             ),
                                           ),
                                         ),
-                                        child: Text('Sign In here'),
+                                        child: const Text('Sign In here'),
                                       ),
                                     ],
                                   ),

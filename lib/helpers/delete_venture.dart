@@ -20,20 +20,20 @@ Future<void> deleteVenture(
     context: context,
     builder: (BuildContext context) {
       return AlertDialog(
-        title: Text('Confirm Deletion'),
-        content: Text('Are you sure you want to delete this venture?'),
+        title: const Text('Confirm Deletion'),
+        content: const Text('Are you sure you want to delete this venture?'),
         actions: [
           TextButton(
             onPressed: () {
               Navigator.of(context).pop(false);
             },
-            child: Text('Cancel'),
+            child: const Text('Cancel'),
           ),
           TextButton(
             onPressed: () {
               Navigator.of(context).pop(true);
             },
-            child: Text('Delete'),
+            child: const Text('Delete'),
           ),
         ],
       );
@@ -59,7 +59,8 @@ Future<void> deleteVenture(
         }
         await batch.commit();
       }
-      MySnackBar.show(context, content: Text('Venture deleted successfully'));
+      MySnackBar.show(context,
+          content: const Text('Venture deleted successfully'));
     } catch (e) {
       MySnackBar.show(context, content: Text('Failed to delete venture: $e'));
     }

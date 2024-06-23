@@ -49,7 +49,7 @@ class _OnboardingWidgetState extends State<Onboarding> {
             body: SafeArea(
           child: Column(
             children: [
-              SizedBox(
+              const SizedBox(
                 height: 24,
               ),
               Image.asset(
@@ -57,7 +57,7 @@ class _OnboardingWidgetState extends State<Onboarding> {
                 width: double.infinity,
                 height: 200,
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               Expanded(
                 child: Container(
                   width: double.infinity,
@@ -65,71 +65,69 @@ class _OnboardingWidgetState extends State<Onboarding> {
                   child: Stack(
                     children: [
                       Padding(
-                        padding: EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 40.0),
+                        padding: const EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 40.0),
                         child: PageView(
                           controller: _pageController,
                           scrollDirection: Axis.horizontal,
                           children: [
-                            OnboardTextWidget(
+                            const OnboardTextWidget(
                               title: 'Find Your Travel Tribe',
                               description:
                                   'Connect with groups of like-minded travellers to your dream destinations',
                             ),
-                            OnboardTextWidget(
+                            const OnboardTextWidget(
                               title: 'Expand your network',
                               description:
                                   'Network with entrepreneurs, freelancers, and remote professionals from diverse industries whilst having fun',
                             ),
-                            OnboardTextWidget(
+                            const OnboardTextWidget(
                               title: 'Build Lasting Memories',
                               description:
                                   'Learn, grow, and share unforgettable experiences, fulfilling both soul and bank account',
                             ),
                             Padding(
-                              padding: EdgeInsets.fromLTRB(16, 20, 16, 0),
-                              child: SingleChildScrollView(
-                                child: Form(
-                                  key: _formKey,
-                                  child: Column(
-                                    children: [
-                                      Text(
-                                        'We Are Almost There!',
-                                        style: TextStyle(
-                                          fontSize: 30.0,
-                                          fontWeight: FontWeight.bold,
-                                        ),
+                              padding: const EdgeInsets.fromLTRB(16, 20, 16, 0),
+                              child: Form(
+                                key: _formKey,
+                                child: Column(
+                                  children: [
+                                    const Text(
+                                      'We Are Almost There!',
+                                      style: TextStyle(
+                                        fontSize: 30.0,
+                                        fontWeight: FontWeight.bold,
                                       ),
-                                      SizedBox(height: 12.0),
-                                      Text(
-                                        'Enter your username',
-                                        textAlign: TextAlign.center,
-                                        style: TextStyle(
-                                          fontSize: 16.0,
-                                        ),
+                                    ),
+                                    const SizedBox(height: 12.0),
+                                    const Text(
+                                      'Enter your username',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                        fontSize: 16.0,
                                       ),
-                                      SizedBox(height: 24.0),
-                                      MyTextField(
-                                        controller: _usernameTextController,
-                                        hintText: "Username",
-                                        validator: (value) {
-                                          if (value == null || value.isEmpty) {
-                                            return 'Username is required';
-                                          }
-                                          if (value.length < 3) {
-                                            return 'Username must be at least 3 characters long';
-                                          }
-                                          if (value.length > 18) {
-                                            return 'Username must be below 18 characters long';
-                                          }
-                                          if (!RegExp(r'^[a-zA-Z0-9_]+$')
-                                              .hasMatch(value)) {
-                                            return 'Username can only contain letters, numbers, and underscores';
-                                          }
-                                          return null; // Return null if validation passes
-                                        },
-                                      ),
-                                    ],
-                                  ),
+                                    ),
+                                    const SizedBox(height: 24.0),
+                                    MyTextField(
+                                      controller: _usernameTextController,
+                                      hintText: "Username",
+                                      validator: (value) {
+                                        if (value == null || value.isEmpty) {
+                                          return 'Username is required';
+                                        }
+                                        if (value.length < 3) {
+                                          return 'Username must be at least 3 characters long';
+                                        }
+                                        if (value.length > 18) {
+                                          return 'Username must be below 18 characters long';
+                                        }
+                                        if (!RegExp(r'^[a-zA-Z0-9_]+$')
+                                            .hasMatch(value)) {
+                                          return 'Username can only contain letters, numbers, and underscores';
+                                        }
+                                        return null; // Return null if validation passes
+                                      },
+                                    ),
+                                  ],
                                 ),
                               ),
                             ),
@@ -137,9 +135,9 @@ class _OnboardingWidgetState extends State<Onboarding> {
                         ),
                       ),
                       Align(
-                        alignment: AlignmentDirectional(0.0, 1.0),
+                        alignment: const AlignmentDirectional(0.0, 1.0),
                         child: Padding(
-                          padding: EdgeInsets.fromLTRB(0, 0.0, 0.0, 8.0),
+                          padding: const EdgeInsets.fromLTRB(0, 0.0, 0.0, 8.0),
                           child: SmoothPageIndicator(
                             controller: _pageController,
                             count: 4,
@@ -147,12 +145,12 @@ class _OnboardingWidgetState extends State<Onboarding> {
                             onDotClicked: (i) async {
                               await _pageController.animateToPage(
                                 i,
-                                duration: Duration(milliseconds: 500),
+                                duration: const Duration(milliseconds: 500),
                                 curve: Curves.ease,
                               );
                               setState(() {});
                             },
-                            effect: ExpandingDotsEffect(
+                            effect: const ExpandingDotsEffect(
                               expansionFactor: 3.0,
                               spacing: 8.0,
                               radius: 16.0,
@@ -170,9 +168,9 @@ class _OnboardingWidgetState extends State<Onboarding> {
                 ),
               ),
               Padding(
-                padding: EdgeInsets.fromLTRB(0.0, 0, 0.0, 8),
+                padding: const EdgeInsets.fromLTRB(0.0, 0, 0.0, 8),
                 child: Container(
-                  constraints: BoxConstraints(maxWidth: 200),
+                  constraints: const BoxConstraints(maxWidth: 200),
                   child: MyButton(
                     onPressed: _isLoading
                         ? () {}
@@ -202,7 +200,7 @@ class _OnboardingWidgetState extends State<Onboarding> {
                                 // Username is not available, inform the user
                                 MySnackBar.show(
                                   context,
-                                  content: Text(
+                                  content: const Text(
                                       'Username is not available. Please choose a different one.'),
                                 );
                               }
@@ -212,17 +210,17 @@ class _OnboardingWidgetState extends State<Onboarding> {
                               });
                             } else {
                               _pageController.nextPage(
-                                duration: Duration(milliseconds: 300),
+                                duration: const Duration(milliseconds: 300),
                                 curve: Curves.ease,
                               );
                             }
                           },
                     child: _isLoading
-                        ? CircularProgressIndicator(
+                        ? const CircularProgressIndicator(
                             valueColor:
                                 AlwaysStoppedAnimation<Color>(Colors.white),
                           )
-                        : Text('Next'),
+                        : const Text('Next'),
                   ),
                 ),
               ),
@@ -246,22 +244,22 @@ class OnboardTextWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return SingleChildScrollView(
         child: Padding(
-      padding: EdgeInsets.fromLTRB(16, 16, 16, 0),
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
       child: Column(
         children: [
           Text(
             title,
             textAlign: TextAlign.center,
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 40.0,
               fontWeight: FontWeight.bold,
             ),
           ),
-          SizedBox(height: 16.0),
+          const SizedBox(height: 16.0),
           Text(
             description,
             textAlign: TextAlign.center,
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 20.0,
             ),
           ),

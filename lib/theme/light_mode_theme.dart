@@ -20,7 +20,7 @@ class lightModeTheme {
     return ThemeData(
       useMaterial3: true,
       brightness: Brightness.light,
-      colorScheme: ColorScheme(
+      colorScheme: const ColorScheme(
         brightness: Brightness.light,
         primary: primary,
         onPrimary: onPrimary,
@@ -31,7 +31,7 @@ class lightModeTheme {
         error: error,
         onError: onError,
       ),
-      textTheme: TextTheme(
+      textTheme: const TextTheme(
         bodyLarge: TextStyle(color: primaryText),
         bodyMedium: TextStyle(color: secondaryText),
       ),

@@ -125,7 +125,7 @@ class _ProfileWidgetState extends State<EditProfile> {
     final imageSource = await showDialog<ImageSource>(
       context: context,
       builder: (BuildContext context) => AlertDialog(
-        title: Text("Select Image Source"),
+        title: const Text("Select Image Source"),
         actions: <Widget>[
           Row(
             children: [
@@ -145,7 +145,7 @@ class _ProfileWidgetState extends State<EditProfile> {
                       print('No image selected.');
                     }
                   },
-                  child: Text("Gallery"),
+                  child: const Text("Gallery"),
                 ),
               ),
               Expanded(
@@ -164,7 +164,7 @@ class _ProfileWidgetState extends State<EditProfile> {
                       print('No image selected.');
                     }
                   },
-                  child: Text("Camera"),
+                  child: const Text("Camera"),
                 ),
               ),
             ],
@@ -227,7 +227,7 @@ class _ProfileWidgetState extends State<EditProfile> {
         if (!isAvailable) {
           MySnackBar.show(
             context,
-            content: Text('Username is not available'),
+            content: const Text('Username is not available'),
           );
           return; // Stop the saving process if the username is not available
         }
@@ -261,7 +261,7 @@ class _ProfileWidgetState extends State<EditProfile> {
         print('Error saving changes: $e');
         MySnackBar.show(
           context,
-          content: Text('Failed to save changes'),
+          content: const Text('Failed to save changes'),
         );
       }
     }
@@ -287,21 +287,21 @@ class _ProfileWidgetState extends State<EditProfile> {
         }
       },
       child: _isLoading
-          ? Scaffold(body: Center(child: CircularProgressIndicator()))
+          ? const Scaffold(body: Center(child: CircularProgressIndicator()))
           : Scaffold(
               appBar: MyAppBar(
                 title: "Edit Profile",
               ),
               body: SafeArea(
                 child: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 16.0),
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
                   child: SingleChildScrollView(
                     child: Form(
                       key: _formKey,
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          SizedBox(height: 16),
+                          const SizedBox(height: 16),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: [
@@ -336,7 +336,7 @@ class _ProfileWidgetState extends State<EditProfile> {
                                                   fit: BoxFit.cover,
                                                 ),
                                               )
-                                            : Icon(
+                                            : const Icon(
                                                 Icons.person,
                                                 size: 50,
                                                 color: Colors.white,
@@ -348,20 +348,20 @@ class _ProfileWidgetState extends State<EditProfile> {
                                     onPressed: () async {
                                       await _pickImage();
                                     },
-                                    child: Text('Change Photo'),
+                                    child: const Text('Change Photo'),
                                   ),
-                                  SizedBox(height: 12),
+                                  const SizedBox(height: 12),
                                   ElevatedButton(
                                     onPressed: () async {
                                       _cancelChanges();
                                     },
-                                    child: Text('Reset Photo'),
+                                    child: const Text('Reset Photo'),
                                   ),
                                 ],
                               ),
                             ],
                           ),
-                          SizedBox(height: 24),
+                          const SizedBox(height: 24),
                           MyTextField(
                             focusNode: _usernameFocusNode,
                             controller: _usernameTextController,
@@ -382,7 +382,7 @@ class _ProfileWidgetState extends State<EditProfile> {
                               return null;
                             },
                           ),
-                          SizedBox(height: 24),
+                          const SizedBox(height: 24),
                           MyTextField(
                             maxLines: null,
                             focusNode: _descriptionFocusNode,
@@ -396,7 +396,7 @@ class _ProfileWidgetState extends State<EditProfile> {
                               return null;
                             },
                           ),
-                          SizedBox(height: 24),
+                          const SizedBox(height: 24),
                           CustomDropdown<String>(
                             controller: industryController,
                             decoration: CustomDropdownDecoration(
@@ -415,7 +415,7 @@ class _ProfileWidgetState extends State<EditProfile> {
                               });
                             },
                           ),
-                          SizedBox(height: 24),
+                          const SizedBox(height: 24),
                           CustomDropdown<String?>.multiSelect(
                             multiSelectController: industriesController,
                             decoration: CustomDropdownDecoration(
@@ -435,7 +435,7 @@ class _ProfileWidgetState extends State<EditProfile> {
                               });
                             },
                           ),
-                          SizedBox(height: 24),
+                          const SizedBox(height: 24),
                           CustomDropdown<String?>.multiSelect(
                             multiSelectController: countriesController,
                             decoration: CustomDropdownDecoration(
@@ -455,7 +455,7 @@ class _ProfileWidgetState extends State<EditProfile> {
                               });
                             },
                           ),
-                          SizedBox(height: 24),
+                          const SizedBox(height: 24),
                           Align(
                             alignment: Alignment.center,
                             child: Container(
@@ -465,12 +465,12 @@ class _ProfileWidgetState extends State<EditProfile> {
                                     ? () {}
                                     : _saveChanges, // Disable button during data saving process
                                 child: _isSavingChanges
-                                    ? CircularProgressIndicator(
+                                    ? const CircularProgressIndicator(
                                         valueColor:
                                             AlwaysStoppedAnimation<Color>(
                                                 Colors.white),
                                       ) // Display loading indicator when saving changes
-                                    : Text(
+                                    : const Text(
                                         "Save changes",
                                         style: TextStyle(
                                             fontWeight: FontWeight.bold),

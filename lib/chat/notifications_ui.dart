@@ -16,11 +16,11 @@ class NotificationsUI extends StatelessWidget {
       body: Consumer<RequestProvider>(
         builder: (context, provider, _) {
           if (provider.isLoading) {
-            return Center(child: CircularProgressIndicator());
+            return const Center(child: CircularProgressIndicator());
           } else if (provider.requests.isEmpty &&
               provider.acceptedRequests.isEmpty &&
               provider.rejectedRequests.isEmpty) {
-            return Center(child: Text('No pending requests or notifications'));
+            return const Center(child: Text('No pending requests or notifications'));
           } else {
             return ListView.builder(
               itemCount: provider.requests.length +
@@ -43,21 +43,21 @@ class NotificationsUI extends StatelessWidget {
                             snapshot.data!.data() as Map<String, dynamic>;
 
                         return Card(
-                          margin: EdgeInsets.symmetric(
+                          margin: const EdgeInsets.symmetric(
                               vertical: 8.0, horizontal: 16.0),
                           child: ListTile(
                             title: Text(
                               '${request.requester} wants to join your venture!',
-                              style: TextStyle(
+                              style: const TextStyle(
                                   fontSize: 18.0, fontWeight: FontWeight.bold),
                             ),
                             subtitle: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                SizedBox(height: 8.0),
+                                const SizedBox(height: 8.0),
                                 Text(
                                   'Requested ${timeago.format(request.timestamp)}',
-                                  style: TextStyle(
+                                  style: const TextStyle(
                                       fontSize: 14.0, color: Colors.grey),
                                 ),
                               ],
@@ -69,14 +69,14 @@ class NotificationsUI extends StatelessWidget {
                                 children: [
                                   IconButton(
                                     icon:
-                                        Icon(Icons.check, color: Colors.green),
+                                        const Icon(Icons.check, color: Colors.green),
                                     onPressed: () {
                                       provider.respondToRequest(
                                           request, 'accepted');
                                     },
                                   ),
                                   IconButton(
-                                    icon: Icon(Icons.close, color: Colors.red),
+                                    icon: const Icon(Icons.close, color: Colors.red),
                                     onPressed: () {
                                       provider.respondToRequest(
                                           request, 'rejected');
@@ -102,7 +102,7 @@ class NotificationsUI extends StatelessWidget {
                         .get(),
                     builder: (context, snapshot) {
                       if (!snapshot.hasData || !snapshot.data!.exists) {
-                        return Card(
+                        return const Card(
                           margin: EdgeInsets.symmetric(
                               vertical: 8.0, horizontal: 16.0),
                           child: ListTile(
@@ -145,21 +145,21 @@ class NotificationsUI extends StatelessWidget {
                                   }
                                 },
                                 child: Card(
-                                  margin: EdgeInsets.symmetric(
+                                  margin: const EdgeInsets.symmetric(
                                       vertical: 8.0, horizontal: 16.0),
                                   child: ListTile(
                                     title: Text(
                                       '${requestData['requester']} joined ${usernameSnapshot.data}\'s venture!',
-                                      style: TextStyle(
+                                      style: const TextStyle(
                                           fontSize: 18.0,
                                           fontWeight: FontWeight.bold),
                                     ),
                                     subtitle: Text(
                                       'Joined ${timeago.format(requestTime)}',
-                                      style: TextStyle(
+                                      style: const TextStyle(
                                           fontSize: 14.0, color: Colors.grey),
                                     ),
-                                    trailing: Icon(Icons.check_circle,
+                                    trailing: const Icon(Icons.check_circle,
                                         color: Colors.green),
                                   ),
                                 ),
@@ -181,7 +181,7 @@ class NotificationsUI extends StatelessWidget {
                         .get(),
                     builder: (context, snapshot) {
                       if (!snapshot.hasData || !snapshot.data!.exists) {
-                        return Card(
+                        return const Card(
                           margin: EdgeInsets.symmetric(
                               vertical: 8.0, horizontal: 16.0),
                           child: ListTile(
@@ -224,22 +224,22 @@ class NotificationsUI extends StatelessWidget {
                                   }
                                 },
                                 child: Card(
-                                  margin: EdgeInsets.symmetric(
+                                  margin: const EdgeInsets.symmetric(
                                       vertical: 8.0, horizontal: 16.0),
                                   child: ListTile(
                                     title: Text(
                                       'You were rejected from ${usernameSnapshot.data}\'s venture.',
-                                      style: TextStyle(
+                                      style: const TextStyle(
                                           fontSize: 18.0,
                                           fontWeight: FontWeight.bold),
                                     ),
                                     subtitle: Text(
                                       'Rejected ${timeago.format(requestTime)}',
-                                      style: TextStyle(
+                                      style: const TextStyle(
                                           fontSize: 14.0, color: Colors.grey),
                                     ),
                                     trailing:
-                                        Icon(Icons.cancel, color: Colors.red),
+                                        const Icon(Icons.cancel, color: Colors.red),
                                   ),
                                 ),
                               );

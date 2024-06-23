@@ -8,7 +8,7 @@ class Settings extends StatelessWidget {
     await FirebaseAuth.instance.signOut();
     Navigator.of(context).pushReplacement(
       MaterialPageRoute(
-        builder: (context) => SignUp(),
+        builder: (context) => const SignUp(),
       ),
     );
   }
@@ -18,17 +18,17 @@ class Settings extends StatelessWidget {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Confirm Logout'),
-          content: Text('Are you sure you want to log out?'),
+          title: const Text('Confirm Logout'),
+          content: const Text('Are you sure you want to log out?'),
           actions: <Widget>[
             TextButton(
-              child: Text('Cancel'),
+              child: const Text('Cancel'),
               onPressed: () {
                 Navigator.of(context).pop(); // Dismiss the dialog
               },
             ),
             TextButton(
-              child: Text('Logout'),
+              child: const Text('Logout'),
               onPressed: () {
                 Navigator.of(context).pop(); // Dismiss the dialog
                 _logout(context); // Call the logout function
@@ -44,10 +44,10 @@ class Settings extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Settings'),
+        title: const Text('Settings'),
       ),
       body: SingleChildScrollView(
-        padding: EdgeInsets.symmetric(vertical: 20.0, horizontal: 16.0),
+        padding: const EdgeInsets.symmetric(vertical: 20.0, horizontal: 16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -59,7 +59,7 @@ class Settings extends StatelessWidget {
                 Navigator.pushNamed(context, '/changeEmail');
               },
             ),
-            SizedBox(height: 8), // Add some vertical space between widgets
+            const SizedBox(height: 8), // Add some vertical space between widgets
             SingleLineWidget(
               icon: Icons.lock,
               text: 'Change Password',
@@ -68,7 +68,7 @@ class Settings extends StatelessWidget {
                 Navigator.pushNamed(context, '/changePassword');
               },
             ),
-            SizedBox(height: 8), // Add some vertical space between widgets
+            const SizedBox(height: 8), // Add some vertical space between widgets
             SingleLineWidget(
               icon: Icons.exit_to_app,
               text: 'Logout',
