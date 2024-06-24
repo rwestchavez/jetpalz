@@ -101,7 +101,7 @@ class _VentureChatState extends State<VentureChat> {
   }
 
   void _loadMessages() {
-    if (_isLoading) return;
+    if (_isLoading || !mounted) return;
     setState(() {
       _isLoading = true;
     });
@@ -114,6 +114,8 @@ class _VentureChatState extends State<VentureChat> {
         .limit(_messageLimit);
 
     query.snapshots().listen((snapshot) {
+      if (!mounted) return;
+
       setState(() {
         _messages = snapshot.docs;
         _isLoading = false;
@@ -403,24 +405,19 @@ class _VentureChatState extends State<VentureChat> {
           title: const Text('Leave Chat'),
           content: const Text('Are you sure you want to leave this chat?'),
           actions: <Widget>[
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                TextButton(
-                  child: Text('Yes',
-                      style: TextStyle(color: Theme.of(context).primaryColor)),
-                  onPressed: () {
-                    Navigator.of(context).pop(true);
-                  },
-                ),
-                TextButton(
-                  child: Text('No',
-                      style: TextStyle(color: Theme.of(context).primaryColor)),
-                  onPressed: () {
-                    Navigator.of(context).pop(false);
-                  },
-                ),
-              ],
+            TextButton(
+              child: Text('Cancel',
+                  style: TextStyle(color: Theme.of(context).primaryColor)),
+              onPressed: () {
+                Navigator.of(context).pop(true);
+              },
+            ),
+            TextButton(
+              child: Text('Leave',
+                  style: TextStyle(color: Theme.of(context).primaryColor)),
+              onPressed: () {
+                Navigator.of(context).pop(false);
+              },
             ),
           ],
         );

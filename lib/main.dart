@@ -32,6 +32,11 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
+  SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+  ]);
+
   // Set up Crashlytics error handlers
   FlutterError.onError = (FlutterErrorDetails errorDetails) {
     FirebaseCrashlytics.instance.recordFlutterFatalError(errorDetails);
