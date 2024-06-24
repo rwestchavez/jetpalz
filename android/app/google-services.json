@@ -12,7 +12,20 @@
           "package_name": "com.jetpalz.app"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "416263953272-cv9pdf72un35efrc7gv0oda5sh27sht6.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.jetpalz.app",
+            "certificate_hash": "4dc64232eae03d9830a371dac07b85892f0d1055"
+          }
+        },
+        {
+          "client_id": "416263953272-teg9ookeea8t19gkrl7kl4cufhgo2c37.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyD_l6cTYMSn-6IY1mS6P97IcTovF_pUYyA"
@@ -20,7 +33,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "416263953272-teg9ookeea8t19gkrl7kl4cufhgo2c37.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "416263953272-eioefn00gviddhkrc4g4ri301aebbsgh.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.jetPalz"
+              }
+            }
+          ]
         }
       }
     }

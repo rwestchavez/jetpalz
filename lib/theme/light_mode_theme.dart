@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 class lightModeTheme {
-  // Light mode colors
   static const Color primary = Color(0xFF105DFB);
   static const Color secondary = Color(0xFF8AC7FF);
   static const Color tertiary = Color(0xFFEE8B60);
@@ -15,7 +14,6 @@ class lightModeTheme {
   static const Color onSecondary = Color(0xFFFFFFFF);
   static const Color onError = Color(0xFFFFFFFF);
 
-  // ThemeData for light mode
   static ThemeData get themeData {
     return ThemeData(
       useMaterial3: true,

@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import 'package:jet_palz/components/my_button.dart';
 import 'package:jet_palz/components/my_textField.dart';
@@ -86,7 +87,7 @@ class _OnboardingWidgetState extends State<Onboarding> {
                                   'Learn, grow, and share unforgettable experiences, fulfilling both soul and bank account',
                             ),
                             Padding(
-                              padding: const EdgeInsets.fromLTRB(16, 20, 16, 0),
+                              padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
                               child: Form(
                                 key: _formKey,
                                 child: Column(
@@ -98,7 +99,7 @@ class _OnboardingWidgetState extends State<Onboarding> {
                                         fontWeight: FontWeight.bold,
                                       ),
                                     ),
-                                    const SizedBox(height: 12.0),
+                                    const SizedBox(height: 6.0),
                                     const Text(
                                       'Enter your username',
                                       textAlign: TextAlign.center,
@@ -182,26 +183,37 @@ class _OnboardingWidgetState extends State<Onboarding> {
                               });
 
                               final username = _usernameTextController.text;
-                              final isAvailable =
-                                  await isUsernameAvailable(username);
+                              try {
+                                final isAvailable =
+                                    await isUsernameAvailable(username);
 
-                              if (isAvailable) {
-                                // Username is available, proceed with registration
-                                await FirebaseFirestore.instance
-                                    .collection('users')
-                                    .doc(userId)
-                                    .update({
-                                  'username': username,
-                                  'photo_url': DefaultPfp,
-                                });
-                                Navigator.pushReplacementNamed(
-                                    context, '/feed');
-                              } else {
-                                // Username is not available, inform the user
+                                if (isAvailable) {
+                                  // Username is available, proceed with registration
+                                  await FirebaseFirestore.instance
+                                      .collection('users')
+                                      .doc(userId)
+                                      .update({
+                                    'username': username,
+                                    'photo_url': DefaultPfp,
+                                  });
+                                  Navigator.pushReplacementNamed(
+                                      context, '/feed');
+                                } else {
+                                  // Username is not available, inform the user
+                                  MySnackBar.show(
+                                    context,
+                                    content: const Text(
+                                        'Username is not available. Please choose a different one.'),
+                                  );
+                                }
+                              } catch (e, stackTrace) {
+                                // Handle Firestore errors
+                                FirebaseCrashlytics.instance
+                                    .recordError(e, stackTrace, reason: "onboarding error");
                                 MySnackBar.show(
                                   context,
                                   content: const Text(
-                                      'Username is not available. Please choose a different one.'),
+                                      'An error occurred. Please try again later.'),
                                 );
                               }
 

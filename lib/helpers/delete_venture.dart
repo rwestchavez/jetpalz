@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:jet_palz/components/my_snack_bar.dart';
 
 Future<void> deleteVenture(
@@ -54,7 +55,7 @@ Future<void> deleteVenture(
       if (Navigator.of(context).canPop()) {
         Navigator.pop(context);
       }
-      await Future.delayed(Duration(milliseconds: 500));
+      await Future.delayed(const Duration(milliseconds: 500));
 
       final requestsQuerySnapshot = await FirebaseFirestore.instance
           .collection("requests")
@@ -76,8 +77,18 @@ Future<void> deleteVenture(
       }
       MySnackBar.show(context,
           content: const Text('Venture deleted successfully'));
-    } catch (e) {
-      // MySnackBar.show(context, content: Text('Failed to delete venture: $e'));
+    } catch (e, stackTrace) {
+      // Handle the error locally
+      FirebaseCrashlytics.instance.recordError(
+        e,
+        stackTrace,
+        reason: 'Failed to delete venture',
+        fatal: true,
+      );
+
+      // Optionally, show a snackbar or UI feedback for the user
+      MySnackBar.show(context,
+          content: const Text('Failed to delete venture. Please try again.'));
     }
   }
 }

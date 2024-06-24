@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import '../components/my_snack_bar.dart';
@@ -38,7 +39,10 @@ Future<void> googleAuth(BuildContext context, bool signUp) async {
     } else {
       Navigator.pushReplacementNamed(context, '/feed');
     }
-  } catch (e) {
+  } catch (e, stackTrace) {
+    FirebaseCrashlytics.instance
+        .recordError(e, stackTrace, reason: "google auth error");
+
     MySnackBar.show(
       context,
       content: const Text('Google sign in failed. Please try again later.'),

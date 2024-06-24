@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import 'package:jet_palz/components/my_snack_bar.dart';
 import 'package:jet_palz/helpers/delete_venture.dart';
@@ -82,12 +83,21 @@ class _VentureChatState extends State<VentureChat> {
   }
 
   void _fetchMemberCount() async {
-    DocumentSnapshot chatDoc =
-        await firestore.collection('venture_chats').doc(widget.chatId).get();
-    List<dynamic> members = chatDoc['members'] ?? [];
-    setState(() {
-      _memberCount = members.length;
-    });
+    try {
+      DocumentSnapshot chatDoc = await FirebaseFirestore.instance
+          .collection('venture_chats')
+          .doc(widget.chatId)
+          .get();
+      List<dynamic> members = chatDoc['members'] ?? [];
+      setState(() {
+        _memberCount = members.length;
+      });
+    } catch (e, stackTrace) {
+      FirebaseCrashlytics.instance
+          .recordError(e, stackTrace, reason: "Failed to fetch member count");
+      MySnackBar.show(context,
+          content: const Text('Failed to fetch member count'));
+    }
   }
 
   void _loadMessages() {
@@ -113,6 +123,11 @@ class _VentureChatState extends State<VentureChat> {
           _lastMessageSnapshot = snapshot.docs.last;
         }
       });
+    }, onError: (e) {
+      FirebaseCrashlytics.instance
+          .recordError(e, StackTrace.current, reason: "load message error");
+      // Handle error as needed (optional)
+      MySnackBar.show(context, content: const Text('Failed to load messages'));
     });
   }
 
@@ -140,42 +155,56 @@ class _VentureChatState extends State<VentureChat> {
           _lastMessageSnapshot = snapshot.docs.last;
         }
       });
+    }).catchError((e, stack) {
+      FirebaseCrashlytics.instance
+          .recordError(e, stack, reason: "lead more messages error");
+      MySnackBar.show(context,
+          content: const Text('Failed to load more messages'));
     });
   }
 
   void sendMessage() async {
-    if (_messageController.text.trim().isEmpty) {
-      return;
+    try {
+      if (_messageController.text.trim().isEmpty) {
+        return;
+      }
+      var userId = FirebaseAuth.instance.currentUser!.uid;
+      var userRef = FirebaseFirestore.instance.collection("users").doc(userId);
+      var userSnap = await userRef.get();
+
+      String pfpUrl = userSnap["photo_url"];
+      String username = userSnap['username'];
+
+      await FirebaseFirestore.instance
+          .collection('venture_chats')
+          .doc(widget.chatId)
+          .collection('messages')
+          .add({
+        'content': _messageController.text.trim(),
+        'sentBy': userId,
+        'timestamp': Timestamp.now(),
+        'pfpUrl': pfpUrl,
+        'senderName': username,
+        'seenBy': [userId],
+        'senderId': userId,
+      });
+
+      await FirebaseFirestore.instance
+          .collection('venture_chats')
+          .doc(widget.chatId)
+          .update({
+        'last_message': _messageController.text.trim(),
+        'last_message_time': Timestamp.now(),
+        'last_message_sent_by': userRef,
+      });
+
+      _messageController.clear();
+      _scrollToBottom();
+    } catch (e, stackTrace) {
+      FirebaseCrashlytics.instance
+          .recordError(e, stackTrace, reason: "send message error");
+      MySnackBar.show(context, content: const Text('Failed to send message'));
     }
-    var userId = FirebaseAuth.instance.currentUser!.uid;
-    var userRef = firestore.collection("users").doc(userId);
-    var userSnap = await userRef.get();
-
-    String pfpUrl = userSnap["photo_url"];
-    String username = userSnap['username'];
-
-    await firestore
-        .collection('venture_chats')
-        .doc(widget.chatId)
-        .collection('messages')
-        .add({
-      'content': _messageController.text.trim(),
-      'sentBy': userId,
-      'timestamp': Timestamp.now(),
-      'pfpUrl': pfpUrl,
-      'senderName': username,
-      'seenBy': [userId],
-      'senderId': userId,
-    });
-
-    await firestore.collection('venture_chats').doc(widget.chatId).update({
-      'last_message': _messageController.text.trim(),
-      'last_message_time': Timestamp.now(),
-      'last_message_sent_by': userRef,
-    });
-
-    _messageController.clear();
-    _scrollToBottom();
   }
 
   void _scrollToBottom() {
@@ -404,80 +433,89 @@ class _VentureChatState extends State<VentureChat> {
   }
 
   void _leaveChat() async {
-    var userId = FirebaseAuth.instance.currentUser!.uid;
-    DocumentSnapshot ventureSnapshot = await widget.ventureRef!.get();
-    Map<String, dynamic> ventureData =
-        ventureSnapshot.data() as Map<String, dynamic>;
-    final DocumentReference creatorRef = ventureData['creator'];
+    try {
+      var userId = FirebaseAuth.instance.currentUser!.uid;
+      DocumentSnapshot ventureSnapshot = await widget.ventureRef!.get();
+      Map<String, dynamic> ventureData =
+          ventureSnapshot.data() as Map<String, dynamic>;
+      final DocumentReference creatorRef = ventureData['creator'];
 
-    final DocumentReference userRef =
-        FirebaseFirestore.instance.collection('users').doc(userId);
+      final DocumentReference userRef =
+          FirebaseFirestore.instance.collection('users').doc(userId);
 
-    final DocumentReference chatRef = FirebaseFirestore.instance
-        .collection('venture_chats')
-        .doc(widget.chatId);
-    DocumentSnapshot chatSnapshot = await chatRef.get();
-    Map<String, dynamic> chatData = chatSnapshot.data() as Map<String, dynamic>;
-    final List members = chatData['members'];
+      final DocumentReference chatRef = FirebaseFirestore.instance
+          .collection('venture_chats')
+          .doc(widget.chatId);
+      DocumentSnapshot chatSnapshot = await chatRef.get();
+      Map<String, dynamic> chatData =
+          chatSnapshot.data() as Map<String, dynamic>;
+      final List members = chatData['members'];
 
-    if (creatorRef.id == userId) {
-      if (members.length > 1) {
-        // Attempt to find a new creator in members list
-        DocumentReference? newCreatorRef;
-        try {
-          newCreatorRef = members.firstWhere((ref) => ref.id != userId);
-        } catch (e) {
-          // Handle case where no matching element is found
-          print('No valid creator found in members list');
-        }
+      if (creatorRef.id == userId) {
+        if (members.length > 1) {
+          // Attempt to find a new creator in members list
+          DocumentReference? newCreatorRef;
+          try {
+            newCreatorRef = members.firstWhere((ref) => ref.id != userId);
+          } catch (e, stack) {
+            // Handle case where no matching element is found
+            FirebaseCrashlytics.instance
+                .recordError(e, stack, reason: "leave chat error");
+          }
 
-        if (newCreatorRef != null) {
-          await widget.ventureRef!.update({
-            'creator': newCreatorRef,
-            'member_num': FieldValue.increment(-1),
-          });
+          if (newCreatorRef != null) {
+            await widget.ventureRef!.update({
+              'creator': newCreatorRef,
+              'member_num': FieldValue.increment(-1),
+            });
 
-          await chatRef.update({
-            'members': FieldValue.arrayRemove([userRef]),
-          });
+            await chatRef.update({
+              'members': FieldValue.arrayRemove([userRef]),
+            });
+          } else {
+            deleteVenture(context, widget.ventureRef!,
+                true); // Custom function to handle venture deletion
+          }
         } else {
-          // Handle scenario where no valid creator reference is found
-          deleteVenture(context, widget.ventureRef!, true);
-          //   await widget.ventureRef!.delete();
-          //   await chatRef.delete();
+          deleteVenture(context, widget.ventureRef!,
+              true); // Custom function to handle venture deletion
         }
       } else {
-        deleteVenture(context, widget.ventureRef!, true);
-        //   await widget.ventureRef!.delete();
-        //   await chatRef.delete();
+        await chatRef.update({
+          'members': FieldValue.arrayRemove([userRef]),
+        });
+        await widget.ventureRef!.update({
+          'member_num': FieldValue.increment(-1),
+        });
       }
-    } else {
-      await chatRef.update({
-        'members': FieldValue.arrayRemove([userRef]),
-      });
-      await widget.ventureRef!.update({
-        'member_num': FieldValue.increment(-1),
-      });
-    }
 
-    var requests = await FirebaseFirestore.instance
-        .collection("requests")
-        .where("requesterId", isEqualTo: userId)
-        .where("ventureId", isEqualTo: widget.ventureRef!.id)
-        .limit(1)
-        .get();
+      var requests = await FirebaseFirestore.instance
+          .collection("requests")
+          .where("requesterId", isEqualTo: userId)
+          .where("ventureId", isEqualTo: widget.ventureRef!.id)
+          .limit(1)
+          .get();
 
-    if (requests.docs.isNotEmpty) {
-      var requestRef = requests.docs.first.reference;
-      requestRef.delete();
-    }
-    if (Navigator.of(context).canPop()) {
-      Navigator.of(context).pop();
-      if (Navigator.canPop(context)) {
+      if (requests.docs.isNotEmpty) {
+        var requestRef = requests.docs.first.reference;
+        requestRef.delete();
+      }
+
+      if (Navigator.of(context).canPop()) {
         Navigator.of(context).pop();
+        if (Navigator.canPop(context)) {
+          Navigator.of(context).pop();
+        }
       }
+
+      MySnackBar.show(context,
+          content: const Text("You have left the venture"));
+    } catch (e, stackTrace) {
+      FirebaseCrashlytics.instance
+          .recordError(e, stackTrace, reason: "delete venture error");
+      MySnackBar.show(context,
+          content: const Text("Failed to leave the venture"));
     }
-    MySnackBar.show(context, content: const Text("You have left the venture"));
   }
 
   @override

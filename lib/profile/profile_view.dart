@@ -1,7 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import '../components/my_appBar.dart';
+import '../components/my_snack_bar.dart';
 
 class ProfileView extends StatefulWidget {
   final String? userId; // Add this to accept another user's ID
@@ -25,14 +27,21 @@ class _ProfileWidgetState extends State<ProfileView> {
 
   Future<void> _fetchUserData(String? userId) async {
     if (userId != null) {
-      final userDataSnapshot = await FirebaseFirestore.instance
-          .collection('users')
-          .doc(userId)
-          .get();
-      if (userDataSnapshot.exists) {
-        setState(() {
-          _userData = userDataSnapshot.data() as Map<String, dynamic>?;
-        });
+      try {
+        final userDataSnapshot = await FirebaseFirestore.instance
+            .collection('users')
+            .doc(userId)
+            .get();
+        if (userDataSnapshot.exists) {
+          setState(() {
+            _userData = userDataSnapshot.data() as Map<String, dynamic>?;
+          });
+        }
+      } catch (error) {
+        // Record the error to Firebase Crashlytics
+        FirebaseCrashlytics.instance.recordError(error, StackTrace.current,
+            reason: "Error fetching user data for ID: $userId");
+        MySnackBar.show(context, content: const Text("Error fetching data"));
       }
     }
   }

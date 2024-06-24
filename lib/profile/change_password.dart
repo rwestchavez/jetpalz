@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import 'package:jet_palz/components/my_button.dart';
 import 'package:jet_palz/components/my_textField.dart';
@@ -51,8 +52,11 @@ class _ChangePasswordWidgetState extends State<ChangePassword> {
             errorMessage = 'The email address is not valid.';
             break;
           default:
-            errorMessage = 'Failed to send password reset email: ${e.message}';
+            errorMessage = 'Failed to send password reset email';
         }
+        FirebaseCrashlytics.instance.recordError(
+            e, StackTrace.current, // Provide stack trace for detailed logging
+            reason: e.message);
         MySnackBar.show(
           context,
           content: Text(errorMessage),

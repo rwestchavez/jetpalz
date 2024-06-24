@@ -31,12 +31,10 @@ class FirebaseApi {
       query = query.where('estimated_weeks', isEqualTo: weeks);
     }
 
-    // query = query.where(FieldPath.documentId, whereNotIn: acceptedVentureIds);
-
-    // If startAfter is provided, paginate using startAfterDocument
     if (startAfter == null) {
-      return query.get();
+      return await query.get();
+    } else {
+      return await query.startAfterDocument(startAfter).get();
     }
-    return query.startAfterDocument(startAfter).get();
   }
 }

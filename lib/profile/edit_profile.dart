@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:animated_custom_dropdown/custom_dropdown.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -57,7 +58,6 @@ class _ProfileWidgetState extends State<EditProfile> {
   void dispose() {
     _usernameFocusNode.dispose();
     _descriptionFocusNode.dispose();
-    //_cancelChanges();
     super.dispose();
   }
 
@@ -99,8 +99,12 @@ class _ProfileWidgetState extends State<EditProfile> {
         _usernameTextController.text = _userData!['username'] ?? '';
         _descriptionTextController.text = _userData!['description'] ?? '';
       });
-    } catch (e) {
-      MySnackBar.show(context, content: Text("Error $e"));
+    } catch (error) {
+      // Record the error to Firebase Crashlytics
+      FirebaseCrashlytics.instance.recordError(
+          error, StackTrace.current, // Provide stack trace for detailed logging
+          reason: "Error fetching user data for ID: ${_user!.uid}");
+      MySnackBar.show(context, content: const Text("Error Initialising data"));
     }
   }
 
@@ -112,8 +116,14 @@ class _ProfileWidgetState extends State<EditProfile> {
             .doc(_user!.uid)
             .get();
         return userDataSnapshot.data() as Map<String, dynamic>;
-      } catch (e) {
-        MySnackBar.show(context, content: Text("Error $e"));
+      } catch (error) {
+        // Record the error to Firebase Crashlytics
+        FirebaseCrashlytics.instance.recordError(error,
+            StackTrace.current, // Provide stack trace for detailed logging
+            reason:
+                "Error fetching user data for ID: ${_user!.uid}"); // Provide context
+
+        MySnackBar.show(context, content: const Text("Error fetching data"));
       }
     }
     throw Exception('User is null');

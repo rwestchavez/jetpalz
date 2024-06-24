@@ -1,27 +1,21 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:jet_palz/app_state.dart';
-import 'package:jet_palz/models/venture_model.dart';
 import 'package:flutter/material.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+import '../app_state.dart';
+import '../models/venture_model.dart';
 import 'firebase_api.dart';
 
-// this is meant to get ventures, not users
-
 class VentureProvider extends ChangeNotifier {
-  // final AppState appState = AppState();
   final _venturesSnapshot = <DocumentSnapshot>[];
   String _errorMessage = '';
   int documentLimit = 5;
   bool _hasNext = true;
-  bool _isFetchingVentures = false; // Initialize AppState instance
+  bool _isFetchingVentures = false;
 
   String get errorMessage => _errorMessage;
-
   bool get hasNext => _hasNext;
-
   List<VentureModel> get ventures => _venturesSnapshot.map((snap) {
-        // converts List of snapshots
         final doc = snap.data() as Map<String, dynamic>;
-
         return VentureModel(
           ventureId: snap.id,
           country: doc['country'] ?? 'Unknown',
@@ -37,9 +31,9 @@ class VentureProvider extends ChangeNotifier {
         );
       }).toList();
 
-  Future fetchNextUsers({bool reset = false}) async {
+  Future<void> fetchNextUsers({bool reset = false}) async {
     if (_isFetchingVentures) {
-      return; // quits early if already fetching users. Return stops function
+      return;
     }
 
     _errorMessage = '';
@@ -54,8 +48,6 @@ class VentureProvider extends ChangeNotifier {
     try {
       final appState = AppState();
       final snap = await FirebaseApi.getVentures(
-        //appState: appState,
-        // get users still just gets even if its first page or next page
         documentLimit,
         startAfter:
             _venturesSnapshot.isNotEmpty ? _venturesSnapshot.last : null,
@@ -67,16 +59,19 @@ class VentureProvider extends ChangeNotifier {
       );
       _venturesSnapshot.addAll(snap.docs);
 
-      // this is where the client side filtering will happen. You edit the user snapshot here
-
       if (snap.docs.length < documentLimit) {
-        _hasNext =
-            false; // so if it fetches 3 documents since there are 3 documents at the end, then it will know it has run out, this happens after the fetch
+        _hasNext = false;
       }
       notifyListeners();
-    } catch (error) {
+    } catch (error, stackTrace) {
       _errorMessage = error.toString();
       notifyListeners();
+
+      FirebaseCrashlytics.instance.recordError(
+        error,
+        stackTrace,
+        reason: 'Failed to fetch ventures',
+      );
     }
 
     _isFetchingVentures = false;

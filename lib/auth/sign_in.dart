@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:jet_palz/components/my_button.dart';
@@ -76,14 +77,17 @@ class _SignInWidgetState extends State<SignIn> {
         context,
         content: Text(snackBarMessage),
       );
-    } catch (e) {
+    } catch (e, stackTrace) {
+      FirebaseCrashlytics.instance
+          .recordError(e, stackTrace, reason: "Sign in error");
+
       MySnackBar.show(
         context,
         content: const Text("An error occurred. Please try again later."),
       );
     } finally {
       setState(() {
-        _isLoading = false; // Stop loading
+        _isLoading = false;
       });
     }
   }

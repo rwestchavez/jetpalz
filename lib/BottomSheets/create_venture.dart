@@ -1,6 +1,7 @@
 import 'package:animated_custom_dropdown/custom_dropdown.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import '../components/my_snack_bar.dart';
 import '../constants.dart';
@@ -90,7 +91,6 @@ class _CreateVentureWidgetState extends State<CreateVenture> {
                                               .get();
 
                                       if (venturesSnapshot.docs.isNotEmpty) {
-                                        // Show a message or handle the situation when the user already has a venture
                                         showDialog(
                                           context: context,
                                           builder: (context) => AlertDialog(
@@ -136,10 +136,13 @@ class _CreateVentureWidgetState extends State<CreateVenture> {
                                           content:
                                               const Text("Venture Created"));
                                       Navigator.pop(context);
-                                    } catch (e) {
+                                    } catch (e, stackTrace) {
+                                      FirebaseCrashlytics.instance.recordError(
+                                          e, stackTrace,
+                                          reason: "create venture error");
                                       MySnackBar.show(context,
-                                          content: Text(
-                                              "Error creating venture: $e"));
+                                          content: const Text(
+                                              "Error creating venture"));
                                     } finally {
                                       setState(() {
                                         isLoading = false;

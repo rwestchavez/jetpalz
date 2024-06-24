@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import '../components/my_appBar.dart';
 import '../components/my_snack_bar.dart';
@@ -37,8 +38,10 @@ class _ProfileWidgetState extends State<Profile> {
         setState(() {
           _userData = userDataSnapshot.data() as Map<String, dynamic>;
         });
-      } catch (e) {
-        MySnackBar.show(context, content: Text("Error $e"));
+      } catch (error) {
+        FirebaseCrashlytics.instance.recordError(error, StackTrace.current,
+            reason: "Error fetching user data");
+        MySnackBar.show(context, content: const Text("Error fetching data"));
       }
     }
   }
@@ -254,12 +257,9 @@ class _ProfileWidgetState extends State<Profile> {
                                                 horizontal: 12, vertical: 6),
                                             decoration: BoxDecoration(
                                               color: const Color.fromARGB(
-                                                  255,
-                                                  71,
-                                                  200,
-                                                  255), // Same background color as the Chip
-                                              borderRadius: BorderRadius.circular(
-                                                  20), // Same border radius as the Chip
+                                                  255, 71, 200, 255),
+                                              borderRadius:
+                                                  BorderRadius.circular(20),
                                             ),
                                             child: Text(
                                               profession.toString(),

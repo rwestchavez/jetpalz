@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import 'package:jet_palz/components/my_appBar.dart';
 import 'package:jet_palz/components/my_button.dart';
@@ -37,7 +38,9 @@ class _ForgotPasswordWidgetState extends State<ForgotPassword> {
       await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
       MySnackBar.show(context,
           content: const Text("Password reset email sent!"));
-    } catch (error) {
+    } catch (error, stackTrace) {
+      FirebaseCrashlytics.instance
+          .recordError(error, stackTrace, reason: "failed to send password");
       MySnackBar.show(context,
           content: const Text(
               "Failed to send password reset email. Please try again."));

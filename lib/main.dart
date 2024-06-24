@@ -1,5 +1,9 @@
+import 'dart:async';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:jet_palz/auth/forgot_password.dart';
@@ -20,7 +24,6 @@ import 'feed/venture_provider.dart';
 import 'chat/chat_provider.dart';
 import 'feed/feed.dart';
 import 'profile/profile.dart';
-import 'theme/dark_mode_theme.dart';
 import 'theme/light_mode_theme.dart';
 import 'app_state.dart';
 import 'package:badges/badges.dart' as badges;
@@ -28,6 +31,16 @@ import 'package:badges/badges.dart' as badges;
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
+  // Set up Crashlytics error handlers
+  FlutterError.onError = (FlutterErrorDetails errorDetails) {
+    FirebaseCrashlytics.instance.recordFlutterFatalError(errorDetails);
+  };
+
+  PlatformDispatcher.instance.onError = (error, stack) {
+    FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
+    return true;
+  };
   runApp(MultiProvider(
     providers: [
       ChangeNotifierProvider(create: (_) => AppState()),
@@ -59,14 +72,13 @@ class MyApp extends StatelessWidget {
         '/onboarding': (context) => const Onboarding(),
         '/editProfile': (context) => const EditProfile(),
         '/myVentures': (context) => const MyVenturesListView(),
-        '/settings': (context) => Settings(),
+        '/settings': (context) => const Settings(),
         '/changeEmail': (context) => const ChangeEmail(),
         '/changePassword': (context) => const ChangePassword(),
         '/notifications': (context) => const NotificationsUI(),
       },
       home: user != null ? const Main() : const SignUp(),
       theme: lightModeTheme.themeData,
-      darkTheme: darkModeTheme.themeData,
       debugShowCheckedModeBanner: false,
     );
   }

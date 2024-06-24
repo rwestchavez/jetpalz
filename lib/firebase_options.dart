@@ -63,6 +63,9 @@ class DefaultFirebaseOptions {
     messagingSenderId: '416263953272',
     projectId: 'jetpalz',
     storageBucket: 'jetpalz.appspot.com',
+    androidClientId: '416263953272-cv9pdf72un35efrc7gv0oda5sh27sht6.apps.googleusercontent.com',
+    iosClientId: '416263953272-eioefn00gviddhkrc4g4ri301aebbsgh.apps.googleusercontent.com',
     iosBundleId: 'com.example.jetPalz',
   );
+
 }

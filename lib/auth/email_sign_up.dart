@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import 'package:jet_palz/components/my_appBar.dart';
 import 'package:jet_palz/components/my_button.dart';
@@ -98,7 +99,9 @@ class _EmailSignUpWidgetState extends State<EmailSignUp> {
         context,
         content: Text(snackBarMessage),
       );
-    } catch (e) {
+    } catch (e, stackTrace) {
+          FirebaseCrashlytics.instance.recordError(e, stackTrace, reason: "email sign up not working");
+
       // Handle other errors
       MySnackBar.show(context,
           content: const Text("An error occurred. Please try again later."));

@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import 'package:jet_palz/components/my_button.dart';
 import 'package:jet_palz/components/my_textField.dart';
@@ -57,10 +58,11 @@ class _ChangeEmailWidgetState extends State<ChangeEmail> {
             content: const Text('Verification sent to your email'),
           );
         } on FirebaseAuthException catch (e) {
-          MySnackBar.show(
-            context,
-            content: Text('Failed to update email: ${e.message}'),
-          );
+          FirebaseCrashlytics.instance.recordError(
+              e, StackTrace.current, // Provide stack trace for detailed logging
+              reason: e.message);
+          MySnackBar.show(context,
+              content: const Text('Failed to update email'));
         }
       }
     }

@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import 'package:jet_palz/components/my_button.dart';
 import 'package:jet_palz/components/my_snack_bar.dart';
@@ -105,6 +106,16 @@ class _ListViewWidgetState extends State<ListViewWidget> {
 
       MySnackBar.show(context,
           content: const Text("You sent a request to join the venture"));
+    } catch (error, stackTrace) {
+      // Handle error and report to Firebase Crashlytics
+      FirebaseCrashlytics.instance.recordError(
+        error,
+        stackTrace,
+        reason: 'Failed to send join request',
+      );
+      // Show error message to user
+      MySnackBar.show(context,
+          content: const Text('Failed to send join request'));
     } finally {
       setState(() {
         _isButtonDisabled = false;
@@ -133,6 +144,16 @@ class _ListViewWidgetState extends State<ListViewWidget> {
       MySnackBar.show(context,
           content:
               const Text("You cancelled your request to join the venture"));
+    } catch (error, stackTrace) {
+      FirebaseCrashlytics.instance.recordError(
+        error,
+        stackTrace,
+        reason: 'Failed to cancel join request',
+      );
+
+      // Show error message to user
+      MySnackBar.show(context,
+          content: Text('Failed to cancel join request: $error'));
     } finally {
       setState(() {
         _isButtonDisabled = false;
