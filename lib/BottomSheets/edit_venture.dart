@@ -1,28 +1,44 @@
 import 'package:animated_custom_dropdown/custom_dropdown.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import '../components/my_snack_bar.dart';
 import '../constants.dart';
 
-class CreateVenture extends StatefulWidget {
-  const CreateVenture({super.key});
+class EditVenture extends StatefulWidget {
+  final DocumentReference ventureRef;
+  final Map<String, dynamic> ventureData;
+
+  const EditVenture({
+    required this.ventureRef,
+    required this.ventureData,
+    super.key,
+  });
 
   @override
-  State<CreateVenture> createState() => _CreateVentureWidgetState();
+  State<EditVenture> createState() => _EditVentureWidgetState();
 }
 
-class _CreateVentureWidgetState extends State<CreateVenture> {
+class _EditVentureWidgetState extends State<EditVenture> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final TextEditingController textController = TextEditingController();
-  String? description = "";
+  String? description;
   String? country;
   String? industry;
-  int? people = 0;
+  int? people;
   String? month;
-  int? weeks = 0;
-  bool isLoading = false;
+  int? weeks;
+
+  @override
+  void initState() {
+    super.initState();
+    textController.text = widget.ventureData['description'] ?? '';
+    description = widget.ventureData['description'];
+    country = widget.ventureData['country'];
+    industry = widget.ventureData['industry'];
+    people = widget.ventureData['max_people'];
+    month = widget.ventureData['starting_month'];
+    weeks = widget.ventureData['estimated_weeks'];
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -50,7 +66,7 @@ class _CreateVentureWidgetState extends State<CreateVenture> {
                         onPressed: () => Navigator.pop(context),
                       ),
                       const Text(
-                        'Create Venture',
+                        'Edit Venture',
                         style: TextStyle(
                           fontSize: 20.0,
                           fontWeight: FontWeight.w500,
@@ -60,113 +76,36 @@ class _CreateVentureWidgetState extends State<CreateVenture> {
                         child: Align(
                           alignment: Alignment.centerRight,
                           child: TextButton(
-                            onPressed: isLoading
-                                ? () {}
-                                : () async {
-                                    if (_formKey.currentState!.validate()) {
-                                      setState(() {
-                                        isLoading = true;
-                                      });
+                            onPressed: () async {
+                              if (_formKey.currentState!.validate()) {
+                                await widget.ventureRef.update({
+                                  'description': description,
+                                  'country': country,
+                                  'industry': industry,
+                                  'max_people': people,
+                                  'starting_month': month,
+                                  'estimated_weeks': weeks,
+                                });
 
-                                      try {
-                                        FirebaseFirestore firestore =
-                                            FirebaseFirestore.instance;
-                                        final currentUser =
-                                            FirebaseAuth.instance.currentUser;
-                                        final userDoc = firestore
-                                            .collection('users')
-                                            .doc(currentUser!.uid);
-                                        final venturesRef =
-                                            firestore.collection('ventures');
-
-                                        var userSnap = await userDoc.get();
-                                        var userData = userSnap.data()
-                                            as Map<String, dynamic>;
-                                        String creatorName =
-                                            userData['username'];
-
-                                        // Check if the user is already a venture creator
-                                        QuerySnapshot venturesSnapshot =
-                                            await venturesRef
-                                                .where('creator',
-                                                    isEqualTo: userDoc)
-                                                .get();
-
-                                        if (venturesSnapshot.docs.isNotEmpty) {
-                                          showDialog(
-                                            context: context,
-                                            builder: (context) => AlertDialog(
-                                              title: const Text(
-                                                'You can only be the creator of one venture at a time.',
-                                                textAlign: TextAlign.center,
-                                              ),
-                                              actions: [
-                                                TextButton(
-                                                  onPressed: () =>
-                                                      Navigator.pop(context),
-                                                  child: const Text('OK'),
-                                                ),
-                                              ],
-                                            ),
-                                          );
-                                          return;
-                                        }
-
-                                        await firestore.runTransaction(
-                                            (transaction) async {
-                                          Map<String, dynamic> ventureData = {
-                                            'country': country,
-                                            'creator': userDoc,
-                                            'creator_name': creatorName,
-                                            'industry': industry,
-                                            'description': description,
-                                            'member_num': 1,
-                                            'starting_month': month,
-                                            'estimated_weeks': weeks,
-                                            'created_time': DateTime.now(),
-                                            'max_people': people,
-                                            'chat': null,
-                                          };
-
-                                          DocumentReference newVentureRef =
-                                              venturesRef.doc();
-                                          transaction.set(
-                                              newVentureRef, ventureData);
-                                        });
-
-                                        MySnackBar.show(context,
-                                            content:
-                                                const Text("Venture Created"));
-                                        Navigator.pop(context);
-                                      } catch (e, stackTrace) {
-                                        FirebaseCrashlytics.instance
-                                            .recordError(e, stackTrace,
-                                                reason: "create venture error");
-                                        MySnackBar.show(context,
-                                            content: const Text(
-                                                "Error creating venture"));
-                                      } finally {
-                                        setState(() {
-                                          isLoading = false;
-                                        });
-                                      }
-                                    }
-                                  },
-                            child: isLoading
-                                ? const CircularProgressIndicator()
-                                : const Text(
-                                    'Post',
-                                    style: TextStyle(
-                                      fontSize: 18.0,
-                                      color: Colors.blue,
-                                    ),
-                                  ),
+                                MySnackBar.show(context,
+                                    content: const Text("Venture Updated"));
+                                Navigator.pop(context);
+                              }
+                            },
+                            child: const Text(
+                              'Save',
+                              style: TextStyle(
+                                fontSize: 18.0,
+                                color: Colors.blue,
+                              ),
+                            ),
                           ),
                         ),
                       ),
                     ],
                   ),
                 ),
+                //  SizedBox(height: 12),
                 Flexible(
                   child: SingleChildScrollView(
                     child: Padding(
@@ -176,8 +115,7 @@ class _CreateVentureWidgetState extends State<CreateVenture> {
                         children: [
                           TextFormField(
                             validator: (value) {
-                              if (value!.length > 400) {
-                                // Adjust the maximum character limit as needed
+                              if (value != null && value.length > 400) {
                                 return 'Description must be less than 400 characters';
                               }
                               return null;
@@ -211,6 +149,7 @@ class _CreateVentureWidgetState extends State<CreateVenture> {
                           ),
                           const SizedBox(height: 12),
                           CustomDropdown<String>(
+                            initialItem: country,
                             decoration: CustomDropdownDecoration(
                               closedBorder: Border.all(
                                 color: Colors.grey.withOpacity(0.3),
@@ -229,6 +168,7 @@ class _CreateVentureWidgetState extends State<CreateVenture> {
                           ),
                           const SizedBox(height: 12),
                           CustomDropdown<String>(
+                            initialItem: industry,
                             decoration: CustomDropdownDecoration(
                               closedBorder: Border.all(
                                 color: Colors.grey.withOpacity(0.3),
@@ -247,6 +187,7 @@ class _CreateVentureWidgetState extends State<CreateVenture> {
                           ),
                           const SizedBox(height: 12),
                           CustomDropdown<String>(
+                            initialItem: people?.toString(),
                             decoration: CustomDropdownDecoration(
                               closedBorder: Border.all(
                                 color: Colors.grey.withOpacity(0.3),
@@ -265,6 +206,7 @@ class _CreateVentureWidgetState extends State<CreateVenture> {
                           ),
                           const SizedBox(height: 12),
                           CustomDropdown<String>(
+                            initialItem: month,
                             decoration: CustomDropdownDecoration(
                               closedBorder: Border.all(
                                 color: Colors.grey.withOpacity(0.3),
@@ -283,6 +225,7 @@ class _CreateVentureWidgetState extends State<CreateVenture> {
                           ),
                           const SizedBox(height: 12),
                           CustomDropdown<String>(
+                            initialItem: weeks?.toString(),
                             decoration: CustomDropdownDecoration(
                               closedBorder: Border.all(
                                 color: Colors.grey.withOpacity(0.3),

@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:jet_palz/components/my_button.dart';
 import 'package:jet_palz/components/my_snack_bar.dart';
 import 'package:jet_palz/helpers/delete_venture.dart';
-import 'package:jet_palz/helpers/edit_venture.dart';
+import 'package:jet_palz/bottomsheets/edit_venture.dart';
 import '../app_state.dart';
 import '../profile/profile_view.dart';
 import 'venture_provider.dart';
@@ -281,7 +281,7 @@ class _ListViewWidgetState extends State<ListViewWidget> {
                                     builder: (BuildContext context) {
                                       return FractionallySizedBox(
                                           heightFactor:
-                                              0.5, // Adjust this factor to control the height
+                                              0.6, // Adjust this factor to control the height
                                           child: EditVenture(
                                               ventureRef: ventureRef,
                                               ventureData: ventureData));

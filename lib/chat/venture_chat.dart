@@ -6,7 +6,7 @@ import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import 'package:jet_palz/components/my_snack_bar.dart';
 import 'package:jet_palz/helpers/delete_venture.dart';
-import 'package:jet_palz/helpers/edit_venture.dart';
+import 'package:jet_palz/bottomsheets/edit_venture.dart';
 import 'package:jet_palz/profile/profile_view.dart';
 
 class VentureChat extends StatefulWidget {
@@ -278,7 +278,7 @@ class _VentureChatState extends State<VentureChat> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const Text(
-                        'Country: ',
+                        'Country ',
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
                       Expanded(
@@ -296,7 +296,7 @@ class _VentureChatState extends State<VentureChat> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const Text(
-                        'Leader: ',
+                        'Leader ',
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
                       Expanded(
@@ -314,7 +314,7 @@ class _VentureChatState extends State<VentureChat> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const Text(
-                        'Profession: ',
+                        'Profession ',
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
                       Expanded(
@@ -332,7 +332,7 @@ class _VentureChatState extends State<VentureChat> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const Text(
-                        'Starting Month: ',
+                        'Starting Month ',
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
                       Expanded(
@@ -350,7 +350,7 @@ class _VentureChatState extends State<VentureChat> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const Text(
-                        'Estimated Weeks: ',
+                        'Estimated Weeks ',
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
                       Expanded(
@@ -367,10 +367,6 @@ class _VentureChatState extends State<VentureChat> {
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
-                        'Description: ',
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
                       Expanded(
                         child: Text(
                           ventureData['description'],
@@ -409,14 +405,14 @@ class _VentureChatState extends State<VentureChat> {
               child: Text('Cancel',
                   style: TextStyle(color: Theme.of(context).primaryColor)),
               onPressed: () {
-                Navigator.of(context).pop(true);
+                Navigator.of(context).pop(false);
               },
             ),
             TextButton(
               child: Text('Leave',
                   style: TextStyle(color: Theme.of(context).primaryColor)),
               onPressed: () {
-                Navigator.of(context).pop(false);
+                Navigator.of(context).pop(true);
               },
             ),
           ],
@@ -555,12 +551,13 @@ class _VentureChatState extends State<VentureChat> {
                         _showVentureInfo();
                       } else if (value == 'edit') {
                         showModalBottomSheet(
+                            useSafeArea: true,
                             isScrollControlled: true,
                             context: context,
                             builder: (BuildContext context) {
                               return FractionallySizedBox(
                                   heightFactor:
-                                      0.5, // Adjust this factor to control the height
+                                      0.6, // Adjust this factor to control the height
                                   child: EditVenture(
                                       ventureRef: widget.ventureRef!,
                                       ventureData: ventureData));
@@ -623,22 +620,24 @@ class _VentureChatState extends State<VentureChat> {
           ],
           centerTitle: true,
         ),
-        body: Column(
-          children: [
-            Expanded(
-              child: MessagesList(
-                chatId: widget.chatId,
-                messages: _messages,
-                scrollController: _scrollController,
-                isLoading: _isLoading,
-                markMessageSeen: markMessageSeen,
+        body: SafeArea(
+          child: Column(
+            children: [
+              Expanded(
+                child: MessagesList(
+                  chatId: widget.chatId,
+                  messages: _messages,
+                  scrollController: _scrollController,
+                  isLoading: _isLoading,
+                  markMessageSeen: markMessageSeen,
+                ),
               ),
-            ),
-            SendMessageBar(
-              messageController: _messageController,
-              onSend: sendMessage,
-            ),
-          ],
+              SendMessageBar(
+                messageController: _messageController,
+                onSend: sendMessage,
+              ),
+            ],
+          ),
         ),
       ),
     );

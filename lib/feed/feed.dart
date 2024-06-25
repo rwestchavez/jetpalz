@@ -24,12 +24,13 @@ class Feed extends StatelessWidget {
               splashColor: Colors.transparent, // Remove the tap color
               highlightColor: Colors.transparent,
               onPressed: () => showModalBottomSheet(
+                    useSafeArea: true,
                     isScrollControlled: true,
                     context: context,
                     builder: (BuildContext context) {
                       return const FractionallySizedBox(
                           heightFactor:
-                              0.5, // Adjust this factor to control the height
+                              0.6, // Adjust this factor to control the height
                           child: CreateVenture());
                     },
                   ),
@@ -43,12 +44,13 @@ class Feed extends StatelessWidget {
                 highlightColor: Colors.transparent,
                 onPressed: () {
                   showModalBottomSheet(
+                    useSafeArea: true,
                     isScrollControlled: true,
                     context: context,
                     builder: (BuildContext context) {
                       return const FractionallySizedBox(
                           heightFactor:
-                              0.5, // Adjust this factor to control the height
+                              0.6, // Adjust this factor to control the height
                           child: FilterVenture());
                     },
                   );

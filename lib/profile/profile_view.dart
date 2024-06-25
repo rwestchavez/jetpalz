@@ -90,7 +90,7 @@ class _ProfileWidgetState extends State<ProfileView> {
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                           Text(
-                            _userData?['username'] ?? 'Loading...',
+                            _userData?['username'] ?? '',
                             style: TextStyle(
                                 color: Theme.of(context)
                                     .textTheme
