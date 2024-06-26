@@ -7,6 +7,7 @@ import 'package:jet_palz/components/my_button.dart';
 import 'package:jet_palz/components/my_textField.dart';
 
 import '../components/my_snack_bar.dart';
+import '../notifications.dart';
 
 class EmailSignUp extends StatefulWidget {
   const EmailSignUp({
@@ -61,6 +62,7 @@ class _EmailSignUpWidgetState extends State<EmailSignUp> {
         email: widget.email,
         password: _passwordController.text.trim(),
       );
+
       await FirebaseFirestore.instance
           .collection('users')
           .doc(userCredential.user!.uid)
@@ -74,6 +76,8 @@ class _EmailSignUpWidgetState extends State<EmailSignUp> {
         'professions_interest': [], // Add professions interest if needed
         'description': '', // Add description if needed
       });
+      await storeFCMToken();
+
       // Handle successful sign-up
       Navigator.pushReplacementNamed(context, '/onboarding');
     } on FirebaseAuthException catch (e) {
@@ -100,7 +104,8 @@ class _EmailSignUpWidgetState extends State<EmailSignUp> {
         content: Text(snackBarMessage),
       );
     } catch (e, stackTrace) {
-          FirebaseCrashlytics.instance.recordError(e, stackTrace, reason: "email sign up not working");
+      FirebaseCrashlytics.instance
+          .recordError(e, stackTrace, reason: "email sign up not working");
 
       // Handle other errors
       MySnackBar.show(context,

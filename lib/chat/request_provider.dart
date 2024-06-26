@@ -1,4 +1,5 @@
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -18,6 +19,37 @@ class RequestProvider with ChangeNotifier {
   List<JoinRequest> get rejectedRequests => _rejectedRequests;
 
   bool get isLoading => _isLoading;
+
+  final _firebaseMessaging = FirebaseMessaging.instance;
+
+  Future<void> initNotifications() async {
+    try {
+      // Request permission and get FCM token
+      await _firebaseMessaging.requestPermission();
+    } catch (e, stackTrace) {
+      // Handle errors
+      print('Error initializing notifications: $e');
+      FirebaseCrashlytics.instance.recordError(e, stackTrace);
+    }
+  }
+
+  Future<String> getCreatorUsername(String creatorId) async {
+    try {
+      var creatorSnapshot = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(creatorId)
+          .get();
+      if (creatorSnapshot.exists) {
+        var creatorData = creatorSnapshot.data() as Map<String, dynamic>;
+        return creatorData['username'] ?? 'Unknown User';
+      } else {
+        return 'Unknown User';
+      }
+    } catch (e, stackTrace) {
+      _handleError(e, stackTrace);
+      return 'Unknown User';
+    }
+  }
 
   RequestProvider() {
     _fetchRequests();
@@ -40,24 +72,6 @@ class RequestProvider with ChangeNotifier {
       });
     } catch (e, stackTrace) {
       _handleError(e, stackTrace);
-    }
-  }
-
-  Future<String> getCreatorUsername(String creatorId) async {
-    try {
-      var creatorSnapshot = await FirebaseFirestore.instance
-          .collection('users')
-          .doc(creatorId)
-          .get();
-      if (creatorSnapshot.exists) {
-        var creatorData = creatorSnapshot.data() as Map<String, dynamic>;
-        return creatorData['username'] ?? 'Unknown User';
-      } else {
-        return 'Unknown User';
-      }
-    } catch (e, stackTrace) {
-      _handleError(e, stackTrace);
-      return 'Unknown User';
     }
   }
 

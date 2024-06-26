@@ -1,8 +1,11 @@
 import 'dart:async';
+import 'dart:io';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -18,19 +21,40 @@ import 'package:jet_palz/profile/change_email.dart';
 import 'package:jet_palz/profile/change_password.dart';
 import 'package:jet_palz/profile/edit_profile.dart';
 import 'package:jet_palz/profile/my_ventures.dart';
-import 'package:jet_palz/profile/settings.dart';
+import 'package:jet_palz/profile/user_settings.dart';
 import 'package:provider/provider.dart';
 import 'feed/venture_provider.dart';
 import 'chat/chat_provider.dart';
 import 'feed/feed.dart';
+import 'notifications.dart';
 import 'profile/profile.dart';
 import 'theme/light_mode_theme.dart';
 import 'app_state.dart';
 import 'package:badges/badges.dart' as badges;
 
+// Remember to turn off clear text in /Users/richard_alt/Desktop/JetPalz/android/app/src/main/AndroidManifest.xml
+const bool emulator = false;
+
+Future<void> _connectEmulator() async {
+  final localHostString = Platform.isAndroid ? '10.0.2.2' : 'localhost';
+  FirebaseFirestore.instance.useFirestoreEmulator(localHostString, 8080);
+  FirebaseAuth.instance.useAuthEmulator(
+    localHostString,
+    9099,
+  );
+  FirebaseStorage.instance.useStorageEmulator(
+    localHostString,
+    9199,
+  );
+}
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
+  if (emulator) {
+    await _connectEmulator();
+  }
 
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
@@ -77,7 +101,7 @@ class MyApp extends StatelessWidget {
         '/onboarding': (context) => const Onboarding(),
         '/editProfile': (context) => const EditProfile(),
         '/myVentures': (context) => const MyVenturesListView(),
-        '/settings': (context) => const Settings(),
+        '/settings': (context) => const UserSettings(),
         '/changeEmail': (context) => const ChangeEmail(),
         '/changePassword': (context) => const ChangePassword(),
         '/notifications': (context) => const NotificationsUI(),
@@ -103,6 +127,8 @@ class MainState extends State<Main> {
   @override
   void initState() {
     super.initState();
+    handleFCMTokenRefresh();
+    RequestProvider().initNotifications();
   }
 
   @override

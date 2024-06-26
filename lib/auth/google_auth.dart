@@ -4,6 +4,7 @@ import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import '../components/my_snack_bar.dart';
+import '../notifications.dart';
 
 Future<void> googleAuth(BuildContext context, bool signUp) async {
   try {
@@ -35,6 +36,8 @@ Future<void> googleAuth(BuildContext context, bool signUp) async {
         'professions_interest': [], // Add professions interest if needed
         'description': '', // Add description if needed
       });
+      await storeFCMToken();
+
       Navigator.pushReplacementNamed(context, '/onboarding');
     } else {
       Navigator.pushReplacementNamed(context, '/feed');

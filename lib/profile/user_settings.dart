@@ -3,8 +3,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import '../auth/sign_up.dart';
 import '../components/single_line_widget.dart';
 
-class Settings extends StatelessWidget {
-  const Settings({super.key});
+class UserSettings extends StatelessWidget {
+  const UserSettings({super.key});
 
   void _logout(BuildContext context) async {
     await FirebaseAuth.instance.signOut();

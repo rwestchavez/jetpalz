@@ -10,6 +10,7 @@ class UserModel {
   final List<String> countriesInterest;
   final List<String> professionsInterest;
   final String description;
+  final String? fcmToken; // Optional FCM token field
 
   UserModel({
     required this.email,
@@ -21,6 +22,7 @@ class UserModel {
     required this.countriesInterest,
     required this.professionsInterest,
     required this.description,
+    this.fcmToken, // Include FCM token in constructor
   });
 
   // Factory method to create a UserModel from a Firestore document
@@ -35,6 +37,7 @@ class UserModel {
       countriesInterest: List<String>.from(doc['countries_interest']),
       professionsInterest: List<String>.from(doc['professions_interest']),
       description: doc['description'],
+      fcmToken: doc['fcm_token'], // Read FCM token from document
     );
   }
 
@@ -50,6 +53,7 @@ class UserModel {
       'countries_interest': countriesInterest,
       'professions_interest': professionsInterest,
       'description': description,
+      'fcm_token': fcmToken, // Include FCM token in map
     };
   }
 }

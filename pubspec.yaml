@@ -50,6 +50,7 @@ dependencies:
   timeago: ^3.6.1
   firebase_analytics: ^11.0.1
   firebase_crashlytics: ^4.0.1
+  firebase_messaging: ^15.0.2
   
 
 

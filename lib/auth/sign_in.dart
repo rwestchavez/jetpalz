@@ -5,6 +5,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:jet_palz/components/my_button.dart';
 import 'package:jet_palz/components/my_textField.dart';
 import '../components/my_snack_bar.dart';
+import '../notifications.dart';
 import 'google_auth.dart';
 
 class SignIn extends StatefulWidget {
@@ -51,6 +52,7 @@ class _SignInWidgetState extends State<SignIn> {
         email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
       );
+      await storeFCMToken();
 
       if (_emailController.text.trim() == "StoreTestOnboarding@gmail.com") {
         Navigator.pushReplacementNamed(context, '/onboarding');
