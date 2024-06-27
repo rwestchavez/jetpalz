@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
@@ -33,7 +34,7 @@ import 'app_state.dart';
 import 'package:badges/badges.dart' as badges;
 
 // Remember to turn off clear text in /Users/richard_alt/Desktop/JetPalz/android/app/src/main/AndroidManifest.xml
-const bool emulator = false;
+const bool emulator = true;
 
 Future<void> _connectEmulator() async {
   final localHostString = Platform.isAndroid ? '10.0.2.2' : 'localhost';
@@ -46,6 +47,7 @@ Future<void> _connectEmulator() async {
     localHostString,
     9199,
   );
+  FirebaseFunctions.instance.useFunctionsEmulator(localHostString, 5001);
 }
 
 Future<void> main() async {
