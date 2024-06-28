@@ -227,7 +227,7 @@ class _ListViewWidgetState extends State<ListViewWidget> {
                   children: [
                     Text("${venture.country}",
                         style: const TextStyle(
-                            fontWeight: FontWeight.w900, fontSize: 30)),
+                            fontWeight: FontWeight.bold, fontSize: 24)),
                     Row(
                       children: [
                         Padding(
@@ -260,7 +260,7 @@ class _ListViewWidgetState extends State<ListViewWidget> {
                           child: Text(
                             venture.creatorName,
                             style: const TextStyle(
-                                fontWeight: FontWeight.w700, fontSize: 20),
+                                fontWeight: FontWeight.bold, fontSize: 20),
                           ),
                         ),
                         if (isCreator)
@@ -307,7 +307,7 @@ class _ListViewWidgetState extends State<ListViewWidget> {
                       children: [
                         const Text("Profession",
                             style: TextStyle(
-                                fontWeight: FontWeight.bold, fontSize: 15)),
+                                fontWeight: FontWeight.bold, fontSize: 16)),
                         Padding(
                           padding: const EdgeInsets.only(left: 8),
                           child: Text("${venture.industry}"),

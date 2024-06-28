@@ -20,6 +20,7 @@ import 'package:jet_palz/chat/request_provider.dart';
 import 'package:jet_palz/firebase_options.dart';
 import 'package:jet_palz/profile/change_email.dart';
 import 'package:jet_palz/profile/change_password.dart';
+import 'package:jet_palz/profile/contact.dart';
 import 'package:jet_palz/profile/edit_profile.dart';
 import 'package:jet_palz/profile/my_ventures.dart';
 import 'package:jet_palz/profile/user_settings.dart';
@@ -34,7 +35,7 @@ import 'app_state.dart';
 import 'package:badges/badges.dart' as badges;
 
 // Remember to turn off clear text in /Users/richard_alt/Desktop/JetPalz/android/app/src/main/AndroidManifest.xml
-const bool emulator = true;
+const bool emulator = false;
 
 Future<void> _connectEmulator() async {
   final localHostString = Platform.isAndroid ? '10.0.2.2' : 'localhost';
@@ -72,6 +73,21 @@ Future<void> main() async {
     FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
     return true;
   };
+  User? user = FirebaseAuth.instance.currentUser;
+
+  bool usernameExists = false;
+  if (user != null) {
+    // Fetch user document from Firestore
+    DocumentSnapshot userDoc = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(user.uid)
+        .get();
+
+    // Check if username field is present and not null
+    if (userDoc.exists && userDoc['username'] != null) {
+      usernameExists = true;
+    }
+  }
   runApp(MultiProvider(
     providers: [
       ChangeNotifierProvider(create: (_) => AppState()),
@@ -79,12 +95,19 @@ Future<void> main() async {
       ChangeNotifierProvider(create: (_) => RequestProvider()),
       ChangeNotifierProvider(create: (_) => ChatProvider()),
     ],
-    child: const MyApp(),
+    child: MyApp(userExists: user != null, usernameExists: usernameExists),
   ));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final bool userExists;
+  final bool usernameExists;
+
+  const MyApp({
+    super.key,
+    required this.userExists,
+    required this.usernameExists,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -107,8 +130,9 @@ class MyApp extends StatelessWidget {
         '/changeEmail': (context) => const ChangeEmail(),
         '/changePassword': (context) => const ChangePassword(),
         '/notifications': (context) => const NotificationsUI(),
+        '/contact': (context) => const Contact(),
       },
-      home: user != null ? const Main() : const SignUp(),
+      home: userExists && usernameExists ? const Main() : const SignUp(),
       theme: lightModeTheme.themeData,
       debugShowCheckedModeBanner: false,
     );

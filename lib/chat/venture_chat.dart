@@ -43,6 +43,7 @@ class _VentureChatState extends State<VentureChat> {
   bool _isLoading = false;
   bool _hasNext = true;
   int _memberCount = 0;
+  List<String> _blockedUsers = [];
 
   StreamSubscription<DocumentSnapshot>? _ventureRefSubscription;
 
@@ -68,6 +69,7 @@ class _VentureChatState extends State<VentureChat> {
     });
     _loadMessages();
     _fetchMemberCount();
+    _fetchBlockedUsers();
 
     _scrollController.addListener(_scrollListener);
   }
@@ -97,6 +99,26 @@ class _VentureChatState extends State<VentureChat> {
           .recordError(e, stackTrace, reason: "Failed to fetch member count");
       MySnackBar.show(context,
           content: const Text('Failed to fetch member count'));
+    }
+  }
+
+  void _fetchBlockedUsers() async {
+    try {
+      var userId = FirebaseAuth.instance.currentUser!.uid;
+      var blockedUsersSnapshot = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(userId)
+          .collection('blocked_users')
+          .get();
+
+      setState(() {
+        _blockedUsers = blockedUsersSnapshot.docs.map((doc) => doc.id).toList();
+      });
+    } catch (e, stackTrace) {
+      FirebaseCrashlytics.instance
+          .recordError(e, stackTrace, reason: "Failed to fetch blocked users");
+      MySnackBar.show(context,
+          content: const Text('Failed to fetch blocked users'));
     }
   }
 
@@ -421,11 +443,11 @@ class _VentureChatState extends State<VentureChat> {
     );
 
     if (confirmLeave) {
-      _leaveChat();
+      leaveChat();
     }
   }
 
-  void _leaveChat() async {
+  void leaveChat() async {
     try {
       var userId = FirebaseAuth.instance.currentUser!.uid;
       DocumentSnapshot ventureSnapshot = await widget.ventureRef!.get();
@@ -630,6 +652,7 @@ class _VentureChatState extends State<VentureChat> {
                   scrollController: _scrollController,
                   isLoading: _isLoading,
                   markMessageSeen: markMessageSeen,
+                  blockedUsers: _blockedUsers,
                 ),
               ),
               SendMessageBar(
@@ -674,6 +697,7 @@ class MessagesList extends StatelessWidget {
   final ScrollController scrollController;
   final bool isLoading;
   final Function(String) markMessageSeen;
+  final List<String> blockedUsers; // Add this line
 
   const MessagesList({
     super.key,
@@ -682,6 +706,7 @@ class MessagesList extends StatelessWidget {
     required this.scrollController,
     required this.isLoading,
     required this.markMessageSeen,
+    required this.blockedUsers, // Add this line
   });
 
   @override
@@ -706,9 +731,12 @@ class MessagesList extends StatelessWidget {
               if (!isSentByMe) {
                 markMessageSeen(message.id);
               }
+              var isBlocked = blockedUsers.contains(message['sentBy']);
 
               return MessageBubble(
-                content: message['content'],
+                content: isBlocked
+                    ? "This user is blocked. Unblock to see the message"
+                    : message['content'], // Conditionally show message
                 timestamp: message['timestamp'],
                 isSentByMe: isSentByMe,
                 pfpUrl: message['pfpUrl'],

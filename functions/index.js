@@ -5,18 +5,9 @@ admin.initializeApp();
 exports.sendNotificationOnRequestChange = functions.firestore
     .document("requests/{requestId}")
     .onUpdate(async (change, context) => {
-        console.log("wagwan");
+        console.log("Request update detected");
         const beforeData = change.before.data();
         const afterData = change.after.data();
-
-        const ventureId = afterData["ventureId"];
-
-        const ventureSnap = await admin.firestore().collection("ventures").doc(ventureId).get();
-
-        // **Get the creator ID:**
-        const ventureData = ventureSnap.data()
-        const creatorRef = ventureData['creator']
-        const creatorId = creatorRef.id;
 
         // Check if the status has changed
         if (beforeData['status'] !== afterData['status']) {
@@ -25,37 +16,83 @@ exports.sendNotificationOnRequestChange = functions.firestore
 
             if (afterData['status'] === "accepted") {
                 message = "Your request has been accepted.";
-                console.log("This is working accepted");
+                console.log("Accepted request");
 
-            } else if (afterData['status'] === "rejected") { // only works for this. Need to use emulator for firestore. 
+            } else if (afterData['status'] === "rejected") {
                 message = "Your request has been rejected.";
-                console.log("This is working rejected");
+                console.log("Rejected request");
             }
 
             if (message && userId) {
-                // Fetch the user document to get the FCM token
+                // Fetch the user document to get the FCM or APNS token and device type
                 const userDoc = await admin.firestore().collection("users").doc(userId).get();
                 const userData = userDoc.data();
 
-                if (userData && userData['fcm_token']) {
-                    const payload = {
-                        notification: {
-                            title: "Request Status Update",
-                            body: message,
-                        },
-                    };
+                if (userData) {
 
-                    // Send the notification to the device
-                    try {
-                        const response = await admin.messaging().send({
-                            token: userData['fcm_token'],
-                            notification: payload.notification,
-                            data: payload.data, // Optional: add data payload if needed
-                        });
 
-                        console.log('Notification sent successfully:', response);
-                    } catch (error) {
-                        console.error('Error sending notification:', error);
+                    // Determine the token type and send the notification
+                    if (userData["device_type"] === "ios" && userData["apns_token"]) {
+                        try {
+                            console.log("sending message ios");
+                            const response = await admin.messaging().send({
+                                token: userData["fcm_token"],
+                                notification: {
+                                    title: "New Notice!",
+                                    body: message,
+                                },
+                                android: {
+                                    ttl: 86400000,  // 1 day in milliseconds
+                                    notification: {
+                                        clickAction: "OPEN_ACTIVITY_1"
+                                    }
+                                },
+                                apns: {
+                                    headers: {
+                                        "apns-priority": "5",
+                                    },
+                                    payload: {
+                                        aps: {
+                                            category: "NEW_MESSAGE_CATEGORY"
+                                        }
+                                    }
+                                }
+                            });
+
+                            console.log('APNS notification sent successfully:', response);
+                        } catch (error) {
+                            console.error('Error sending APNS notification:', error);
+                        }
+                    } else if (userData["device_type"] === "android" && userData["fcm_token"]) {
+                        try {
+                            const response = await admin.messaging().send({
+                                token: userData["fcm_token"],
+                                notification: {
+                                    title: "New Notice!",
+                                    body: message,
+                                },
+                                android: {
+                                    ttl: 86400000,  // 1 day in milliseconds
+                                    notification: {
+                                        clickAction: "OPEN_ACTIVITY_1"
+                                    }
+                                },
+                                apns: {
+                                    headers: {
+                                        "apns-priority": "5",
+                                    },
+                                    payload: {
+                                        aps: {
+                                            category: "NEW_MESSAGE_CATEGORY"
+                                        }
+                                    }
+                                }
+                            });
+
+                            console.log('FCM notification sent successfully:', response);
+                        } catch (error) {
+                            console.error('Error sending FCM notification:', error);
+                        }
                     }
                 }
             }
@@ -67,46 +104,85 @@ exports.sendNotificationOnRequestChange = functions.firestore
 exports.sendNotificationOnRequestCreate = functions.firestore
     .document("requests/{requestId}")
     .onCreate(async (snap, context) => {
-        console.log("on create");
+        console.log("Request create detected");
         const requestData = snap.data();
-
-        const ventureId = requestData["ventureId"]
-
+        const ventureId = requestData["ventureId"];
         const ventureSnap = await admin.firestore().collection("ventures").doc(ventureId).get();
-
-        // **Get the creator ID:**
-        const ventureData = ventureSnap.data()
-        const creatorRef = ventureData['creator']
+        const ventureData = ventureSnap.data();
+        const creatorRef = ventureData['creator'];
         const creatorId = creatorRef.id;
 
         if (creatorId) {
-            // Fetch the user document to get the FCM token
+            // Fetch the user document to get the FCM or APNS token and device type
             const userDoc = await admin.firestore().collection("users").doc(creatorId).get();
             const userData = userDoc.data();
 
-            if (userData && userData['fcm_token']) {
-                const payload = {
-                    notification: {
-                        title: "Someone requested to join your Venture!",
-                        body: "Click here to accept or reject ",
-                    },
-                };
+            if (userData) {
 
-                // Send the notification to the device
-                try {
-                    const response = await admin.messaging().send({
-                        token: userData['fcm_token'],
-                        notification: payload.notification,
-                        data: payload.data, // Optional: add data payload if needed
-                    });
+                // Determine the token type and send the notification
+                if (userData["device_type"] === "ios" && userData["apns_token"]) {
+                    try {
+                        console.log("sending message ios")
+                        const response = await admin.messaging().send(
+                            {
+                                token: userData["fcm_token"],
+                                notification: {
+                                    title: "New Notice!",
+                                    body: 'Someone has just requested to join your venture'
+                                },
+                                android: {
+                                    ttl: 86400000,  // 1 day in milliseconds
+                                    notification: {
+                                        clickAction: "OPEN_ACTIVITY_1"
+                                    }
+                                },
+                                aps: {
+                                    alert: {
+                                        title: "this    is    a    title",
+                                        body: "this is body"
+                                    }
+                                },
+                            }
+                        );
 
-                    console.log('Notification sent successfully:', response);
-                } catch (error) {
-                    console.error('Error sending notification:', error);
+                        console.log('APNS notification sent successfully:', response);
+                    } catch (error) {
+                        console.error('Error sending APNS notification:', error);
+                    }
+                } else if (userData["device_type"] === "android" && userData["fcm_token"]) {
+                    try {
+                        const response = await admin.messaging().send(
+                            {
+                                token: userData["fcm_token"],
+                                notification: {
+                                    title: "New Notice!",
+                                    body: 'Someone has just requested to join your venture'
+                                },
+                                android: {
+                                    ttl: 86400000,  // 1 day in milliseconds
+                                    notification: {
+                                        clickAction: "OPEN_ACTIVITY_1"
+                                    }
+                                },
+                                apns: {
+                                    headers: {
+                                        "apns-priority": "5",
+                                    },
+                                    payload: {
+                                        aps: {
+                                            category: "NEW_MESSAGE_CATEGORY"
+                                        }
+                                    }
+                                }
+                            });
+
+                        console.log('FCM notification sent successfully:', response);
+                    } catch (error) {
+                        console.error('Error sending FCM notification:', error);
+                    }
                 }
             }
         }
-
 
         return null;
     });
