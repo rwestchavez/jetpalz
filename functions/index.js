@@ -1,6 +1,12 @@
 const functions = require("firebase-functions");
 const admin = require("firebase-admin");
-admin.initializeApp();
+var serviceAccount = require("./cloud-services.json");
+
+admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount)
+});
+
+
 
 exports.sendNotificationOnRequestChange = functions.firestore
     .document("requests/{requestId}")
@@ -36,10 +42,11 @@ exports.sendNotificationOnRequestChange = functions.firestore
                         try {
                             console.log("sending message ios");
                             const response = await admin.messaging().send({
+
                                 token: userData["fcm_token"],
                                 notification: {
-                                    title: "New Notice!",
-                                    body: message,
+                                    title: "JetPalz",
+                                    body: message
                                 },
                                 android: {
                                     ttl: 86400000,  // 1 day in milliseconds
@@ -48,15 +55,17 @@ exports.sendNotificationOnRequestChange = functions.firestore
                                     }
                                 },
                                 apns: {
-                                    headers: {
-                                        "apns-priority": "5",
-                                    },
                                     payload: {
                                         aps: {
-                                            category: "NEW_MESSAGE_CATEGORY"
+                                            alert: {
+                                                title: "JetPalz",
+                                                body: message
+                                            },
+                                            badge: 1, // Optional: Add badge count if needed
+                                            sound: "default" // Optional: Add sound
                                         }
                                     }
-                                }
+                                },
                             });
 
                             console.log('APNS notification sent successfully:', response);
@@ -66,10 +75,11 @@ exports.sendNotificationOnRequestChange = functions.firestore
                     } else if (userData["device_type"] === "android" && userData["fcm_token"]) {
                         try {
                             const response = await admin.messaging().send({
+
                                 token: userData["fcm_token"],
                                 notification: {
-                                    title: "New Notice!",
-                                    body: message,
+                                    title: "JetPalz",
+                                    body: message
                                 },
                                 android: {
                                     ttl: 86400000,  // 1 day in milliseconds
@@ -78,15 +88,17 @@ exports.sendNotificationOnRequestChange = functions.firestore
                                     }
                                 },
                                 apns: {
-                                    headers: {
-                                        "apns-priority": "5",
-                                    },
                                     payload: {
                                         aps: {
-                                            category: "NEW_MESSAGE_CATEGORY"
+                                            alert: {
+                                                title: "JetPalz",
+                                                body: message
+                                            },
+                                            badge: 1, // Optional: Add badge count if needed
+                                            sound: "default" // Optional: Add sound
                                         }
                                     }
-                                }
+                                },
                             });
 
                             console.log('FCM notification sent successfully:', response);
@@ -119,15 +131,21 @@ exports.sendNotificationOnRequestCreate = functions.firestore
 
             if (userData) {
 
+
+
                 // Determine the token type and send the notification
                 if (userData["device_type"] === "ios" && userData["apns_token"]) {
                     try {
                         console.log("sending message ios")
                         const response = await admin.messaging().send(
+
+
+
                             {
+
                                 token: userData["fcm_token"],
                                 notification: {
-                                    title: "New Notice!",
+                                    title: "JetPalz",
                                     body: 'Someone has just requested to join your venture'
                                 },
                                 android: {
@@ -136,10 +154,16 @@ exports.sendNotificationOnRequestCreate = functions.firestore
                                         clickAction: "OPEN_ACTIVITY_1"
                                     }
                                 },
-                                aps: {
-                                    alert: {
-                                        title: "this    is    a    title",
-                                        body: "this is body"
+                                apns: {
+                                    payload: {
+                                        aps: {
+                                            alert: {
+                                                title: "JetPalz",
+                                                body: 'Someone has just requested to join your venture'
+                                            },
+                                            badge: 1, // Optional: Add badge count if needed
+                                            sound: "default" // Optional: Add sound
+                                        }
                                     }
                                 },
                             }
@@ -147,6 +171,8 @@ exports.sendNotificationOnRequestCreate = functions.firestore
 
                         console.log('APNS notification sent successfully:', response);
                     } catch (error) {
+
+
                         console.error('Error sending APNS notification:', error);
                     }
                 } else if (userData["device_type"] === "android" && userData["fcm_token"]) {
@@ -155,7 +181,7 @@ exports.sendNotificationOnRequestCreate = functions.firestore
                             {
                                 token: userData["fcm_token"],
                                 notification: {
-                                    title: "New Notice!",
+                                    title: "JetPalz",
                                     body: 'Someone has just requested to join your venture'
                                 },
                                 android: {

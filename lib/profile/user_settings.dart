@@ -1,8 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:jet_palz/components/my_appbar.dart';
+import 'package:jet_palz/helpers/launch_url.dart';
 import '../auth/sign_up.dart';
 import '../components/my_snack_bar.dart';
 import '../components/single_line_widget.dart';
@@ -221,6 +223,22 @@ class UserSettings extends StatelessWidget {
               text: 'Contact us ',
               onTap: () {
                 Navigator.pushNamed(context, '/contact');
+              },
+            ),
+            const SizedBox(height: 8),
+            SingleLineWidget(
+              icon: Icons.privacy_tip,
+              text: 'Privacy Policy',
+              onTap: () async {
+                launchURL("https://jetpalz.com/privacy", context);
+              },
+            ),
+            const SizedBox(height: 8),
+            SingleLineWidget(
+              icon: Icons.toc,
+              text: 'Terms and conditions',
+              onTap: () async {
+                launchURL("https://jetpalz.com/toc", context);
               },
             ),
             const SizedBox(height: 8),

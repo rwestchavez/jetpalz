@@ -5,6 +5,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:platform/platform.dart';
 
 Future<void> storeFCMToken() async {
@@ -33,23 +34,25 @@ Future<void> storeFCMToken() async {
         'fcm_token': fcmToken,
         'apns_token': apnsToken
       };
+
       // Store the tokens and device type in Firestore
       await firestore.collection('users').doc(user.uid).update(data);
     }
   }
 }
 
-void handleFCMTokenRefresh() {
-  FirebaseMessaging.instance.onTokenRefresh.listen((newToken) async {
-    User? user = FirebaseAuth.instance.currentUser;
-    if (user != null) {
-      await FirebaseFirestore.instance
-          .collection('users')
-          .doc(user.uid)
-          .update({
-        'fcm_token': newToken,
-        'apns_token': await FirebaseMessaging.instance.getAPNSToken(),
-      });
+void handleFCMTokenRefresh() async {
+  final userId = FirebaseAuth.instance.currentUser!.uid;
+
+  final userRef = FirebaseFirestore.instance.collection("users").doc(userId);
+  final userSnap = userRef.snapshots();
+
+  userSnap.listen((snap) async {
+    final token = await FirebaseMessaging.instance.getToken();
+    if (snap["fcm_token"] != token) {
+      final userRef =
+          FirebaseFirestore.instance.collection("users").doc(userId);
+      userRef.update({"fcm_token": token});
     }
   });
 }
