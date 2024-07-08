@@ -130,6 +130,7 @@ class _SignInWidgetState extends State<SignIn> {
                     const SizedBox(height: 24.0),
                     const Text(
                       'Welcome Back',
+                      textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 32.0,
                         fontWeight: FontWeight.bold,
@@ -190,6 +191,7 @@ class _SignInWidgetState extends State<SignIn> {
                                   AlwaysStoppedAnimation<Color>(Colors.white),
                             )
                           : const Text('Sign in',
+                              textAlign: TextAlign.center,
                               style: TextStyle(fontWeight: FontWeight.bold)),
                     ),
                     Row(
@@ -279,7 +281,10 @@ class _SignInWidgetState extends State<SignIn> {
                               ),
                             ),
                           ),
-                          child: const Text('Sign Up here'),
+                          child: const Text(
+                            'Sign Up here',
+                            textAlign: TextAlign.center,
+                          ),
                         ),
                       ],
                     ),

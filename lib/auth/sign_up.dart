@@ -74,6 +74,8 @@ class _SignUpState extends State<SignUp> {
                               const Align(
                                 alignment: Alignment.center,
                                 child: Text(
+                                                        textAlign: TextAlign.center,
+
                                   'Create an account',
                                   style: TextStyle(
                                     fontSize: 32.0,
@@ -93,6 +95,7 @@ class _SignUpState extends State<SignUp> {
                                   child: Align(
                                     alignment: Alignment.center,
                                     child: Text(
+                                      
                                       'Let\'s get started by filling out the form below.',
                                       textAlign: TextAlign.center,
                                       style: TextStyle(
@@ -154,6 +157,8 @@ class _SignUpState extends State<SignUp> {
                                     }
                                   },
                                   child: const Text('Continue with email',
+                                                        textAlign: TextAlign.center,
+
                                       style: TextStyle(
                                           fontWeight: FontWeight.bold)),
                                 ),

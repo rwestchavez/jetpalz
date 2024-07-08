@@ -115,7 +115,6 @@ class MyApp extends StatelessWidget {
       statusBarColor: Colors.transparent,
       systemNavigationBarColor: Colors.transparent,
     ));
-    User? user = FirebaseAuth.instance.currentUser;
 
     return MaterialApp(
       title: 'JetPalz',

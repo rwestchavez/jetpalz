@@ -135,6 +135,7 @@ class _EmailSignUpWidgetState extends State<EmailSignUp> {
                   children: [
                     const Text(
                       'Enter your password',
+                      textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
@@ -189,6 +190,7 @@ class _EmailSignUpWidgetState extends State<EmailSignUp> {
                                   AlwaysStoppedAnimation<Color>(Colors.white),
                             )
                           : const Text("Create Account",
+                              textAlign: TextAlign.center,
                               style: TextStyle(fontWeight: FontWeight.bold)),
                     ),
                     const SizedBox(height: 16),
