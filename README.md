@@ -1,3 +1,3 @@
-# Jetpalz
+# Jetpalz - mobile app
 
-The JetPalz app 
+Old project (Not released on appstore or google play. Available as a download)
